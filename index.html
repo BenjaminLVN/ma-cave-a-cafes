@@ -360,7 +360,7 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
     </header>
     <div class="scan-hero ed">
       <button class="btn primary" id="b-scan" type="button">Scanner un café</button>
-      <button class="btn small" id="b-web" type="button">🔗 Coller la page web du café</button>
+      <button class="btn small" id="b-web" type="button">🔗 Lien de la page web du café</button>
       <div class="hint">Prenez une photo ou choisissez-en dans la galerie (face, dos, étiquette) : l'appli lit le sachet et pré-remplit la fiche.</div>
       <label class="check old-mode"><input type="checkbox" id="old-mode"> Anciens sachets (achetés avant novembre 2026) : cochez pour que les fiches que vous ajoutez soient datées « avant novembre 2026 »</label>
     </div>
@@ -498,6 +498,7 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
         <div class="field"><label for="l-adresse">Adresse</label><input id="l-adresse" type="text"></div>
         <div class="field full"><label for="l-site">Site web</label><input id="l-site" type="url" inputmode="url" placeholder="https://"></div>
       </div>
+      <div class="place-btn ed"><button class="btn small" id="l-find" type="button">📍 Chercher le lieu sur la carte (adresse et point)</button></div>
     </div>
     <div class="block">
       <div class="block-head"><h2>Rôles</h2><span class="hint">Un lieu peut en cumuler plusieurs</span></div>
@@ -512,7 +513,7 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
     <div class="block">
       <div class="block-head"><h2>Position</h2></div>
       <div class="hint" id="l-pos"></div>
-      <div class="row-btns" style="margin:10px 0"><button class="btn small ed" id="l-geo" type="button">Trouver la position</button><a class="btn small ghost" id="l-gmaps" target="_blank" rel="noopener" href="#">Ouvrir dans Google Maps</a><a class="btn small ghost" id="l-site-a" target="_blank" rel="noopener" href="#" hidden>Site web</a></div>
+      <div class="row-btns" style="margin:10px 0"><button class="btn small ed" id="l-geo" type="button">📍 Chercher le lieu et son adresse</button><a class="btn small ghost" id="l-gmaps" target="_blank" rel="noopener" href="#">Ouvrir dans Google Maps</a><a class="btn small ghost" id="l-site-a" target="_blank" rel="noopener" href="#" hidden>Site web</a></div>
       <div class="field ed"><label for="l-link">Ou collez un lien Google Maps</label><input id="l-link" type="url" inputmode="url" placeholder="https://www.google.com/maps/place/…"></div>
     </div>
     <div class="block">
@@ -576,11 +577,11 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
         <button class="btn small" id="b-read" type="button">Lire les photos avec Claude</button>
         <button class="btn small" id="b-ocr" type="button">Lire le sachet (sur le téléphone)</button>
         <button class="btn small" id="b-crop" type="button">🔍 Relire une zone</button>
-        <button class="btn small ghost" id="b-paste" type="button">Coller le texte du sachet</button>
+        <button class="btn small ghost" id="b-paste" type="button">🔗 Lien de la page web ou texte du sachet</button>
       </div>
       <div class="paste-box" id="paste-box" hidden>
         <div class="hint">Astuce iPhone : ouvrez la photo du sachet dans Photos, touchez l'icône de texte en bas à droite, puis « Tout sélectionner » et « Copier ». Collez ici :</div>
-        <textarea id="paste-txt" placeholder="Texte du sachet (origine, variété, procédé, notes…)"></textarea>
+        <textarea id="paste-txt" placeholder="Collez le lien de la page du café (https://…) ou le texte du sachet (origine, variété, procédé, notes…)"></textarea>
         <div class="row" style="display:flex;gap:8px"><button class="btn small primary" id="b-paste-go" type="button">Ranger dans la fiche</button><button class="btn small ghost" id="b-paste-x" type="button">Fermer</button></div>
       </div>
       <div class="reading" id="reading" hidden><span class="spin"></span><span id="reading-txt">Claude lit le sachet…</span><button class="btn small ghost" id="b-stop" type="button">Arrêter</button></div>
@@ -2002,7 +2003,20 @@ $("l-link").addEventListener("input", () => {
   if (p){ curLieu.lat = p.lat; curLieu.lon = p.lon; renderLieuPos(); toast("Position récupérée depuis le lien."); }
   else if (/goo\.gl|maps\.app/.test(v)) toast("Les liens courts ne contiennent pas la position. Ouvrez-le, puis copiez l'adresse complète de la page Google Maps.");
 });
-$("l-geo").onclick = async () => {
+$("l-geo").onclick = () => {
+  const q = [$("l-nom").value, $("l-ville").value].map(x => x.trim()).filter(Boolean).join(" ");
+  openPick("lieu", q, null, r => {
+    if (r.nom && !$("l-nom").value.trim()) $("l-nom").value = r.nom;
+    if (r.adresse) $("l-adresse").value = r.adresse;
+    if (r.ville) $("l-ville").value = r.ville;
+    if (r.pays) $("l-pays").value = r.pays;
+    if (r.site && !$("l-site").value) $("l-site").value = r.site;
+    curLieu.lat = r.lat; curLieu.lon = r.lon;
+    renderLieuPos(); toast("Adresse et point sur la carte trouvés. Pensez à enregistrer le lieu.");
+  });
+};
+$("l-find").onclick = () => $("l-geo").click();
+const lGeoMapbox = async () => {
   const q = [$("l-nom").value, $("l-adresse").value, $("l-ville").value, $("l-pays").value].map(s => s.trim()).filter(Boolean).join(", ");
   if (!$("l-ville").value.trim()){ toast("Indiquez au moins la ville."); return; }
   const m = await getMcp(); if (!m){ toast("La recherche de position n'est pas disponible ici."); return; }
@@ -2371,12 +2385,23 @@ function localNear(q){
   const t = findTown(q);
   const hits = nameHits(q);
   if (hits.length && (!t || fold(t[0]) !== fold(q).trim())){ showNameHits(q, hits); return; }
-  if (!t){ nearResults = []; renderNear(); note.hidden = false; note.textContent = "Aucun lieu ni ville de ce nom dans l'application. Le bouton « " + q + " » sur Google Maps ci-dessus le cherche par son nom, et les autres boutons cherchent le café de spécialité autour."; return; }
+  if (!t){
+    note.hidden = false; note.textContent = "Recherche de « " + q + " » sur la carte…";
+    placeSearch(q, nearHome()).then(res => {
+      nearResults = res; renderNear(null);
+      if (res.length){ note.hidden = true; $("near-tools").hidden = false; $("near-home").textContent = "Lieux trouvés pour « " + q + " » (carte OpenStreetMap) : touchez un numéro, puis « ★ À tester » pour l'ajouter à vos lieux."; }
+      else note.textContent = "Aucun lieu de ce nom trouvé. Le bouton « " + q + " » sur Google Maps ci-dessus le cherche par son nom.";
+    }).catch(() => { nearResults = []; renderNear(); note.textContent = "Aucun lieu ni ville de ce nom dans l'application, et la recherche en ligne n'a pas répondu. Le bouton Google Maps ci-dessus le cherche par son nom."; });
+    return; }
   const home = {lat:t[1], lon:t[2], label:t[0]}; setHome(home); drawPins();
   nearResults = dirNear(home, 40000).sort((a,b) => a.dist - b.dist);
   if (!nearResults.length){ renderNear(home); note.hidden = false; note.textContent = "Pas encore d'adresse de café de spécialité vérifiée à moins de 40 km de " + t[0] + " dans la sélection. Les liens Google Maps ci-dessus cherchent « " + specTerm(t[3]) + " » sur place."; return; }
   note.hidden = true; $("near-home").textContent = "Autour de : " + t[0] + " · sélection café de spécialité de l'application";
   renderNear(home);
+  if (fold(q).replace(/[^a-z0-9]+/g, " ").trim() !== fold(t[0]).replace(/[^a-z0-9]+/g, " ").trim()){
+    placeSearch(q, home).then(res => { const extra = res.filter(m => !nearResults.some(o => fold(o.nom) === fold(m.nom))).slice(0, 10); if (!extra.length) return;
+      nearResults = extra.concat(nearResults); renderNear(home); $("near-home").textContent = "« " + q + " » : lieux trouvés sur la carte en tête de liste, puis la sélection café de spécialité autour de " + t[0] + "."; }).catch(() => {});
+  }
 }
 function isSaved(r){ return lieux.find(l => (r.id && l.mapboxId === r.id) || (fold(l.nom) === fold(r.nom) && fold(l.ville) === fold(r.ville))); }
 function nearItemEl(r, i, inPop){
@@ -2430,7 +2455,7 @@ async function renderNear(home, keepMap){
 /* ---------- Navigation ---------- */
 /* ---------- Sélecteur de lieu (lieu d'achat, lieu de dégustation) ---------- */
 var pickCtx = null;
-const PICK_T = {achat:"Lieu d'achat", degustation:"Lieu de dégustation"};
+const PICK_T = {achat:"Lieu d'achat", degustation:"Lieu de dégustation", lieu:"Trouver le lieu et son adresse"};
 function lieuByName(v){ const n = fold(v || "").trim(); return n ? lieux.find(l => fold(l.nom) === n) : null; }
 function placeBtn(kind, inp, set){
   const w = document.createElement("div"); w.className = "place-btn";
@@ -2443,8 +2468,8 @@ function placeBtn(kind, inp, set){
   w.append(b, h); return w;
 }
 let pickHome = null;
-async function openPick(kind, val, done){
-  pickCtx = {kind, done, val:(val||"").trim()};
+async function openPick(kind, val, done, fill){
+  pickCtx = {kind, done, fill, val:(val||"").trim()};
   $("pick-t").textContent = PICK_T[kind];
   pickHome = [$("world"), $("world-cap")].map(e => { const m = document.createComment("map"); e.parentNode.insertBefore(m, e); return [e, m]; });
   $("pick-slot").append($("world"), $("world-cap"));
@@ -2464,7 +2489,24 @@ function closePick(){
 $("pick-x").onclick = closePick;
 $("pick-form").addEventListener("submit", e => { e.preventDefault(); stopPlacing(); pickSearch($("pick-q").value.trim()); });
 function lieuItem(l){ return {id:"lieu_" + l.id, lieuId:l.id, nom:l.nom, adresse:[l.adresse, l.ville].filter(Boolean).join(", "), ville:l.ville || "", pays:l.pays || "", lat:l.lat, lon:l.lon, site:l.site || "", spec:true, mine:true, genre:"dans vos lieux", dist:null}; }
-function pickSearch(q){
+/* Base mondiale de lieux et d'adresses (OpenStreetMap, via Photon) : gratuite, sans clé */
+function osmKind(p){ const v = p.osm_value || "", k = p.osm_key || "";
+  return ({cafe:"café", coffee:"boutique de café", restaurant:"restaurant", bakery:"boulangerie", deli:"épicerie fine", tea:"salon de thé", bar:"bar", supermarket:"supermarché", convenience:"épicerie"})[v] || (k === "place" ? "ville ou quartier" : k === "highway" ? "rue" : k === "building" || k === "addr" ? "adresse" : v.replace(/_/g, " ")); }
+async function placeSearch(q, bias){
+  const u = new URL("https://photon.komoot.io/api/"); u.searchParams.set("q", q); u.searchParams.set("limit", "15"); u.searchParams.set("lang", "fr");
+  if (bias && isFinite(bias.lat)){ u.searchParams.set("lat", (+bias.lat).toFixed(4)); u.searchParams.set("lon", (+bias.lon).toFixed(4)); }
+  const r = await fetch(u.toString()); if (!r.ok) throw new Error("photon " + r.status);
+  const j = await r.json();
+  return (j.features || []).map(f => { const p = f.properties || {}, c = (f.geometry || {}).coordinates || [];
+    const ville = p.city || p.town || p.village || p.municipality || p.county || "";
+    const ad = [[p.housenumber, p.street].filter(Boolean).join(" "), [p.postcode, ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+    const it = {id:"osm_" + (p.osm_type || "") + (p.osm_id || ""), nom:p.name || ad || ville, adresse:ad || [ville, p.country].filter(Boolean).join(", "), ville, pays:p.country || "", lat:c[1], lon:c[0], site:"", spec:true, genre:osmKind(p), src:"Trouvé sur la carte OpenStreetMap"};
+    if (bias && isFinite(bias.lat)) it.dist = haversine(bias, it);
+    return it; }).filter(x => x.nom && isFinite(x.lat));
+}
+let pickTok = 0;
+async function pickSearch(q){
+  const tok = ++pickTok;
   $("pick-gm").href = "https://www.google.com/maps/search/" + encodeURIComponent(q || "café de spécialité");
   const out = [], seen = new Set();
   const add = r => { const k = fold(r.nom) + "|" + fold(r.ville); if (r.lat == null || seen.has(k)) return; seen.add(k); out.push(r); };
@@ -2483,11 +2525,24 @@ function pickSearch(q){
   if (!out.length && home) setTimeout(() => zoomToPoints([home], 400), 60);
   const ex = q && out.find(r => fold(r.nom) === fold(q));
   if (ex) setTimeout(() => selectResult(out.indexOf(ex), false), 750);
+  if (q){
+    $("pick-hint").textContent = "Recherche du lieu et de son adresse…";
+    const mb = mapBounds(); const bias = home || (mb && world && world.k > 3 ? {lat:mb.c.lat, lon:mb.c.lon} : nearHome());
+    try {
+      const more = await placeSearch(q, bias); if (tok !== pickTok || !pickCtx) return;
+      const near = (a, b) => a.lat != null && b.lat != null && haversine(a, b) < 120;
+      more.forEach(m => { if (!out.some(o => (fold(o.nom) === fold(m.nom) && (near(o, m) || fold(o.ville) === fold(m.ville))))) out.push(m); });
+      nearResults = out; selResult = -1; renderNear(home);
+      const ex2 = out.findIndex(r => fold(r.nom) === fold(q)) ; if (out.length === 1 || ex2 >= 0) setTimeout(() => selectResult(Math.max(0, ex2), false), 750);
+    } catch (e) { if (tok !== pickTok) return; }
+  }
+  if (tok !== pickTok) return;
   $("pick-hint").textContent = out.length
     ? "Touchez un numéro sur la carte ou dans la liste, puis « Choisir ce lieu ». Le point est ajouté à « Ma carte » et relié à cette fiche. Vous pouvez aussi zoomer puis « Rechercher dans cette zone »."
     : (q ? "« " + q + " » n'est pas encore dans l'application. Zoomez sur l'endroit puis touchez « Placer le point moi-même », ou cherchez une ville." : "Cherchez une boutique ou une ville, ou zoomez sur la carte.");
 }
 async function pickChoose(r, saved){
+  if (pickCtx && pickCtx.fill){ const fill = pickCtx.fill, src = saved ? Object.assign({}, saved) : r; closePick(); fill(src); return; }
   if (!db){ toast("Sauvegarde indisponible ici."); return; }
   const kind = pickCtx.kind, now = new Date().toISOString();
   let l = saved;
@@ -3362,9 +3417,67 @@ $("b-crop").onclick = () => openCrop();
 $("b-web").onclick = () => {
   pickTarget = "new"; openForm(null);
   $("paste-box").hidden = false; $("paste-txt").value = "";
-  $("paste-txt").placeholder = "Sur le site du torréfacteur, sélectionnez tout le texte de la page du café (ou son lien), copiez, puis collez ici.";
+  $("paste-txt").placeholder = "Collez ici le lien de la page du café (https://…). L'appli va lire la page et remplir la fiche.";
   $("paste-box").scrollIntoView({block:"center"}); setTimeout(() => $("paste-txt").focus(), 50);
 };
+/* Lecture d'une page web à partir de son lien : la page est récupérée via un relais (les sites bloquent la lecture directe), puis rangée dans la fiche */
+const RELAYS = [u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u), u => "https://corsproxy.io/?url=" + encodeURIComponent(u), u => "https://r.jina.ai/" + u];
+async function viaRelay(u, blob){
+  for (const mk of RELAYS){
+    if (blob && /r\.jina/.test(mk("x"))) continue;
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 20000);
+    try { const r = await fetch(mk(u), {signal:ctl.signal}); if (r.ok){ const v = blob ? await r.blob() : await r.text(); if (blob ? v.size > 1000 : v.length > 200) return v; } } catch {} finally { clearTimeout(tm); }
+  }
+  throw new Error("relay");
+}
+function pageText(src, url){
+  if (!/<html|<body|<div|<meta/i.test(src)){ // texte déjà propre (relais « lecteur »)
+    const t = (src.match(/^Title:\s*(.+)$/m) || [])[1] || ""; const body = src.replace(/^[\s\S]*?Markdown Content:\s*/, "").replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_>|]+/g, " ");
+    return {title:t, brand:"", image:"", text:body};
+  }
+  const d = new DOMParser().parseFromString(src, "text/html");
+  const meta = n => { const m = d.querySelector(`meta[property="${n}"],meta[name="${n}"]`); return m ? (m.getAttribute("content") || "") : ""; };
+  const ld = []; d.querySelectorAll('script[type="application/ld+json"]').forEach(sc => { try { const j = JSON.parse(sc.textContent); const walk = x => { if (!x) return; if (Array.isArray(x)) return x.forEach(walk); if (x["@graph"]) walk(x["@graph"]); if (/Product/i.test(String(x["@type"]))) ld.push(x); }; walk(j); } catch {} });
+  const P = ld[0] || {};
+  const title = P.name || meta("og:title") || (d.querySelector("h1") || {}).textContent || d.title || "";
+  const brand = (P.brand && (P.brand.name || (typeof P.brand === "string" ? P.brand : ""))) || meta("og:site_name") || "";
+  let image = Array.isArray(P.image) ? P.image[0] : (P.image && P.image.url) || P.image || meta("og:image") || "";
+  if (image && typeof image === "string") { try { image = new URL(image, url).href; } catch {} } else image = "";
+  const desc = [P.description || "", meta("og:description") || meta("description")].filter(Boolean).join("\n");
+  d.querySelectorAll("script,style,noscript,svg,nav,header,footer,form,iframe,button,select,aside,[role=navigation],.cart,.header,.footer,.menu,.related,.recommendations").forEach(e => e.remove());
+  const main = d.querySelector('[itemtype*="Product"], main, article, #product, .product, #MainContent') || d.body;
+  if (!main) return {title, brand, image, text:desc};
+  main.querySelectorAll("h1,h2,h3,h4,h5,p,li,dt,dd,tr,div,section,br").forEach(e => e.after(d.createTextNode("\n")));
+  let body = main.textContent.replace(/[ \t\u00a0]+/g, " ").replace(/\n\s*\n+/g, "\n").trim();
+  const cut = body.search(/(vous aimerez aussi|produits similaires|you may also like|related products|avis clients|customer reviews|découvrez aussi|nos autres cafés)/i); if (cut > 200) body = body.slice(0, cut);
+  return {title, brand, image, text:(desc + "\n" + body).slice(0, 15000)};
+}
+async function readWebPage(url){
+  const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Lecture de la page web du café…";
+  try {
+    const src = await viaRelay(url);
+    if (cur !== f) return;
+    const pg = pageText(src, url);
+    const parts = String(pg.title).split(/\s+[|–—-]\s+|\s*[|]\s*/).map(x => x.trim()).filter(Boolean);
+    const full = [parts.join("\n"), pg.brand ? "Torréfié par : " + pg.brand : "", pg.text].filter(Boolean).join("\n\n");
+    $("paste-txt").value = full.slice(0, 6000);
+    let data = null;
+    if (sample){ try { $("reading-txt").textContent = "Claude range les informations…"; data = await sample.json(webPrompt(full)); } catch {} }
+    if (!data) data = SX.parse(full, {bigLines:parts.slice(0, 3), knownRoasters:knownRoasters().concat(pg.brand ? [pg.brand] : [])});
+    if (pg.brand && !data.torrefacteur && !/^(shop|boutique|accueil|home)$/i.test(pg.brand)) data.torrefacteur = pg.brand;
+    if (!data.nom && parts[0] && parts[0].length < 50) data.nom = parts[0];
+    if (cur !== f) return;
+    applyFields(data, "depuis la page web");
+    if (!cur.produit.texteSachet) { cur.produit.texteSachet = "Source : " + url; const ts = $("f_texteSachet"); if (ts) ts.value = cur.produit.texteSachet; }
+    $("paste-box").hidden = true;
+    if (pg.image && !pending.length && !(cur.photos || []).length){
+      try { const b = await viaRelay(pg.image, true); if (/^image\//.test(b.type) || b.size > 5000){ const sm = await downscale(new File([b], "page.jpg", {type:b.type || "image/jpeg"})); pending.push({key:uid(), blob:sm, url:URL.createObjectURL(sm), orig:sm}); renderPhotos(); } } catch {}
+    }
+  } catch (e) {
+    $("paste-box").hidden = false;
+    toast("La page n'a pas pu être lue (site protégé ou pas de réseau). Ouvrez-la, sélectionnez tout son texte, copiez-le et collez-le ici.");
+  } finally { $("reading").hidden = true; }
+}
 function webPrompt(t){
   return readPrompt(1).replace(/Tu lis 1 photo\(s\) d'un même sachet de café \(face, dos, étiquette, tampon\)\. Déchiffre tout le texte visible, y compris petits caractères, tampons, écriture manuscrite et texte en anglais, espagnol ou autre langue\./, "Tu lis le texte copié depuis la page web d'un café (site d'un torréfacteur ou d'une boutique). Ignore menus, panier, livraison, avis clients et autres cafés proposés : garde uniquement ce qui décrit CE café.")
     + "\n\nTexte de la page :\n<<<\n" + t.slice(0, 20000) + "\n>>>";
@@ -3372,7 +3485,8 @@ function webPrompt(t){
 $("b-paste").onclick = () => { $("paste-box").hidden = !$("paste-box").hidden; if (!$("paste-box").hidden) $("paste-txt").focus(); };
 $("b-paste-x").onclick = () => { $("paste-box").hidden = true; };
 $("b-paste-go").onclick = async () => { const t = $("paste-txt").value; if (!t.trim()){ toast("Collez d'abord le texte du sachet."); return; }
-  if (/^\s*https?:\/\/\S+\s*$/.test(t)){ toast("L'appli ne peut pas ouvrir les sites. Ouvrez la page, sélectionnez tout son texte, copiez-le et collez-le ici."); return; }
+  const um = t.trim().match(/^https?:\/\/\S+$/) || (t.trim().length < 400 && t.match(/https?:\/\/[^\s"'<>]+/));
+  if (um){ await readWebPage(um[0]); return; }
   if (sample && t.trim().length > 60){
     const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Claude range les informations…";
     try { const data = await sample.json(webPrompt(t)); if (cur === f){ applyFields(data, "par Claude depuis le texte collé"); $("paste-box").hidden = true; } return; }
