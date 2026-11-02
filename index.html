@@ -943,6 +943,10 @@ async function boot(){
   if (window.CAVE_CFG && window.CAVE_CFG.url){
     remote = remoteStore(window.CAVE_CFG, caveKey());
     db = remote.db; assets = remote.assets; localMode = false;
+    showStoreNote('<strong>Enregistrement automatique en ligne.</strong> Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">🔗 Copier le lien de ma cave</button>');
+    setTimeout(() => { const bt = document.getElementById("b-share-link"); if (bt) bt.onclick = async () => { const u = location.origin + location.pathname + "?k=" + encodeURIComponent(caveKey());
+      try { if (navigator.share){ await navigator.share({title:"Ma cave à cafés", url:u}); return; } } catch (e) { if (e && e.name === "AbortError") return; }
+      try { await navigator.clipboard.writeText(u); toast("Lien copié. Gardez-le pour vous : il donne accès à votre cave."); } catch { prompt("Copiez ce lien :", u); } }; }, 0);
     migrateLocal();
   } else
   if (c && c.use){
