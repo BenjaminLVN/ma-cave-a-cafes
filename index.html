@@ -856,8 +856,10 @@ function remoteStore(cfg, key){
     else { const r = await api(`items?cave=eq.${enc(key)}&coll=eq.${enc(op.n)}&id=eq.${enc(op.id)}`, {method:"DELETE"}); if (!r.ok) throw {code:"http_" + r.status, status:r.status}; }
   }
   let flushing = false;
-  async function flush(){ if (flushing) return; flushing = true; try { while (outbox.length){ try { await send(outbox[0]); outbox.shift(); saveOut(); } catch (e) { if (e && e.status >= 400 && e.status < 500){ outbox.shift(); saveOut(); } else break; } } } finally { flushing = false; syncNote(); } }
-  function syncNote(){ const b = document.getElementById("sync-band"); if (b) b.hidden = !outbox.length; }
+  let lastErr = "";
+  async function flush(){ if (flushing) return; flushing = true; try { while (outbox.length){ try { await send(outbox[0]); outbox.shift(); saveOut(); lastErr = ""; } catch (e) { lastErr = (e && e.status) ? "refusé par le serveur (" + e.status + ")" : ""; break; } } } finally { flushing = false; syncNote(); } }
+  function syncNote(){ const b = document.getElementById("sync-band"); if (!b) return; b.hidden = !outbox.length;
+    b.innerHTML = lastErr ? "<strong>Enregistrement en ligne " + lastErr + ".</strong> Vos modifications sont gardées sur le téléphone ; signalez-le pour que je corrige." : "<strong>Hors ligne.</strong> Vos dernières modifications sont gardées sur le téléphone et seront envoyées dès le retour du réseau."; }
   async function pull(n){
     const r = await api(`items?select=id,data&cave=eq.${enc(key)}&coll=eq.${enc(n)}`); if (!r.ok) throw {code:"http_" + r.status};
     const rows = await r.json(); const o = {}; rows.forEach(x => o[x.id] = x.data);
@@ -874,7 +876,7 @@ function remoteStore(cfg, key){
       (subs[n] = subs[n] || []).push(next);
       try { if (!cache[n]) cache[n] = JSON.parse(localStorage.getItem(ck(n)) || "null"); } catch {}
       if (cache[n]) setTimeout(() => emit(n), 0);
-      pull(n).catch(e => { if (!cache[n]){ cache[n] = {}; emit(n); } });
+      pull(n).catch(e => { if (e && /^http_/.test(e.code)){ lastErr = "impossible (" + e.code.slice(5) + ")"; const b = document.getElementById("sync-band"); if (b){ b.hidden = false; b.innerHTML = "<strong>Lecture en ligne " + lastErr + ".</strong> Signalez-le pour que je corrige."; } } if (!cache[n]){ cache[n] = {}; emit(n); } });
       flush();
       return () => {};
     },
