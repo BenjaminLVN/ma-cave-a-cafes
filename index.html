@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Ma cave">
-<meta name="theme-color" content="#c13bff">
+<meta name="theme-color" content="#f8f3ed">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
 <script src="config.js"></script>
@@ -261,6 +261,15 @@ body.ro .ed, body.ro .ph .x{display:none!important}
 .schema-box.narrow{max-width:520px}
 .schema{width:100%;height:auto;display:block;min-width:260px}
 .schema.wide{min-width:520px}
+.timeline{list-style:none;margin:10px 0 12px;padding:0 0 0 14px;border-left:2px solid var(--line);display:grid;gap:8px}
+.tl-item{position:relative}.tl-item::before{content:"";position:absolute;left:-21px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--muted)}
+.tl-item.now::before{background:var(--grad);border-color:transparent}
+.tl-item summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;padding:8px 10px;border-radius:14px;background:var(--sunk)}
+.tl-item summary::-webkit-details-marker{display:none}
+.tl-t{display:grid;min-width:0}.tl-t .hint{font-size:.82rem}
+.tl-body{padding:8px 10px 2px;display:grid;gap:4px}.tl-body p{margin:0;font-size:.92rem}
+.hist-chart{margin:6px 0}
+.link-list{display:grid;gap:10px;margin-top:10px}.link-row{display:grid;gap:6px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg)}.link-t{display:grid}.link-t .hint{font-size:.8rem}.link-prop{overflow-wrap:anywhere}
 .schema.grind-v{display:none;max-width:320px;margin:0 auto}
 @media (max-width:640px){.schema.grind-h{display:none}.schema.grind-v{display:block}}
 .schema .lbl{fill:var(--ink);font-size:12px;font-family:var(--f-body)}
@@ -355,6 +364,30 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
 .badge{display:inline-block;font-size:.75rem;font-weight:600;color:var(--accent);margin-right:8px}
 .badge.ok{color:var(--bean)}
 .tl-date{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+/* Univers « Crème et prune » choisi le 3 novembre 2026 : fond crème, prune profond, formes arrondies, toujours clair */
+:root,:root[data-theme]{color-scheme:light!important;--bg:#f8f3ed!important;--surface:#ffffff!important;--sunk:#f2ebe3!important;--line:#ebe2d7!important;--ink:#2a1f2f!important;--muted:#7a6d74!important;--accent:#a3367f!important;--accent-ink:#ffffff!important;--accent-soft:#f9e4f0!important;--grad:linear-gradient(120deg,#d1478f 0%,#a13fae 50%,#6f4fd6 100%)!important;--glow:0 8px 20px -10px rgba(161,63,174,.55)!important;--coffee:#8b5a3c!important;--sea:#efe8de!important;--land:#e2d7c8!important;--bean:#3f5a3a!important;--ai:#fff2bf!important;--ai-line:#d9b23a!important;--danger:#b42318!important;--water:#2f6f9f!important;--paper:#fbf8f1!important;--bean-green:#9fb27a!important;--r:18px!important}
+.card{border:none!important;border-radius:20px!important;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,30,60,.22)!important}
+.card .thumb{border-radius:14px!important}
+.scan-hero{border:none!important;background:var(--surface)!important;border-radius:24px!important;box-shadow:0 1px 2px rgba(43,34,48,.05),0 12px 32px -16px rgba(60,30,60,.25)!important}
+.btn{border-radius:16px!important}.btn.primary{box-shadow:var(--glow)!important}
+body{background:radial-gradient(120% 60% at 100% 0%,rgba(209,71,143,.10),transparent 60%),radial-gradient(100% 50% at 0% 0%,rgba(111,79,214,.08),transparent 60%),var(--bg)!important;background-attachment:fixed!important}
+.tabs{background:rgba(248,243,237,.85)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+body::before{background:rgba(248,243,237,.85)!important}
+.note-pill:not(.none){background:var(--accent-soft)!important;color:var(--accent)!important}
+.top h1::after{width:56px!important}
+.notice{border:none!important;background:var(--sunk)!important;border-radius:18px!important}
+.tabs{gap:2px!important}
+.tabs a{border:none!important;background:transparent!important;color:var(--muted)!important;box-shadow:none!important}
+.tabs a[aria-current="page"]{background:var(--surface)!important;color:var(--ink)!important;box-shadow:0 4px 14px -8px rgba(60,30,60,.35)!important}
+.tabs a[aria-current="page"]::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--grad);margin-left:8px}
+.top h1{background:none!important;color:var(--ink)!important;-webkit-text-fill-color:var(--ink)!important;letter-spacing:-.02em}
+.top h1::after{content:"";display:block;width:44px;height:4px;border-radius:4px;background:var(--grad);margin-top:8px}
+.note-pill{border-radius:999px!important}
+.seg button{border-radius:14px!important}
+.panel{border:none!important;border-radius:22px!important;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,30,60,.22)!important}
+.schema-box{border:none!important;border-radius:16px!important}
+input.search,select{border-radius:14px!important}
+.link-row{border:none!important;background:var(--sunk)!important;border-radius:16px!important}
 </style>
 
 <div class="wrap">
@@ -438,7 +471,7 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
     </div>
     <div class="section-label">Historique des fiches</div>
     <div class="list" id="g-list"></div>
-    <div style="margin-top:14px" class="ed"><button class="btn" id="b-gnew" type="button">Nouvelle fiche pour ce café</button></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" class="ed"><button class="btn primary" id="b-gnew" type="button">🔁 J'ai racheté ce café</button><button class="btn" id="b-gmerge" type="button" hidden>Réunir en une seule fiche</button></div>
   </section>
 
   <section id="v-dash" hidden>
@@ -488,6 +521,7 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
       <div class="list" id="near-list"></div>
     </div>
+    <div class="panel" id="link-panel" hidden></div>
     <div class="panel">
       <h2>Mes lieux</h2>
       <div class="legend"><span>🔥 Torréfaction</span><span>🛒 Achat</span><span>☕ Dégustation</span><span>💙 Coup de cœur</span></div>
@@ -615,7 +649,12 @@ button.near-num{border:0;cursor:pointer;font:inherit;font-weight:700}
       <div id="methods"></div>
     </div>
 
-    <div class="block">
+    <div class="block hist-block" id="f-hist-block" hidden>
+      <div class="block-head"><span class="block-num">🔁</span><h2>Mes achats de ce café</h2></div>
+      <div id="f-hist"></div>
+    </div>
+
+    <div class="block" id="f-degust-block">
       <div class="block-head"><span class="block-num">3</span><h2>Infos dégustation</h2></div>
       <div class="grid" id="g-degust"></div>
     </div>
@@ -753,8 +792,22 @@ function normalize(d, id){
   f.noteGlobale = parseNote(o.noteGlobale !== undefined ? o.noteGlobale : dg.note);
   f.lieux = Object.assign({}, o.lieux || {});
   f.createdAt = o.createdAt || ""; f.updatedAt = o.updatedAt || "";
+  f.achats = Array.isArray(o.achats) ? o.achats.filter(a => a && typeof a === "object") : [];
   return f;
 }
+/* Achats successifs d'un même café : une seule fiche, chaque achat garde sa date, son lieu, sa dégustation et ses notes */
+const ACHAT_PROD = ["dateTorrefaction","dateAchat","anterieur","anneeAchat","boutique","prix","poids","notesAromatiques","gout","profil","longueur"];
+function snapshotOf(f){
+  const o = JSON.parse(JSON.stringify({produit:{}, degustation:f.degustation, noteGlobale:f.noteGlobale, extractions:f.extractions}));
+  ACHAT_PROD.forEach(k => { if (f.produit[k] !== undefined && f.produit[k] !== "") o.produit[k] = JSON.parse(JSON.stringify(f.produit[k])); });
+  o.at = new Date().toISOString(); return o;
+}
+// Chaque achat vu comme une fiche complète (pour les notes, dates et courbes)
+function versionsOf(f){
+  const past = (f.achats || []).map((a, i) => { const v = normalize(Object.assign({}, JSON.parse(JSON.stringify(f)), {produit:Object.assign({}, f.produit, a.produit || {}), degustation:a.degustation || {}, noteGlobale:a.noteGlobale, extractions:a.extractions || {}, achats:[]}), f.id); v.achatIdx = i; return v; });
+  return past.concat([f]);
+}
+const nbAchats = f => (f.achats || []).length + 1;
 
 /* ---------- Capacités ---------- */
 let db = null, assets = null, sample = null, sampleCaps = null;
@@ -1075,7 +1128,7 @@ async function boot(){
     fiches = snap.docs.map(x => normalize(x.data(), x.id)); setTimeout(backupState, 0);
     if (remote){ const ids = [...new Set(fiches.flatMap(f => f.photos.map(p => p.id)).filter(id => id.startsWith("sb_") && !localUrls.has(id)))]; if (ids.length) remote.assets.ensure(ids).then(n => { if (n){ renderList(); if (cur && !$("v-form").hidden) renderPhotos(); } }); }
     if (!snap.metadata.fromCache){ loaded = true; clearTimeout(timer); if ($("store-note").textContent.startsWith("Vos fiches")) showStoreNote(""); }
-    renderList();
+    renderList(); if (curView === "lieux") renderLinkPanel();
   }, err => { clearTimeout(timer); showStoreNote("<strong>Lecture des fiches impossible.</strong> Rechargez la page plus tard. (" + (err && err.code || "erreur") + ")"); });
 }
 
@@ -1178,7 +1231,7 @@ function groupsOf(list){
   list.forEach(f => { const k = groupKey(f); if (!m.has(k)) m.set(k, []); m.get(k).push(f); });
   return [...m.entries()].map(([k, fs]) => {
     fs.sort((a,b) => ficheDate(a).localeCompare(ficheDate(b)));
-    const last = fs[fs.length-1]; const rs = fs.map(ratingOf).filter(r => r !== null);
+    const last = fs[fs.length-1]; const rs = fs.flatMap(versionsOf).map(ratingOf).filter(r => r !== null);
     return {k, fiches:fs, rep:last, note: rs.length ? Math.round(avg(rs)*10)/10 : null};
   });
 }
@@ -1196,7 +1249,7 @@ function ficheCard(f, line3){
   const brand = (f.produit.torrefacteur || "").trim();
   const n = document.createElement("div"); n.className="name"; n.textContent = (fav ? "💚 " : "") + (brand || f.produit.nom || "Café sans nom");
   const l2 = document.createElement("div"); l2.className="line2"; l2.textContent = (brand ? [f.produit.nom, f.produit.pays] : [f.produit.pays]).filter(Boolean).join(" · ") || (brand ? "Café et pays à compléter" : "Torréfacteur et pays à compléter");
-  const l3 = document.createElement("div"); l3.className="line2"; l3.textContent = line3 !== undefined ? line3 : achatLabel(f);
+  const l3 = document.createElement("div"); l3.className="line2"; l3.textContent = line3 !== undefined ? line3 : ((f.achats || []).length ? `${nbAchats(f)} achats · ` : "") + achatLabel(f);
   meta.append(n, l2, l3);
   b.append(thumbEl(f), meta, pillEl(ratingOf(f)));
   b.onclick = () => openForm(f);
@@ -1237,8 +1290,9 @@ function renderList(){
       const b = ficheCard(g.rep, "");
       b.replaceChild(pillEl(g.note), b.lastChild);
       const meta = b.querySelector(".meta"); const l3 = meta.lastChild;
-      l3.textContent = ""; const c = document.createElement("span"); c.className="count"; c.textContent = `${g.fiches.length} fiche${g.fiches.length>1?"s":""}`; l3.append(c);
-      const sp = sparkSvg(g.fiches.map(ratingOf)); if (sp) meta.append(sp);
+      const na = g.fiches.reduce((t, f) => t + nbAchats(f), 0);
+      l3.textContent = ""; const c = document.createElement("span"); c.className="count"; c.textContent = g.fiches.length > 1 ? `${g.fiches.length} fiches à réunir` : `${na} achat${na>1?"s":""}`; l3.append(c);
+      const sp = sparkSvg(g.fiches.flatMap(versionsOf).sort((a,b) => ficheDate(a).localeCompare(ficheDate(b))).map(ratingOf)); if (sp) meta.append(sp);
       b.onclick = () => openGroup(g.k);
       list.append(b);
     });
@@ -1262,20 +1316,36 @@ function openGroup(k, refresh){
   if (!fs.length){ openGroupKey = null; showView(curView); return; }
   openGroupKey = k; const last = fs[fs.length-1];
   $("g-title").textContent = last.produit.nom || "Café sans nom";
-  $("g-sub").textContent = [last.produit.torrefacteur, last.produit.pays, last.produit.region].filter(Boolean).join(" · ") + ` · ${fs.length} fiche${fs.length>1?"s":""}`;
-  $("g-chart").textContent = ""; $("g-chart").append(lineChart(fs.map(f => ({d:ficheDate(f), lab:ficheDateShort(f), v:ratingOf(f)}))));
+  const vs = fs.flatMap(versionsOf).sort((a,b) => ficheDate(a).localeCompare(ficheDate(b)));
+  $("g-sub").textContent = [last.produit.torrefacteur, last.produit.pays, last.produit.region].filter(Boolean).join(" · ") + ` · ${vs.length} achat${vs.length>1?"s":""}` + (fs.length > 1 ? ` sur ${fs.length} fiches` : "");
+  $("g-chart").textContent = ""; $("g-chart").append(lineChart(vs.map(f => ({d:ficheDate(f), lab:ficheDateShort(f), v:ratingOf(f)}))));
+  $("b-gmerge").hidden = fs.length < 2 || ro; $("b-gmerge").textContent = `Réunir ces ${fs.length} fiches en une seule`;
   const gl = $("g-list"); gl.textContent = "";
   fs.slice().reverse().forEach(f => gl.append(ficheCard(f, degustLabel(f) || achatLabel(f))));
   if (!refresh){ hideAll(); $("v-group").hidden = false; window.scrollTo(0,0); }
 }
 $("b-gback").onclick = () => { openGroupKey = null; showView(curView); };
 $("b-gnew").onclick = () => {
-  const fs = fiches.filter(f => groupKey(f) === openGroupKey); const src = fs[fs.length-1]; if (!src) return;
-  const n = blankFiche();
-  const keep = ["nom","torrefacteur","producteur","pays","region","variete","altitude","procede","torrefaction","boutique"];
-  keep.forEach(k => { if (src.produit[k]) n.produit[k] = src.produit[k]; });
-  n.cafeId = src.cafeId || groupKey(src);
-  openForm(null, n);
+  const fs = fiches.filter(f => groupKey(f) === openGroupKey).sort((a,b) => ficheDate(a).localeCompare(ficheDate(b))); const src = fs[fs.length-1]; if (!src) return;
+  openForm(src); startRebuy();
+};
+// Réunit plusieurs fiches d'un même café en une seule : les plus anciennes deviennent des achats de l'historique
+function mergeFiches(fs){
+  fs = fs.slice().sort((a,b) => ficheDate(a).localeCompare(ficheDate(b)));
+  const base = JSON.parse(JSON.stringify(fs[fs.length-1])); base.achats = [];
+  fs.slice(0, -1).forEach(f => { base.achats.push(...(f.achats || []), snapshotOf(f)); });
+  base.achats.push(...(fs[fs.length-1].achats || []));
+  const seen = new Set(); base.photos = fs.slice().reverse().flatMap(f => f.photos).filter(p => !seen.has(p.id) && seen.add(p.id));
+  fs.forEach(f => Object.entries(f.produit).forEach(([k, v]) => { if (!ACHAT_PROD.includes(k) && v && !base.produit[k]) base.produit[k] = v; }));
+  base.favori = fs.some(f => f.favori); base.createdAt = fs.map(f => f.createdAt).filter(Boolean).sort()[0] || base.createdAt;
+  return base;
+}
+$("b-gmerge").onclick = async () => {
+  const fs = fiches.filter(f => groupKey(f) === openGroupKey); if (fs.length < 2 || !db) return;
+  if (!confirm(`Réunir ces ${fs.length} fiches en une seule ? Chaque ancienne fiche devient un achat de l'historique, avec sa date, sa note et son avis. Rien n'est perdu.`)) return;
+  const base = mergeFiches(fs); base.updatedAt = new Date().toISOString();
+  try { await coll().doc(base.id).set(toDoc(base)); for (const f of fs) if (f.id !== base.id) await coll().doc(f.id).delete();
+    toast(`Une seule fiche maintenant, avec ${nbAchats(base)} achats.`); } catch (e) { toast("Réunion impossible pour l'instant, réessayez."); }
 };
 
 /* ---------- Graphiques (SVG) ---------- */
@@ -1919,26 +1989,31 @@ function normalizeLieu(o, id){
   const num = v => (v === null || v === undefined || v === "" || !isFinite(Number(v))) ? null : Number(v);
   return {id: id || o.id || uid(), nom:o.nom||"", ville:o.ville||"", pays:o.pays||"", adresse:o.adresse||"", lat:num(o.lat), lon:num(o.lon),
     roles:{torrefaction:!!r.torrefaction, achat:!!r.achat, degustation:!!r.degustation}, aTester:!!o.aTester, coeur:!!o.coeur, marques: splitMarques(o.marques), remarques:o.remarques||"",
-    site:o.site||"", mapboxId:o.mapboxId||"", createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
+    site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
 }
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 const roleLabel = l => ROLES.filter(r => l.roles[r.k]).map(r => r.l).join(", ");
+// Un nom écrit sur une fiche correspond-il à ce lieu ? (nom exact, autre nom enregistré, ou même marque pour un torréfacteur)
+function lieuMatches(l, name, kind){
+  const v = fold(name || "").trim(); if (!v || !l) return false;
+  if (fold(l.nom) === v || (l.alias || []).some(a => fold(a) === v)) return true;
+  return kind === "torrefaction" && (l.roles.torrefaction || !(l.roles.achat || l.roles.degustation)) && sameBrand(name, l.nom);
+}
 function cafesAt(l){
-  const n = fold(l.nom); if (!n) return [];
+  if (!fold(l.nom)) return [];
   const out = [];
   fiches.forEach(f => {
     const rel = [];
-    if (fold(f.produit.torrefacteur) === n) rel.push("torréfié");
-    if (fold(f.produit.boutique) === n) rel.push("acheté");
-    if (fold(f.degustation.lieu) === n) rel.push("dégusté");
+    if (lieuMatches(l, f.produit.torrefacteur, "torrefaction")) rel.push("torréfié");
+    if (lieuMatches(l, f.produit.boutique, "achat")) rel.push("acheté");
+    if (lieuMatches(l, f.degustation.lieu, "degustation")) rel.push("dégusté");
     if (!rel.length && f.produit.torrefacteur && (l.marques || []).some(m => sameBrand(m, f.produit.torrefacteur))) rel.push("marque proposée ici");
     if (rel.length) out.push({f, rel});
   });
   return out;
 }
 function lieuxOfFiche(f){
-  const names = [f.produit.torrefacteur, f.produit.boutique, f.degustation.lieu].map(fold).filter(Boolean);
-  return lieux.filter(l => names.includes(fold(l.nom)));
+  return lieux.filter(l => lieuMatches(l, f.produit.torrefacteur, "torrefaction") || lieuMatches(l, f.produit.boutique, "achat") || lieuMatches(l, f.degustation.lieu, "degustation"));
 }
 const gmapsUrl = l => (l.lat !== null && l.lon !== null)
   ? `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}`
@@ -1985,14 +2060,14 @@ function renderLieux(){
     if (lieuFilter === "tester" && !l.aTester) return false;
     if (lieuFilter === "coeur" && !l.coeur) return false;
     if (ROLES.some(r => r.k === lieuFilter) && !l.roles[lieuFilter]) return false;
-    if (q && !fold([l.nom, l.ville, l.pays, l.adresse, (l.marques||[]).join(" ")].join(" ")).includes(q)) return false;
+    if (q && !fold([l.nom, l.ville, l.pays, l.adresse, (l.marques||[]).join(" "), (l.alias||[]).join(" ")].join(" ")).includes(q)) return false;
     return true;
   }).sort((a,b) => (b.coeur - a.coeur) || (b.aTester - a.aTester) || a.nom.localeCompare(b.nom, "fr"));
   const box = $("lieu-list"); box.textContent = "";
   $("lieu-count").textContent = lieux.length ? `${lieux.length} lieu${lieux.length>1?"x":""} enregistré${lieux.length>1?"s":""} · ${lieux.filter(l=>l.aTester).length} à tester · ${lieux.filter(l=>l.coeur).length} coup${lieux.filter(l=>l.coeur).length>1?"s":""} de cœur` : "";
   if (!res.length){ const e = document.createElement("div"); e.className = "empty"; e.textContent = lieux.length ? "Aucun lieu ne correspond." : "Aucun lieu pour l'instant. Cherchez les cafés autour de vous ou ajoutez un torréfacteur, une boutique ou un lieu de dégustation."; box.append(e); }
   res.forEach(l => box.append(lieuCard(l)));
-  drawPins();
+  drawPins(); renderLinkPanel();
 }
 function lieuCard(l){
   const b = document.createElement("button"); b.type = "button"; b.className = "card";
@@ -2555,17 +2630,31 @@ async function renderNear(home, keepMap){
 /* ---------- Navigation ---------- */
 /* ---------- Sélecteur de lieu (lieu d'achat, lieu de dégustation) ---------- */
 var pickCtx = null;
-const PICK_T = {achat:"Lieu d'achat", degustation:"Lieu de dégustation", lieu:"Trouver le lieu et son adresse"};
-function lieuByName(v){ const n = fold(v || "").trim(); return n ? lieux.find(l => fold(l.nom) === n) : null; }
+const PICK_T = {torrefaction:"Atelier du torréfacteur", achat:"Lieu d'achat", degustation:"Lieu de dégustation", lieu:"Trouver le lieu et son adresse"};
+function lieuByName(v, kind){ const n = fold(v || "").trim(); if (!n) return null;
+  const ok = lieux.filter(l => lieuMatches(l, v, kind)); return ok.find(l => l.lat !== null) || ok[0] || null; }
+// Ouvre Ma carte centrée sur ce lieu, avec sa fiche et ses cafés
+async function showOnMap(l){
+  if (location.hash !== "#lieux") location.hash = "#lieux"; else showView("lieux");
+  await new Promise(r => setTimeout(r, 60)); await initWorld();
+  selectLieu(l); if (l.lat !== null) zoomToPoints([l], 900);
+  $("world").scrollIntoView({behavior:"smooth", block:"start"});
+}
 function placeBtn(kind, inp, set){
   const w = document.createElement("div"); w.className = "place-btn";
   const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.textContent = "📍 Choisir sur la carte";
   const h = document.createElement("span"); h.className = "hint";
-  const sync = () => { const l = lieuByName(inp.value); h.textContent = l ? (l.lat !== null ? "Sur Ma carte" + (l.ville ? " · " + l.ville : "") : "Dans vos lieux, sans point sur la carte") : ""; };
+  const go = document.createElement("button"); go.type = "button"; go.className = "btn small ghost"; go.hidden = true;
+  const sync = () => { const l = lieuByName(inp.value, kind); h.textContent = l ? (l.lat !== null ? "" : "Dans vos lieux, sans point sur la carte") : "";
+    go.hidden = !(l && l.lat !== null); if (l) go.textContent = "🗺️ Voir sur Ma carte" + (l.ville ? " · " + l.ville : "");
+    b.textContent = l && l.lat !== null ? "📍 Changer" : "📍 Choisir sur la carte"; };
   inp.addEventListener("input", sync); sync();
-  b.onclick = () => openPick(kind, inp.value, nom => { inp.value = nom; set(nom); inp.closest(".field").classList.remove("ai"); sync(); });
+  b.onclick = () => openPick(kind, inp.value, nom => { const was = inp.value.trim(); if (!was) { inp.value = nom; set(nom); } else addAlias(nom, was); inp.closest(".field").classList.remove("ai"); sync(); });
+  go.onclick = async () => { const l = lieuByName(inp.value, kind); if (!l) return;
+    if (cur && !ro && db){ await $("b-save").onclick(); if (cur) return; }   // enregistre la fiche avant d'aller sur la carte
+    showOnMap(l); };
   if (ro) b.disabled = true;
-  w.append(b, h); return w;
+  w.append(go, b, h); return w;
 }
 let pickHome = null;
 async function openPick(kind, val, done, fill){
@@ -2654,6 +2743,67 @@ async function pickChoose(r, saved){
   if (!lieux.some(x => x.id === l.id)) lieux.push(l);
   const done = pickCtx.done; closePick(); done(l.nom); renderLieux();
   toast(`${l.nom} est placé sur Ma carte et relié à cette fiche.`);
+}
+async function addAlias(nom, written){
+  const l = lieux.find(x => x.nom === nom); if (!l || !written || fold(written) === fold(l.nom) || (l.alias || []).some(a => fold(a) === fold(written))) return;
+  l.alias = (l.alias || []).concat(written); l.updatedAt = new Date().toISOString();
+  const o = JSON.parse(JSON.stringify(l)); delete o.id; try { await db.collection("lieux").doc(l.id).set(o); } catch {}
+  renderLieux();
+}
+/* Relier les fiches à la carte : chaque torréfacteur, boutique et lieu de dégustation des fiches reçoit son point */
+const LINK_KINDS = [["torrefaction", f => f.produit.torrefacteur, "🔥 Torréfacteur"], ["achat", f => f.produit.boutique, "🛒 Achat"], ["degustation", f => f.degustation.lieu, "☕ Dégustation"]];
+let linkSkip = new Set(); try { linkSkip = new Set(JSON.parse(localStorage.getItem("cave_link_skip") || "[]")); } catch {}
+const linkProps = {};
+function unlinkedNames(){
+  const out = new Map();
+  fiches.forEach(f => LINK_KINDS.forEach(([kind, get, lab]) => {
+    const name = (get(f) || "").trim(); if (!name || /^(maison|chez moi|domicile|à la maison|bureau|travail)$/i.test(name)) return;
+    const key = kind + "|" + fold(name); if (linkSkip.has(key)) return;
+    const l = lieuByName(name, kind); if (l && l.lat !== null) return;
+    if (!out.has(key)) out.set(key, {key, kind, name, lab, n:0}); out.get(key).n++;
+  }));
+  return [...out.values()];
+}
+async function saveFound(r, kind, written){
+  const now = new Date().toISOString();
+  let l = lieux.find(x => lieuMatches(x, written, kind) || (r.lat != null && x.lat !== null && haversine(x, r) < 40 && fold(x.nom) === fold(r.nom)));
+  if (l){ l.roles[kind] = true; if (l.lat === null){ l.lat = r.lat; l.lon = r.lon; } if (!l.adresse) l.adresse = r.adresse || ""; if (!l.ville) l.ville = r.ville || ""; if (!l.pays) l.pays = r.pays || ""; }
+  else { l = normalizeLieu({nom:r.nom, ville:r.ville, pays:r.pays, adresse:r.adresse, lat:r.lat, lon:r.lon, site:r.site, roles:{[kind]:true}}); l.createdAt = now; }
+  if (fold(written) !== fold(l.nom) && !(l.alias || []).some(a => fold(a) === fold(written))) l.alias = (l.alias || []).concat(written);
+  l.updatedAt = now; const o = JSON.parse(JSON.stringify(l)); delete o.id;
+  await db.collection("lieux").doc(l.id).set(o);
+  if (!lieux.some(x => x.id === l.id)) lieux.push(l);
+  return l;
+}
+function renderLinkPanel(){
+  const box = $("link-panel"); if (!box) return;
+  const items = unlinkedNames(); box.hidden = !items.length || ro; if (box.hidden) return;
+  box.textContent = "";
+  const h = document.createElement("h2"); h.textContent = "Relier mes fiches à la carte";
+  const p = document.createElement("div"); p.className = "hint"; p.textContent = `${items.length} lieu${items.length>1?"x":""} cité${items.length>1?"s":""} dans vos fiches n'${items.length>1?"ont":"a"} pas encore de point. Vérifiez la proposition, puis touchez « C'est ça ».`;
+  box.append(h, p);
+  const list = document.createElement("div"); list.className = "link-list"; box.append(list);
+  items.forEach(it => {
+    const row = document.createElement("div"); row.className = "link-row";
+    const t = document.createElement("div"); t.className = "link-t"; t.innerHTML = `<span class="hint"></span><strong></strong>`;
+    t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.lastChild.textContent = it.name;
+    const prop = document.createElement("div"); prop.className = "hint link-prop"; prop.textContent = "Recherche sur la carte…";
+    const acts = document.createElement("div"); acts.className = "row-btns";
+    const ok = document.createElement("button"); ok.type = "button"; ok.className = "btn small primary"; ok.textContent = "C'est ça"; ok.hidden = true;
+    const other = document.createElement("button"); other.type = "button"; other.className = "btn small"; other.textContent = "📍 Chercher";
+    const skip = document.createElement("button"); skip.type = "button"; skip.className = "btn small ghost"; skip.textContent = "Ignorer";
+    acts.append(ok, other, skip); row.append(t, prop, acts); list.append(row);
+    const show = r => { if (!r){ prop.textContent = "Pas trouvé automatiquement : touchez « Chercher » pour le placer."; ok.hidden = true; return; }
+      prop.textContent = `Proposition : ${r.nom}${r.genre ? " (" + r.genre + ")" : ""}, ${r.adresse || r.ville || r.pays}`; ok.hidden = false;
+      ok.onclick = async () => { ok.disabled = true; try { const l = await saveFound(r, it.kind, it.name); toast(`${l.nom} est sur Ma carte, relié à ${it.n} fiche${it.n>1?"s":""}.`); renderLieux(); } catch { toast("Enregistrement du lieu impossible."); ok.disabled = false; } }; };
+    if (it.key in linkProps) show(linkProps[it.key]);
+    else placeSearch(it.name, nearHome()).then(res => { const want = fold(it.name);
+        const best = res.find(r => fold(r.nom) === want) || res.find(r => sameBrand(r.nom, it.name)) || null;
+        linkProps[it.key] = best; show(best); })
+      .catch(() => { prop.textContent = "Recherche indisponible (réseau). Touchez « Chercher »."; });
+    other.onclick = () => openPick(it.kind, it.name, nom => { addAlias(nom, it.name); renderLieux(); });
+    skip.onclick = () => { linkSkip.add(it.key); try { localStorage.setItem("cave_link_skip", JSON.stringify([...linkSkip])); } catch {} renderLinkPanel(); };
+  });
 }
 /* Placer le point à la main : un toucher sur la carte */
 function stopPlacing(){ if (!world || !world.svg) return; world.svg.on("click.place", null); $("world").classList.remove("placing"); $("pick-place").textContent = "📍 Placer le point moi-même"; }
@@ -2775,7 +2925,7 @@ function openForm(f, seed){
   pending.forEach(p => URL.revokeObjectURL(p.url)); pending = []; removed = [];
   $("f-title").textContent = f ? (cur.produit.nom || "Café sans nom") : "Nouveau café";
   $("danger").hidden = !f; $("b-del").textContent = "Supprimer cette fiche"; $("del-hint").textContent = ""; delArmed = false;
-  renderProduit(); renderMethods(); renderDegust(); renderPhotos(); lockView("v-form");
+  renderProduit(); renderMethods(); renderDegust(); renderPhotos(); renderHist(); lockView("v-form");
   $("paste-box").hidden = true; $("paste-txt").value = ""; $("reading").hidden = true;
   if (ro) $("f-title").textContent = cur.produit.nom || "Café sans nom";
   hideAll(); $("tabs").hidden = true; $("v-form").hidden = false; $("actionbar").hidden = false;
@@ -2821,6 +2971,7 @@ function renderProduit(){
     if (cur.ai[def.k]) el.classList.add("ai");
     g.append(el);
     if (def.k === "boutique") el.append(placeBtn("achat", el.querySelector("input"), v => { cur.produit.boutique = v; }));
+    if (def.k === "torrefacteur") el.append(placeBtn("torrefaction", el.querySelector("input"), v => { cur.produit.torrefacteur = v; }));
     if (def.k === "dateAchat") g.append(anteControl(cur.produit, "anterieur", "anneeAchat", "f_dateAchat", "dateAchat", "Acheté avant novembre 2026 (date exacte inconnue)"));
   });
 }
@@ -2869,6 +3020,44 @@ function renderDegust(){
   g.append(ratingEl("Note globale", "n_globale", cur.noteGlobale, v => cur.noteGlobale = v));
 }
 
+function achatLine(v){ return [achatLabel(v), v.produit.boutique ? "chez " + v.produit.boutique : "", degustLabel(v)].filter(Boolean).join(" · ") || "Date inconnue"; }
+function renderHist(){
+  const blk = $("f-hist-block"), box = $("f-hist"); box.textContent = "";
+  blk.hidden = !!cur.isNew && !cur.achats.length; if (blk.hidden) return;
+  const vs = versionsOf(cur);
+  if (vs.length > 1){ const ch = document.createElement("div"); ch.className = "hist-chart"; ch.append(lineChart(vs.slice().sort((a,b) => ficheDate(a).localeCompare(ficheDate(b))).map(f => ({d:ficheDate(f), lab:ficheDateShort(f), v:ratingOf(f)})))); box.append(ch); }
+  else { const h = document.createElement("div"); h.className = "hint"; h.textContent = "Vous rachetez ce café ? Touchez le bouton : un nouvel achat s'ajoute à cette fiche, l'ancien et sa note restent dans l'historique."; box.append(h); }
+  const tl = document.createElement("ol"); tl.className = "timeline";
+  vs.slice().reverse().forEach((v, j) => {
+    const li = document.createElement("li"); li.className = "tl-item" + (j === 0 ? " now" : "");
+    const d = document.createElement("details"); if (j === 0) d.open = false;
+    const sm = document.createElement("summary");
+    const t = document.createElement("div"); t.className = "tl-t"; t.innerHTML = "<strong></strong><span class='hint'></span>";
+    t.firstChild.textContent = j === 0 ? `Achat actuel (n° ${vs.length})` : `Achat n° ${vs.length - j}`; t.lastChild.textContent = achatLine(v);
+    sm.append(t, pillEl(ratingOf(v))); d.append(sm);
+    const body = document.createElement("div"); body.className = "tl-body";
+    const ex = METHODS.filter(m => v.extractions[m.k] && v.extractions[m.k].active).map(m => { const e = v.extractions[m.k]; return m.l + (e.note !== null ? " " + fmtNote(e.note) : "") + (e.remarques ? " : " + e.remarques : ""); });
+    [["Avis", v.degustation.avis], ["Arômes", v.produit.notesAromatiques], ["Goût", v.produit.gout], ["Extractions", ex.join(" · ")], ["Racheter", v.degustation.racheter], ["Lieu", v.degustation.lieu]].forEach(([k, x]) => { if (!x) return; const p = document.createElement("p"); const b = document.createElement("b"); b.textContent = k + " : "; p.append(b, document.createTextNode(x)); body.append(p); });
+    if (j === 0) { const p = document.createElement("p"); p.className = "hint"; p.textContent = "C'est l'achat affiché dans les blocs 1 à 3."; body.append(p); }
+    else if (!ro){ const rm = document.createElement("button"); rm.type = "button"; rm.className = "btn small ghost"; rm.textContent = "Retirer cet achat";
+      rm.onclick = () => { if (!confirm("Retirer cet achat de l'historique ? (pensez à enregistrer la fiche)")) return; cur.achats.splice(v.achatIdx, 1); renderHist(); }; body.append(rm); }
+    if (!body.childElementCount){ const p = document.createElement("p"); p.className = "hint"; p.textContent = "Pas de note ni d'avis pour cet achat."; body.append(p); }
+    d.append(body); li.append(d); tl.append(li);
+  });
+  box.append(tl);
+  if (!ro && !cur.isNew){ const b = document.createElement("button"); b.type = "button"; b.className = "btn primary"; b.textContent = "🔁 J'ai racheté ce café"; b.onclick = startRebuy; box.append(b); }
+}
+// Nouvel achat du même café : l'achat actuel part dans l'historique, la fiche repart pour une nouvelle dégustation
+function startRebuy(){
+  if (!cur || ro) return;
+  cur.achats.push(snapshotOf(cur));
+  Object.assign(cur.produit, {dateAchat:today(), anterieur:false, anneeAchat:"", dateTorrefaction:""});
+  cur.degustation = {date:"", lieu:"", avis:"", racheter:"", note:null, anterieur:false, annee:""}; cur.noteGlobale = null;
+  Object.values(cur.extractions).forEach(e => { if (e){ e.note = null; e.remarques = ""; } });
+  renderProduit(); renderMethods(); renderDegust(); renderHist();
+  toast(`Achat n° ${nbAchats(cur)} ajouté. L'achat précédent et sa note sont gardés dans l'historique. Enregistrez quand vous avez noté.`);
+  setTimeout(() => $("f-degust-block").scrollIntoView({behavior:"smooth", block:"start"}), 100);
+}
 function renderPhotos(){
   const box = $("photos"); box.textContent = "";
   const items = cur.photos.map(p => ({src:blobUrl(p.id), del:() => { removed.push(p.id); cur.photos = cur.photos.filter(x => x !== p); renderPhotos(); }}))
@@ -3619,6 +3808,18 @@ function toDoc(f){
 $("b-save").onclick = async () => {
   if (!cur) return;
   if (!db){ toast("Sauvegarde indisponible : ouvrez l'application depuis son lien claude.ai en étant connecté."); return; }
+  if (cur.isNew && fold(cur.produit.nom)){
+    const k = fold(cur.produit.nom) + "|" + fold(cur.produit.torrefacteur);
+    const ex = fiches.filter(f => (cur.cafeId && f.cafeId === cur.cafeId) || (fold(f.produit.nom) + "|" + fold(f.produit.torrefacteur)) === k).sort((a,b) => ficheDate(b).localeCompare(ficheDate(a)))[0];
+    if (ex && confirm(`« ${ex.produit.nom} »${ex.produit.torrefacteur ? " de " + ex.produit.torrefacteur : ""} est déjà dans votre cave. L'ajouter comme nouvel achat de la même fiche ? (recommandé : vos notes s'ajoutent à l'historique, sans nouvelle fiche)`)){
+      const m = JSON.parse(JSON.stringify(ex)); m.achats = (m.achats || []).concat([snapshotOf(ex)]);
+      ACHAT_PROD.forEach(k2 => { m.produit[k2] = cur.produit[k2] !== undefined ? cur.produit[k2] : ""; });
+      Object.entries(cur.produit).forEach(([k2, v]) => { if (v && !m.produit[k2]) m.produit[k2] = v; });
+      m.degustation = cur.degustation; m.noteGlobale = cur.noteGlobale; m.extractions = cur.extractions;
+      m.photos = cur.photos.concat(m.photos.filter(p => !cur.photos.some(q => q.id === p.id)));
+      cur = normalize(m, ex.id);
+    }
+  }
   const btn = $("b-save"); btn.disabled = true; btn.textContent = "Enregistrement…";
   try {
     if (pending.length){
