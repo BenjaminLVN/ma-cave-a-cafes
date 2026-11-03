@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103085444";</script><script src="config.js?v=20261103085444"></script>
+<script>window.CAVE_BUILD="20261103091254";</script><script src="config.js?v=20261103091254"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -368,7 +368,7 @@ body{overflow-x:clip}
 .rp{box-sizing:border-box;border-radius:50%;background:#1d1a21;border:2px solid #fff;box-shadow:0 0 0 1.5px #1d1a21,0 1px 4px rgba(0,0,0,.35);display:grid;place-items:center;color:#fff;font:700 11px var(--f-body)}
 .rp.sel{background:#1d1a21;box-shadow:0 0 0 2px #1d1a21,0 0 0 6px rgba(161,47,127,.35)}
 .rp.man{background:var(--accent)}
-.lp-home{width:16px;height:16px;border-radius:50%;background:#2f7de1;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,125,225,.2)}
+.lp-home{width:16px;height:16px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 0 0 6px rgba(37,99,235,.22);animation:herepulse 2s ease-out infinite}@keyframes herepulse{0%{box-shadow:0 0 0 0 rgba(37,99,235,.45)}100%{box-shadow:0 0 0 16px rgba(37,99,235,0)}}
 .lg-dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
 .zone-btn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:1001;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.18);white-space:nowrap}
 @media (max-width:640px){.world-svg{height:340px}}
@@ -565,8 +565,8 @@ input.search,select{border-radius:14px!important}
       <div class="notice" id="near-note" hidden></div>
       <div id="near-ext" class="near-acts" style="margin:0 0 10px" hidden></div>
       <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>🔍 Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
-      <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ma ville</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
-      <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span data-role-ico="tester" data-size="20">À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
+      <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ici</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
+      <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span data-role-ico="tester" data-size="20">À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.25)"></i>Ici (votre position)</span></div>
       <div id="world-cap" class="world-cap"></div>
       <div id="near-tools" hidden class="near-tools"><span class="hint" id="near-home"></span></div>
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
@@ -2076,7 +2076,8 @@ function normalizeLieu(o, id){
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 /* Motifs choisis le 3 novembre 2026 : T7 torréfacteur, B1 boutique, D1 dégustation (barista) */
 const ROLE_ICO = {coeur:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>', tester:'<path d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/>', torrefaction:'<path d="M8 3h6l-1.5 4h-3z"/><rect x="5" y="7" width="12" height="8" rx="3"/><path d="M17 9h2a1.5 1.5 0 0 1 1.5 1.5V12"/><path d="M15 3v-.5M7 15l-1 5M15 15l1 5M4 20h14"/><circle cx="11" cy="11" r="1.5"/>', achat:'<path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>', degustation:'<path d="M5 10h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.5a2.5 2.5 0 0 1 0 5H15.5"/><path d="M8.5 7c-.8-.8.8-1.7 0-3M12.5 7c-.8-.8.8-1.7 0-3"/>'};
-const ROLE_C = {coeur:"#a12f7f", tester:"#10b981", torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
+const ROLE_C = {coeur:"#a12f7f", tester:"#10b981", torrefaction:"linear-gradient(135deg,#FDE047,#F97316)", achat:"linear-gradient(135deg,#22D3EE,#2563EB)", degustation:"linear-gradient(135deg,#F472B6,#A855F7)"};
+const ROLE_SOLID = {torrefaction:"#FB923C", achat:"#0EA5E9", degustation:"#D946EF"};
 const roleIcon = (k, size, color) => `<svg viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="${color||"currentColor"}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROLE_ICO[k]}</svg>`;
 // Icône « à tester » choisie (Z1) : goutte émeraude avec point d'interrogation
 let z1n = 0;
@@ -2327,13 +2328,14 @@ $("l-back").onclick = closeLieu; $("l-cancel").onclick = closeLieu;
 /* Carte du monde */
 const CITIES = [["Paris",48.857,2.352,1],["Lyon",45.764,4.836,2],["Marseille",43.297,5.37,2],["Bordeaux",44.838,-0.579,2],["Lille",50.63,3.057,2],["Nantes",47.218,-1.554,2],["Toulouse",43.605,1.444,2],["Strasbourg",48.573,7.752,2],["Rennes",48.117,-1.678,3],["Caen",49.182,-0.37,3],["Rouen",49.443,1.1,3],["Le Havre",49.494,0.108,3],["Nice",43.71,7.262,2],["Montpellier",43.611,3.877,3],["Grenoble",45.188,5.724,3],["Dijon",47.322,5.041,3],["Angers",47.478,-0.563,3],["Tours",47.394,0.685,3],["Brest",48.39,-4.486,3],["Cherbourg",49.639,-1.616,4],["Bruxelles",50.85,4.352,2],["Genève",46.204,6.143,2],["Londres",51.507,-0.128,1],["Amsterdam",52.368,4.904,2],["Berlin",52.52,13.405,1],["Madrid",40.417,-3.704,1],["Barcelone",41.385,2.173,2],["Rome",41.903,12.496,1],["Milan",45.464,9.19,2],["Oslo",59.913,10.752,2],["Copenhague",55.676,12.568,2],["Stockholm",59.329,18.069,2],["Vienne",48.208,16.374,2],["Lisbonne",38.722,-9.139,2],["New York",40.713,-74.006,1],["San Francisco",37.775,-122.419,1],["Seattle",47.606,-122.332,2],["Portland",45.515,-122.679,3],["Montréal",45.502,-73.567,2],["Mexico",19.433,-99.133,1],["Guatemala",14.634,-90.507,2],["San José",9.928,-84.091,2],["Panama",8.983,-79.517,2],["Bogotá",4.711,-74.072,1],["Medellín",6.244,-75.581,2],["Lima",-12.046,-77.043,1],["São Paulo",-23.551,-46.633,1],["Belo Horizonte",-19.917,-43.935,2],["Addis-Abeba",9.03,38.74,1],["Nairobi",-1.292,36.822,1],["Kigali",-1.944,30.062,2],["Sanaa",15.369,44.191,2],["Melbourne",-37.814,144.963,1],["Sydney",-33.869,151.209,1],["Tokyo",35.676,139.65,1],["Séoul",37.566,126.978,1],["Shanghai",31.23,121.474,1],["Taipei",25.033,121.565,2],["Bangkok",13.756,100.502,1],["Hô Chi Minh-Ville",10.823,106.63,2],["Jakarta",-6.208,106.846,1],["Bangalore",12.972,77.595,2],["Dubaï",25.205,55.271,1],["Le Cap",-33.925,18.424,1],["Le Caire",30.044,31.236,1]];
 let world = null;
+let herePos = null;
 /* Carte fluide (Leaflet + fond de carte OpenStreetMap/CARTO) : zoom au doigt, rues, noms des lieux */
-const ROLE_COL = {torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
+const ROLE_COL = ROLE_C;
 function pinStyle(l){
   const rs = ["torrefaction","achat","degustation"].filter(k => l.roles[k]);
   if (!rs.length) return {cls:"lp-test", bg:"#8b5cf6", size:14};
-  const cols = rs.map(k => ROLE_COL[k]);
-  const bg = cols.length === 1 ? cols[0] : `conic-gradient(${cols.map((c, i) => `${c} ${i*100/cols.length}% ${(i+1)*100/cols.length}%`).join(",")})`;
+  const cols = rs.map(k => ROLE_SOLID[k]);
+  const bg = rs.length === 1 ? ROLE_COL[rs[0]] : `conic-gradient(${cols.map((c, i) => `${c} ${i*100/cols.length}% ${(i+1)*100/cols.length}%`).join(",")})`;
   return {cls:"", bg, size:26};
 }
 function pinIcon(l, sel){
@@ -2371,7 +2373,7 @@ function drawPins(){
   if (!world || !world.gp) return;
   const gp = world.gp; gp.clearLayers();
   const shown = lieux.filter(l => l.lat !== null && l.lon !== null && (lieuFilter === "tous" || (lieuFilter === "tester" ? l.aTester : lieuFilter === "coeur" ? l.coeur : l.roles[lieuFilter])));
-  const home = nearHome();
+  const home = herePos;
   if (home) window.L.marker([home.lat, home.lon], {icon:window.L.divIcon({className:"lp-wrap", html:'<div class="lp-home"></div>', iconSize:[16,16], iconAnchor:[8,8]}), interactive:false, keyboard:false}).addTo(gp);
   shown.slice().sort((a, b) => pinStyle(a).size - pinStyle(b).size).forEach(l => {
     const m = window.L.marker([l.lat, l.lon], {icon:pinIcon(l, l.id === selLieuId), title:l.nom, riseOnHover:true, zIndexOffset: l.id === selLieuId ? 1000 : (pinStyle(l).size > 14 ? 100 : 0)});
@@ -2464,7 +2466,18 @@ function zoomToPoints(pts, maxK){
 }
 function fitAll(){ zoomToPoints(lieux.filter(l => l.lat !== null && l.lon !== null).concat(nearHome() ? [nearHome()] : []), 4000); }
 $("b-fit").onclick = fitAll;
-$("b-home").onclick = () => { const h = nearHome(); if (h) zoomToPoints([h], 120); else { toast("Cherchez d'abord votre ville dans « Autour de moi »."); $("near-q").focus(); } };
+$("b-home").onclick = () => {
+  if (!navigator.geolocation){ toast("La localisation n'est pas disponible sur cet appareil."); return; }
+  const b = $("b-home"); b.disabled = true; b.textContent = "Localisation…";
+  navigator.geolocation.getCurrentPosition(p => {
+    b.disabled = false; b.textContent = "Ici";
+    herePos = {lat:p.coords.latitude, lon:p.coords.longitude, label:"Ici"};
+    drawPins(); zoomToPoints([herePos], 4000);
+  }, e => {
+    b.disabled = false; b.textContent = "Ici";
+    toast(e && e.code === 1 ? "Autorisez la localisation pour ce site dans les réglages du téléphone (Safari > Position)." : "Position introuvable pour le moment, réessayez.");
+  }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
+};
 $("b-reset-zoom").onclick = () => zoomToPoints([]);
 
 /* Autour de moi (Mapbox) */
