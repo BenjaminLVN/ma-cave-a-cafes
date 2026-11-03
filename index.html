@@ -346,6 +346,9 @@ table.kv td:first-child{font-weight:600;white-space:nowrap}
 .world-svg{display:block;width:100%;height:auto;cursor:grab}
 .world{height:min(62vh,520px);border-radius:18px!important;border:none!important;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,30,60,.25)}
 .lmap{position:absolute;inset:0;z-index:1;background:#ece9f1;font:inherit}
+.lmap .leaflet-tile-pane{filter:saturate(.55) contrast(.96) brightness(1.04)}
+body{overflow-x:clip}
+.panel,.pop,.link-row,.world-cap,.near-item,.card .meta{overflow-wrap:anywhere;min-width:0}
 .pick .world{height:52dvh}
 .world .leaflet-control-zoom a{width:36px;height:36px;line-height:34px;font-size:20px;color:var(--ink)}
 .world .leaflet-control-zoom{border:none!important;box-shadow:0 4px 14px -6px rgba(0,0,0,.35)!important;border-radius:12px;overflow:hidden}
@@ -2333,7 +2336,10 @@ async function initWorld(){
   const el = document.createElement("div"); el.className = "lmap"; box.prepend(el);
   const map = window.L.map(el, {zoomControl:false, worldCopyJump:true, minZoom:2, maxZoom:19, zoomSnap:0.5, tap:true}).setView([46.6, 2.4], 5);
   window.L.control.zoom({position:"topright"}).addTo(map);
-  window.L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {subdomains:"abcd", maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}).addTo(map);
+  // Fond de carte OpenStreetMap (sans clé), avec un second serveur si le premier ne répond pas
+  const OSM_ATTR = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+  let tl = window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:OSM_ATTR}).addTo(map);
+  let tileErr = 0; tl.on("tileerror", () => { if (++tileErr === 4){ map.removeLayer(tl); tl = window.L.tileLayer("https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {subdomains:"abc", maxZoom:19, attribution:OSM_ATTR + " France"}).addTo(map); } });
   const gr = window.L.layerGroup().addTo(map), gp = window.L.layerGroup().addTo(map);
   world = {map, gp, gr, k:1, prog:false};
   const upd = () => { const z = map.getZoom(); world.k = Math.pow(2, z - 1); box.classList.toggle("z-lab", z >= 12.5); box.classList.toggle("z-rlab", z >= 15); };
@@ -2696,6 +2702,11 @@ function placeBtn(kind, inp, set){
     go.hidden = !(l && l.lat !== null); if (l) go.textContent = "🗺️ Voir sur Ma carte" + (l.ville ? " · " + l.ville : "");
     b.textContent = l && l.lat !== null ? "📍 Changer" : "📍 Choisir sur la carte"; };
   inp.addEventListener("input", sync); sync();
+  inp.addEventListener("change", async () => { const v = inp.value.trim(); if (!isMapsUrl(v) || !db || ro) return;
+    h.textContent = "Lecture du lien Google Maps…"; const r = await resolveMapsLink(v);
+    if (!r){ h.textContent = "Lien Google Maps illisible : touchez « Choisir sur la carte »."; return; }
+    try { const l = await saveFound(r, kind, r.nom); inp.value = l.nom; set(l.nom); renderLieux(); toast(`${l.nom} est placé sur Ma carte.`); } catch { inp.value = r.nom; set(r.nom); }
+    sync(); });
   b.onclick = () => openPick(kind, inp.value, nom => { const was = inp.value.trim(); if (!was) { inp.value = nom; set(nom); } else addAlias(nom, was); inp.closest(".field").classList.remove("ai"); sync(); });
   go.onclick = async () => { const l = lieuByName(inp.value, kind); if (!l) return;
     if (cur && !ro && db){ await $("b-save").onclick(); if (cur) return; }   // enregistre la fiche avant d'aller sur la carte
@@ -2822,6 +2833,38 @@ async function saveFound(r, kind, written){
   if (!lieux.some(x => x.id === l.id)) lieux.push(l);
   return l;
 }
+/* Liens Google Maps collés dans une fiche (maps.app.goo.gl, google.com/maps…) : on retrouve le nom, l'adresse et le point */
+const isMapsUrl = v => /^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps|(www\.)?google\.[a-z.]+\/maps|maps\.google\.)/i.test(String(v || "").trim());
+const isUrl = v => /^https?:\/\//i.test(String(v || "").trim());
+const placeLabel = v => isUrl(v) ? (isMapsUrl(v) ? "lien Google Maps" : "lien") : v;
+function mapsInfo(url, html){
+  const out = {}; const u = decodeURIComponent(String(url || ""));
+  const ll = parseMapsLink(u) || parseMapsLink(html || "") || (/center=(-?\d+\.\d+)(?:%2C|,)(-?\d+\.\d+)/.exec(html || "") ? {lat:+RegExp.$1, lon:+RegExp.$2} : null);
+  if (ll){ out.lat = ll.lat; out.lon = ll.lon; }
+  let m = /\/maps\/place\/([^/@?]+)/.exec(u);
+  let full = m ? m[1].replace(/\+/g, " ") : "";
+  if (!full && html){ const t = /<meta[^>]+property="og:title"[^>]+content="([^"]+)"/i.exec(html) || /<title>([^<]+)<\/title>/i.exec(html); if (t) full = t[1].replace(/\s*-\s*Google Maps\s*$/i, "").replace(/&amp;/g, "&").replace(/&#39;/g, "'"); }
+  if (full){ const parts = full.split(/\s*[·,]\s*/); out.nom = parts[0]; out.adresse = parts.slice(1).join(", "); const cp = /(\d{5})\s+([^,]+)/.exec(out.adresse); if (cp) out.ville = cp[2].trim(); }
+  return out;
+}
+async function resolveMapsLink(url){
+  url = String(url).trim(); let info = mapsInfo(url);
+  if (info.nom && info.lat != null) return Object.assign({site:url, pays:"France"}, info);
+  const tries = [
+    async () => { const r = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url)); const j = await r.json(); return mapsInfo((j.status && j.status.url) || "", j.contents || ""); },
+    async () => { const r = await fetch("https://r.jina.ai/" + url, {headers:{"X-Return-Format":"html"}}); const t = await r.text(); const src = (/URL Source:\s*(\S+)/.exec(t) || [])[1] || ""; return mapsInfo(src, t); },
+    async () => { const r = await fetch("https://corsproxy.io/?url=" + encodeURIComponent(url)); const t = await r.text(); return mapsInfo(r.url || "", t); }
+  ];
+  for (const f of tries){ try { const i = await f(); info = Object.assign({}, i, info.nom ? {nom:info.nom} : {}); if (info.nom && info.lat != null) break; } catch {} }
+  if (!info.nom) return null;
+  if (info.lat == null){ try { const res = await placeSearch([info.nom, info.adresse].filter(Boolean).join(" "), nearHome()); if (res[0]){ info.lat = res[0].lat; info.lon = res[0].lon; info.ville = info.ville || res[0].ville; info.pays = res[0].pays; if (!info.adresse) info.adresse = res[0].adresse; } } catch {} }
+  return info.lat != null ? Object.assign({site:url, pays:"France", genre:"Google Maps"}, info) : null;
+}
+// Remplace le lien collé dans les fiches par le vrai nom du lieu
+async function renameInFiches(kind, from, to){
+  const get = {torrefaction:f => f.produit, achat:f => f.produit, degustation:f => f.degustation}[kind], key = {torrefaction:"torrefacteur", achat:"boutique", degustation:"lieu"}[kind];
+  for (const f of fiches.filter(x => (get(x)[key] || "").trim() === from)){ const d = JSON.parse(JSON.stringify(f)); get(d)[key] = to; d.updatedAt = new Date().toISOString(); try { await coll().doc(f.id).set(toDoc(d)); } catch {} }
+}
 const COFFEE_KIND = /café|boutique de café|salon de thé|épicerie fine|torréf|roast|shop|boulangerie/i;
 async function findPlaceFor(name, kind){
   const want = fold(name); const bias = nearHome();
@@ -2845,9 +2888,9 @@ async function autoLinkFiches(){
   try {
     for (const it of unlinkedNames()){
       if (autoTried.has(it.key)) continue; autoTried.add(it.key);
-      const r = await findPlaceFor(it.name, it.kind); linkProps[it.key] = r;
+      const r = isMapsUrl(it.name) ? await resolveMapsLink(it.name) : isUrl(it.name) ? null : await findPlaceFor(it.name, it.kind); linkProps[it.key] = r;
       if (!r) continue;
-      try { const l = await saveFound(r, it.kind, it.name); placed.push(l); } catch {}
+      try { const l = await saveFound(r, it.kind, it.name); placed.push(l); if (isUrl(it.name)) await renameInFiches(it.kind, it.name, l.nom); } catch {}
     }
   } finally { autoLinking = false; }
   if (placed.length){ renderLieux(); if (curView === "lieux"){ await initWorld(); zoomToPoints(lieux.filter(l => l.lat !== null), 800); }
@@ -2865,7 +2908,9 @@ function renderLinkPanel(){
   items.forEach(it => {
     const row = document.createElement("div"); row.className = "link-row";
     const t = document.createElement("div"); t.className = "link-t"; t.innerHTML = `<span class="hint"></span><strong></strong>`;
-    t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.firstChild.insertAdjacentHTML("afterbegin", roleBadge(it.kind, 16)); t.lastChild.textContent = it.name;
+    t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.firstChild.insertAdjacentHTML("afterbegin", roleBadge(it.kind, 16));
+    if (isUrl(it.name)){ t.lastChild.textContent = ""; const a = document.createElement("a"); a.href = it.name; a.target = "_blank"; a.rel = "noopener"; a.textContent = isMapsUrl(it.name) ? "📍 Lien Google Maps ↗" : "Lien ↗"; t.lastChild.append(a); }
+    else t.lastChild.textContent = it.name;
     const prop = document.createElement("div"); prop.className = "hint link-prop"; prop.textContent = "Recherche sur la carte…";
     const acts = document.createElement("div"); acts.className = "row-btns";
     const ok = document.createElement("button"); ok.type = "button"; ok.className = "btn small primary"; ok.textContent = "C'est ça"; ok.hidden = true;
@@ -2876,7 +2921,7 @@ function renderLinkPanel(){
       prop.textContent = `Proposition : ${r.nom}${r.genre ? " (" + r.genre + ")" : ""}, ${r.adresse || r.ville || r.pays}`; ok.hidden = false;
       ok.onclick = async () => { ok.disabled = true; try { const l = await saveFound(r, it.kind, it.name); toast(`${l.nom} est sur Ma carte, relié à ${it.n} fiche${it.n>1?"s":""}.`); renderLieux(); } catch { toast("Enregistrement du lieu impossible."); ok.disabled = false; } }; };
     if (it.key in linkProps) show(linkProps[it.key]); else prop.textContent = "Recherche sur la carte…";
-    other.onclick = () => openPick(it.kind, it.name, nom => { addAlias(nom, it.name); renderLieux(); });
+    other.onclick = () => openPick(it.kind, isUrl(it.name) ? "" : it.name, async nom => { if (isUrl(it.name)) await renameInFiches(it.kind, it.name, nom); else addAlias(nom, it.name); renderLieux(); });
     skip.onclick = () => { linkSkip.add(it.key); try { localStorage.setItem("cave_link_skip", JSON.stringify([...linkSkip])); } catch {} renderLinkPanel(); };
   });
 }
@@ -3093,7 +3138,7 @@ function renderDegust(){
   g.append(ratingEl("Note globale", "n_globale", cur.noteGlobale, v => cur.noteGlobale = v));
 }
 
-function achatLine(v){ return [achatLabel(v), v.produit.boutique ? "chez " + v.produit.boutique : "", degustLabel(v)].filter(Boolean).join(" · ") || "Date inconnue"; }
+function achatLine(v){ return [achatLabel(v), v.produit.boutique ? "chez " + placeLabel(v.produit.boutique) : "", degustLabel(v)].filter(Boolean).join(" · ") || "Date inconnue"; }
 function renderHist(){
   const blk = $("f-hist-block"), box = $("f-hist"); box.textContent = "";
   blk.hidden = !!cur.isNew && !cur.achats.length; if (blk.hidden) return;
