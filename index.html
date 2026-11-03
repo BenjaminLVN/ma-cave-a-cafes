@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103084516";</script><script src="config.js?v=20261103084516"></script>
+<script>window.CAVE_BUILD="20261103085156";</script><script src="config.js?v=20261103085156"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2334,7 +2334,7 @@ function pinStyle(l){
 function pinIcon(l, sel){
   const st = pinStyle(l); const sz = st.size + (sel ? 8 : 0);
   const sym = st.cls ? "" : roleIcon(l.roles.torrefaction ? "torrefaction" : l.roles.achat ? "achat" : "degustation", 15, "#fff");
-  const html = `<div class="lp ${st.cls}${sel ? " sel" : ""}${l.aTester ? " tester" : ""}" style="--bg:${st.bg};width:${sz}px;height:${sz}px"><span>${sym}</span>${l.coeur ? '<i class="lp-heart">' + roleBadge("coeur", 14) + '</i>' : ""}</div><div class="lp-lab"></div>`;
+  const html = `<div class="lp ${st.cls}${sel ? " sel" : ""}${l.aTester ? " tester" : ""}" style="--bg:${st.bg};width:${sz}px;height:${sz}px"><span>${sym}</span></div><div class="lp-lab"></div>`;
   const ic = window.L.divIcon({className:"lp-wrap", html, iconSize:[sz, sz], iconAnchor:[sz/2, sz/2]});
   return ic;
 }
