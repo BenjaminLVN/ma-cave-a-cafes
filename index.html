@@ -95,6 +95,11 @@ button{cursor:pointer}
 #v-form .bar{position:sticky;top:0;z-index:25;background:var(--bg);margin-inline:-4px;padding:calc(8px + env(safe-area-inset-top,0px)) 4px 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
 #v-form .bar h1{font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .paste-box{display:grid;gap:8px;margin-top:10px}
+.keygate{position:fixed;inset:0;z-index:80;background:var(--bg);display:grid;place-items:center;padding:24px 16px}
+.keygate-in{max-width:420px;width:100%;display:grid;gap:12px;justify-items:center;text-align:center}
+.keygate-in img{border-radius:18px;box-shadow:var(--glow)}
+.keygate-in input{width:100%}
+.keygate-in .btn{width:100%}
 .backup{display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:16px}
 .backup.warn{border-color:var(--accent)}
 .paste-box textarea{min-height:140px}
@@ -843,13 +848,36 @@ $("in-restore").addEventListener("change", async e => {
 });
 
 /* ---------- Version hébergée : enregistrement en ligne sans connexion (Supabase), code secret dans le lien ---------- */
+// Le code secret de la cave : dans le lien (?k=…) ou mémorisé sur l'appareil. Jamais créé en silence.
+const KEY_RE = /^[A-Za-z0-9_-]{24,64}$/;
 function caveKey(){
   const q = new URLSearchParams(location.search); let k = q.get("k") || "";
-  try { if (!k) k = localStorage.getItem("cave_key") || ""; } catch {}
-  if (!/^[A-Za-z0-9_-]{24,}$/.test(k)){ const a = new Uint8Array(18); crypto.getRandomValues(a); k = Array.from(a, b => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[b % 64]).join("") + uid(); k = k.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40); }
-  try { localStorage.setItem("cave_key", k); } catch {}
-  if (q.get("k") !== k){ q.set("k", k); history.replaceState(null, "", location.pathname + "?" + q.toString() + location.hash); }
-  return k;
+  if (!KEY_RE.test(k)){ try { k = localStorage.getItem("cave_key") || ""; } catch { k = ""; } }
+  return KEY_RE.test(k) ? k : "";
+}
+function setCaveKey(k){
+  try { localStorage.setItem("cave_key", k); const all = JSON.parse(localStorage.getItem("cave_keys") || "[]"); if (!all.includes(k)){ all.push(k); localStorage.setItem("cave_keys", JSON.stringify(all)); } } catch {}
+  const q = new URLSearchParams(location.search); if (q.get("k") !== k){ q.set("k", k); history.replaceState(null, "", location.pathname + "?" + q.toString() + location.hash); }
+}
+function ensureKey(){
+  const k = caveKey(); if (k){ setCaveKey(k); return Promise.resolve(k); }
+  return new Promise(res => {
+    const g = document.createElement("div"); g.className = "keygate"; g.setAttribute("role", "dialog");
+    g.innerHTML = `<div class="keygate-in"><img src="icon-192.png" alt="" width="72" height="72"><h2>Ouvrir ma cave à cafés</h2>
+      <p class="hint">Collez le lien secret de votre cave (il se termine par <b>?k=…</b>) ou son code.</p>
+      <input class="search" id="kg-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://benjaminlvn.github.io/ma-cave-a-cafes/?k=…">
+      <button class="btn primary" id="kg-go" type="button">Ouvrir ma cave</button>
+      <p class="hint" id="kg-err" hidden></p>
+      <button class="linkbtn" id="kg-new" type="button">Créer une nouvelle cave vide</button></div>`;
+    document.body.append(g);
+    const inp = g.querySelector("#kg-in"), err = g.querySelector("#kg-err");
+    const done = k => { setCaveKey(k); g.remove(); res(k); };
+    g.querySelector("#kg-go").onclick = () => { const v = inp.value.trim(); const m = v.match(/[?&]k=([A-Za-z0-9_-]{24,64})/) || v.match(/^([A-Za-z0-9_-]{24,64})$/);
+      if (!m){ err.hidden = false; err.textContent = "Ce n'est pas un lien de cave valide. Il doit contenir « ?k= » suivi d'un long code."; return; } done(m[1]); };
+    g.querySelector("#kg-new").onclick = () => { if (!confirm("Créer une nouvelle cave VIDE ? Vos fiches existantes restent dans votre ancienne cave, accessible seulement par son lien.")) return;
+      const a = new Uint8Array(24); crypto.getRandomValues(a); done(Array.from(a, b => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[b % 64]).join("") + "x" + Date.now().toString(36)); };
+    setTimeout(() => inp.focus(), 50);
+  });
 }
 function remoteStore(cfg, key){
   const H = {apikey:cfg.key, "x-cave":key}; if (/^eyJ/.test(cfg.key)) H.Authorization = "Bearer " + cfg.key; // clé « anon » (JWT) ou « publishable »
@@ -951,7 +979,7 @@ async function boot(){
   const c = window.claude;
   let d = null, a = null, s = null, u = null;
   if (window.CAVE_CFG && window.CAVE_CFG.url){
-    remote = remoteStore(window.CAVE_CFG, caveKey());
+    remote = remoteStore(window.CAVE_CFG, await ensureKey());
     db = remote.db; assets = remote.assets; localMode = false;
     showStoreNote('<strong>Enregistrement automatique en ligne.</strong> Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">🔗 Copier le lien de ma cave</button>');
     setTimeout(() => { const bt = document.getElementById("b-share-link"); if (bt) bt.onclick = async () => { const u = location.origin + location.pathname + "?k=" + encodeURIComponent(caveKey());
