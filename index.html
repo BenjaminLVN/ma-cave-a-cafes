@@ -261,6 +261,27 @@ body.ro .ed, body.ro .ph .x{display:none!important}
 .schema-box.narrow{max-width:520px}
 .schema{width:100%;height:auto;display:block;min-width:260px}
 .schema.wide{min-width:520px}
+.grind{background:var(--bg);border-radius:18px;padding:16px 14px}
+.grind-head{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.grind-arrow{flex:1;height:4px;border-radius:4px;background:linear-gradient(90deg,#c9a184,var(--coffee),#4a2c1b);position:relative}
+.grind-arrow::after{content:"";position:absolute;right:-2px;top:-4px;border:6px solid transparent;border-left:8px solid #4a2c1b;border-right:0}
+.grind-sub{margin:6px 0 12px}
+.grind-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media (min-width:700px){.grind-list{grid-template-columns:1fr 1fr}}
+.grind-row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:stretch}
+.grind-rail{position:relative;display:grid;place-items:center}
+.grind-rail::before{content:"";position:absolute;top:-6px;bottom:-6px;left:50%;width:3px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,rgba(209,71,143,.35),rgba(111,79,214,.35))}
+.grind-dot{position:relative;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c49272,var(--coffee) 55%,#4a2c1b);box-shadow:0 0 0 3px var(--bg),0 2px 6px rgba(60,30,20,.35)}
+.grind-card{background:var(--surface);border-radius:16px;padding:10px 12px;box-shadow:0 1px 2px rgba(43,34,48,.05),0 8px 22px -14px rgba(60,30,60,.25);display:grid;gap:6px}
+.grind-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.grind-top strong{font-family:var(--f-display);font-size:1.02rem}
+.grind-um{font-size:.8rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.grind-bar{position:relative;height:6px;border-radius:6px;background:var(--sunk)}
+.grind-bar span{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--grad);min-width:6px}
+.grind-tex{font-size:.82rem}
+.grind-stats{display:flex;flex-wrap:wrap;gap:6px}
+.grind-stats span{font-size:.82rem;background:var(--sunk);border-radius:10px;padding:3px 8px;white-space:nowrap}
+.grind-foot{margin-top:12px;font-size:.82rem}
 .timeline{list-style:none;margin:10px 0 12px;padding:0 0 0 14px;border-left:2px solid var(--line);display:grid;gap:8px}
 .tl-item{position:relative}.tl-item::before{content:"";position:absolute;left:-21px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--muted)}
 .tl-item.now::before{background:var(--grad);border-color:transparent}
@@ -505,6 +526,7 @@ input.search,select{border-radius:14px!important}
 
   <section id="v-lieux" hidden>
     <header class="top"><div><h1>Ma carte</h1><div class="sub" id="lieu-count">Torréfacteurs, boutiques, lieux de dégustation et adresses à tester</div></div></header>
+    <div class="panel" id="link-panel" hidden></div>
     <div class="panel">
       <h2>Trouver du café de spécialité</h2>
       <div class="hint">Uniquement du café de spécialité : torréfacteurs et coffee shops qui travaillent des cafés tracés, de saison, notés 80+ (SCA). Pas de chaînes ni de cafés-bars classiques.</div>
@@ -521,7 +543,6 @@ input.search,select{border-radius:14px!important}
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
       <div class="list" id="near-list"></div>
     </div>
-    <div class="panel" id="link-panel" hidden></div>
     <div class="panel">
       <h2>Mes lieux</h2>
       <div class="legend"><span>🔥 Torréfaction</span><span>🛒 Achat</span><span>☕ Dégustation</span><span>💙 Coup de cœur</span></div>
@@ -1120,15 +1141,15 @@ async function boot(){
   if (!assets && !ro) showStoreNote("Les photos ne peuvent pas être enregistrées ici. Les fiches, elles, sont sauvegardées.");
   const timer = setTimeout(() => { if (!loaded) showStoreNote("Vos fiches ne répondent pas encore. Vérifiez la connexion, elles s'afficheront dès que possible."); }, 10000);
   db.collection("lieux").onSnapshot(snap => {
-    lieux = snap.docs.map(x => normalizeLieu(x.data(), x.id));
-    if (!$("v-lieux").hidden) renderLieux();
+    lieux = snap.docs.map(x => normalizeLieu(x.data(), x.id)); if (!snap.metadata.fromCache) lieuxLoaded = true;
+    if (!$("v-lieux").hidden){ renderLieux(); setTimeout(autoLinkFiches, 300); }
     refreshFilterOptions();
   }, () => {});
   coll().onSnapshot(snap => {
     fiches = snap.docs.map(x => normalize(x.data(), x.id)); setTimeout(backupState, 0);
     if (remote){ const ids = [...new Set(fiches.flatMap(f => f.photos.map(p => p.id)).filter(id => id.startsWith("sb_") && !localUrls.has(id)))]; if (ids.length) remote.assets.ensure(ids).then(n => { if (n){ renderList(); if (cur && !$("v-form").hidden) renderPhotos(); } }); }
     if (!snap.metadata.fromCache){ loaded = true; clearTimeout(timer); if ($("store-note").textContent.startsWith("Vos fiches")) showStoreNote(""); }
-    renderList(); if (curView === "lieux") renderLinkPanel();
+    renderList(); if (curView === "lieux"){ renderLinkPanel(); setTimeout(autoLinkFiches, 300); }
   }, err => { clearTimeout(timer); showStoreNote("<strong>Lecture des fiches impossible.</strong> Rechargez la page plus tard. (" + (err && err.code || "erreur") + ")"); });
 }
 
@@ -1699,6 +1720,27 @@ ${[["Espresso",90,1],["Moka",170,0],["V60",250,1],["Origami",300,0],["Filtre él
 <text x="100" y="548" class="lbl small muted" text-anchor="end">gros sel</text><text x="100" y="566" class="lbl strong" text-anchor="end">Très grosse</text>
 ${[["Espresso",90],["Moka",170],["V60",250],["Origami",300],["Filtre élec.",370],["Chemex",440],["Piston",520],["Cold brew",590]].map(([t,x]) => { const y = Math.round(30 + (x - 20) * 540 / 600); return `<line x1="128" y1="${y}" x2="160" y2="${y}" class="lead"/><circle cx="120" cy="${y}" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="166" y="${y + 5}" class="lbl strong">${t}</text>`; }).join("")}
 </svg>`;
+/* Frise de mouture : de la plus fine à la plus grosse, avec taille des grains, ratio, eau et temps (repères courants à ajuster selon le café et le moulin) */
+const GRIND = [
+  ["Espresso","sucre glace",200,300,"1:2","92–94 °C","25–30 s"],
+  ["Moka","sel très fin",300,450,"1:7","eau frémissante","4–5 min"],
+  ["V60","sel fin",500,700,"1:16","92–96 °C","2′30 à 3′30"],
+  ["Origami","sel fin",500,750,"1:15 à 1:16","92–96 °C","2′30 à 3′"],
+  ["Filtre électrique","sable fin",700,900,"1:16 à 1:17","92–96 °C","4–6 min"],
+  ["Chemex","sable",800,1000,"1:15 à 1:16","93–96 °C","4–5 min"],
+  ["Piston","gros sel",1000,1200,"1:15","93–95 °C","4 min"],
+  ["Cold brew","gros sel",1200,1500,"1:8 à 1:12","eau froide","12–18 h"]
+];
+const GRIND_HTML = `<div class="grind-head"><span>Plus fin</span><span class="grind-arrow"></span><span>Plus gros</span></div>
+<div class="grind-sub hint">Plus la mouture est fine, plus l'extraction est rapide : le temps de contact s'allonge à mesure que le grain grossit.</div>
+<ol class="grind-list">${GRIND.map(([n, tex, a, b, ratio, eau, t], i) => {
+  const d = Math.round(6 + (a + b) / 2 / 1500 * 18);
+  return `<li class="grind-row" style="--i:${i}"><div class="grind-rail"><span class="grind-dot" style="width:${d}px;height:${d}px"></span></div>
+<div class="grind-card"><div class="grind-top"><strong>${n}</strong><span class="grind-um">${a}–${b} µm</span></div>
+<div class="grind-bar" aria-hidden="true"><span style="left:${a/1500*100}%;width:${(b-a)/1500*100}%"></span></div>
+<div class="grind-tex hint">Texture : ${tex}</div>
+<div class="grind-stats"><span title="Ratio café/eau">⚖️ ${ratio}</span><span title="Température de l'eau">🌡️ ${eau}</span><span title="Temps de contact">⏱️ ${t}</span></div></div></li>`; }).join("")}</ol>
+<div class="grind-foot hint">Repères courants pour commencer : ajustez selon votre moulin et le café, en changeant un seul réglage à la fois.</div>`;
 const DIAG = `<svg viewBox="0 0 480 300" class="schema" role="img" aria-label="Diagnostic du goût">
 <line x1="16" y1="150" x2="464" y2="150" class="axis"/><line x1="240" y1="20" x2="240" y2="280" class="axis"/>
 <rect x="200" y="134" width="80" height="32" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="240" y="155" text-anchor="middle" class="lbl strong">Équilibré</text>
@@ -1930,7 +1972,7 @@ function buildExtraire(){
   const box = $("learn-extraire");
   const intro = el("div","panel");
   intro.append(el("h2","","Les trois réglages qui comptent"), el("p","","Pour toutes les méthodes, on joue sur trois réglages : la <b>mouture</b> (plus fine, plus d'extraction), le <b>ratio</b> café/eau (plus de café, plus de force) et le <b>temps</b> de contact. Pesez toujours le café et l'eau, et ne changez qu'un réglage à la fois."));
-  intro.append(el("div","schema-box", GRIND_SCALE));
+  intro.append(el("div","grind", GRIND_HTML));
   box.append(intro);
   const d = el("div","panel"); d.append(el("h2","","Corriger une tasse"), el("div","hint","Goûtez, situez votre tasse sur ce schéma, puis faites un seul changement."), el("div","schema-box narrow", DIAG)); box.append(d);
   METHOD_GUIDES.forEach(m => {
@@ -2775,12 +2817,44 @@ async function saveFound(r, kind, written){
   if (!lieux.some(x => x.id === l.id)) lieux.push(l);
   return l;
 }
+const COFFEE_KIND = /café|boutique de café|salon de thé|épicerie fine|torréf|roast|shop|boulangerie/i;
+async function findPlaceFor(name, kind){
+  const want = fold(name); const bias = nearHome();
+  const qs = kind === "torrefaction" ? [name + " torréfaction", name + " café", name] : [name, name + " café"];
+  let best = null, bestScore = 0;
+  for (const q of qs){
+    let res = []; try { res = await placeSearch(q, bias); } catch { continue; }
+    res.forEach((r, i) => { const n = fold(r.nom);
+      let sc = n === want ? 6 : sameBrand(r.nom, name) ? 4 : (n.includes(want) && want.length >= 4) ? 3 : 0; if (!sc) return;
+      if (COFFEE_KIND.test(r.genre || "")) sc += 3; if (/rue|ville|quartier|adresse/.test(r.genre || "")) sc -= 4;
+      sc -= i * 0.1; if (sc > bestScore){ bestScore = sc; best = r; } });
+    if (bestScore >= 7) break;
+  }
+  return bestScore >= 4 ? best : null;
+}
+// Place automatiquement sur la carte les lieux des fiches qu'on retrouve sans ambiguïté
+let autoLinking = false, lieuxLoaded = false; const autoTried = new Set();
+async function autoLinkFiches(){
+  if (autoLinking || ro || !db || !fiches.length || !lieuxLoaded) return; autoLinking = true; renderLinkPanel();
+  let placed = [];
+  try {
+    for (const it of unlinkedNames()){
+      if (autoTried.has(it.key)) continue; autoTried.add(it.key);
+      const r = await findPlaceFor(it.name, it.kind); linkProps[it.key] = r;
+      if (!r) continue;
+      try { const l = await saveFound(r, it.kind, it.name); placed.push(l); } catch {}
+    }
+  } finally { autoLinking = false; }
+  if (placed.length){ renderLieux(); if (curView === "lieux"){ await initWorld(); zoomToPoints(lieux.filter(l => l.lat !== null), 800); }
+    toast(`${placed.length} lieu${placed.length>1?"x":""} de vos fiches placé${placed.length>1?"s":""} sur la carte : ${placed.map(l => l.nom).join(", ")}.`); }
+  renderLinkPanel();
+}
 function renderLinkPanel(){
   const box = $("link-panel"); if (!box) return;
   const items = unlinkedNames(); box.hidden = !items.length || ro; if (box.hidden) return;
   box.textContent = "";
   const h = document.createElement("h2"); h.textContent = "Relier mes fiches à la carte";
-  const p = document.createElement("div"); p.className = "hint"; p.textContent = `${items.length} lieu${items.length>1?"x":""} cité${items.length>1?"s":""} dans vos fiches n'${items.length>1?"ont":"a"} pas encore de point. Vérifiez la proposition, puis touchez « C'est ça ».`;
+  const p = document.createElement("div"); p.className = "hint"; p.textContent = autoLinking ? "Recherche des lieux de vos fiches sur la carte…" : `${items.length} lieu${items.length>1?"x":""} de vos fiches n'${items.length>1?"ont":"a"} pas été trouvé${items.length>1?"s":""} automatiquement. Touchez « Chercher » pour le placer vous-même (nom de la ville, adresse ou point sur la carte).`;
   box.append(h, p);
   const list = document.createElement("div"); list.className = "link-list"; box.append(list);
   items.forEach(it => {
@@ -2796,11 +2870,7 @@ function renderLinkPanel(){
     const show = r => { if (!r){ prop.textContent = "Pas trouvé automatiquement : touchez « Chercher » pour le placer."; ok.hidden = true; return; }
       prop.textContent = `Proposition : ${r.nom}${r.genre ? " (" + r.genre + ")" : ""}, ${r.adresse || r.ville || r.pays}`; ok.hidden = false;
       ok.onclick = async () => { ok.disabled = true; try { const l = await saveFound(r, it.kind, it.name); toast(`${l.nom} est sur Ma carte, relié à ${it.n} fiche${it.n>1?"s":""}.`); renderLieux(); } catch { toast("Enregistrement du lieu impossible."); ok.disabled = false; } }; };
-    if (it.key in linkProps) show(linkProps[it.key]);
-    else placeSearch(it.name, nearHome()).then(res => { const want = fold(it.name);
-        const best = res.find(r => fold(r.nom) === want) || res.find(r => sameBrand(r.nom, it.name)) || null;
-        linkProps[it.key] = best; show(best); })
-      .catch(() => { prop.textContent = "Recherche indisponible (réseau). Touchez « Chercher »."; });
+    if (it.key in linkProps) show(linkProps[it.key]); else prop.textContent = "Recherche sur la carte…";
     other.onclick = () => openPick(it.kind, it.name, nom => { addAlias(nom, it.name); renderLieux(); });
     skip.onclick = () => { linkSkip.add(it.key); try { localStorage.setItem("cave_link_skip", JSON.stringify([...linkSkip])); } catch {} renderLinkPanel(); };
   });
@@ -2843,7 +2913,7 @@ function showView(name){
   curView = name; openGroupKey = null; hideAll();
   $(VIEWS[name]).hidden = false; $("tabs").hidden = false;
   [...$("tabs").children].forEach(a => a.setAttribute("aria-current", a.dataset.view === name ? "page" : "false"));
-  if (name === "tableau") renderDash(); else if (name === "actu") openActu(); else if (name === "apprendre") renderLearn(); else if (name === "lieux"){ renderLieux(); initWorld(); const h = nearHome(); if (h && !$("near-q").value) $("near-q").value = h.label; } else renderList();
+  if (name === "tableau") renderDash(); else if (name === "actu") openActu(); else if (name === "apprendre") renderLearn(); else if (name === "lieux"){ renderLieux(); initWorld(); setTimeout(autoLinkFiches, 300); const h = nearHome(); if (h && !$("near-q").value) $("near-q").value = h.label; } else renderList();
   window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", () => { closePick(); if (cur) closeForm(true); curLieu = null; showView(location.hash.slice(1)); });
