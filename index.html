@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103091254";</script><script src="config.js?v=20261103091254"></script>
+<script>window.CAVE_BUILD="20261103091526";</script><script src="config.js?v=20261103091526"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,7 +229,7 @@ body.ro .ed, body.ro .ph .x{display:none!important}
 .bar-fill.bean{background:var(--bean)}
 .bar-row .val{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
 .example-band{background:var(--ai);border:1px solid var(--ai-line);border-radius:var(--r);padding:10px 14px;font-size:.9rem;margin-bottom:14px}
-.dash-cols{display:grid;gap:16px}
+.dash-cols{display:grid;gap:16px;grid-auto-rows:1fr}
 @media (min-width:720px){.dash-cols{grid-template-columns:1fr 1fr}.dash-cols .panel{margin-bottom:0}}
 .chart-svg{width:100%;height:auto;display:block}
 .top-list{display:grid;gap:8px}
@@ -242,11 +242,13 @@ body.ro .ed, body.ro .ph .x{display:none!important}
 .news:hover h3{color:var(--accent)}
 /* Apprendre */
 .guide{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px}
-.guide summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:14px 16px;min-height:52px}
+.guide summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-auto-flow:column;align-items:center;column-gap:12px;row-gap:2px;padding:14px 16px;min-height:56px;box-sizing:border-box}
+.guide summary > span{grid-column:1;min-width:0}
+.guide summary::after{grid-column:2;grid-row:1 / span 2}
 .guide summary::-webkit-details-marker{display:none}
 .guide summary::after{content:"+";margin-left:auto;font-family:var(--f-display);font-size:1.3rem;color:var(--accent);line-height:1}
 .guide[open] summary::after{content:"–"}
-.g-name{font-family:var(--f-display);font-weight:700;font-size:1.1rem}
+.g-name{font-family:var(--f-display);font-weight:700;font-size:1.1rem;line-height:1.25}
 .g-tag{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .guide-body{padding:0 16px 16px;display:grid;gap:10px}
 .guide-body > *, .guide-top > *, .guide-cols > *, .panel > *{min-width:0}
@@ -1863,7 +1865,7 @@ ${L(150,150,232,172,"Grain vert")}
 </svg>`;
 
 const KNOW = [
- {id:"specialite", t:"Qu'est-ce qu'un café de spécialité ?", h:`<p>Un café est dit « de spécialité » lorsqu'il obtient <b>au moins 80 points sur 100</b> à l'évaluation de la SCA (Specialty Coffee Association), réalisée par des dégustateurs certifiés (Q-graders). Le lot de grains verts doit aussi avoir très peu de défauts : aucun défaut majeur, comme des grains noirs ou moisis, et un nombre limité de défauts mineurs.</p>
+ {id:"specialite", t:"Le café de spécialité", h:`<p>Un café est dit « de spécialité » lorsqu'il obtient <b>au moins 80 points sur 100</b> à l'évaluation de la SCA (Specialty Coffee Association), réalisée par des dégustateurs certifiés (Q-graders). Le lot de grains verts doit aussi avoir très peu de défauts : aucun défaut majeur, comme des grains noirs ou moisis, et un nombre limité de défauts mineurs.</p>
 <p>En pratique, on le reconnaît à des informations précises sur le sachet : <b>pays, région, ferme ou station</b>, variété, procédé, altitude et surtout <b>date de torréfaction</b>. Il est torréfié par petits lots pour révéler son terroir plutôt que pour masquer ses défauts.</p>
 <table class="kv"><tr><th>Score</th><th>Mention</th></tr><tr><td>90 à 100</td><td>Exceptionnel</td></tr><tr><td>85 à 89,99</td><td>Excellent</td></tr><tr><td>80 à 84,99</td><td>Très bon (spécialité)</td></tr><tr><td>moins de 80</td><td>Hors spécialité</td></tr></table>`},
  {id:"plante", t:"Le caféier et la cerise", h:`<div class="schema-box narrow">${CHERRY_SVG}</div><p>Le café est la graine du <b>caféier</b>, un arbuste tropical. Deux espèces dominent : <b>Coffea arabica</b> (environ 60 % de la production mondiale, aromatique, autour de 1,2 % de caféine, cultivé en altitude) et <b>Coffea canephora</b>, dit robusta (plus robuste et plus amer, environ 2,2 % de caféine, cultivé en basse altitude). Le café de spécialité est presque toujours de l'arabica.</p>
@@ -2984,6 +2986,24 @@ function placeForm(p){
 const VIEWS = {cave:"v-list", tableau:"v-dash", actu:"v-actu", apprendre:"v-learn", lieux:"v-lieux"};
 let curView = "cave";
 function hideAll(){ ["v-list","v-dash","v-group","v-form","v-actu","v-learn","v-lieux","v-lieu"].forEach(id => $(id).hidden = true); $("actionbar").hidden = true; }
+/* Harmonie : dans une même page, les bandeaux d'un même groupe ont tous la même hauteur */
+const BAND_SEL = [".guide > summary", ".grind-row", "#list > .card", "#lieu-list > *"];
+function eqBands(){
+  BAND_SEL.forEach(sel => {
+    const groups = new Map();
+    document.querySelectorAll(sel).forEach(e => { const k = sel.startsWith(".guide") ? e.parentElement.parentElement : e.parentElement; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+    groups.forEach(list => {
+      list.forEach(e => e.style.minHeight = "");
+      const vis = list.filter(e => e.offsetParent !== null); if (vis.length < 2) return;
+      const h = Math.max(...vis.map(e => e.getBoundingClientRect().height));
+      vis.forEach(e => e.style.minHeight = Math.ceil(h) + "px");
+    });
+  });
+}
+let eqT = 0; const eqSoon = () => { clearTimeout(eqT); eqT = setTimeout(eqBands, 60); };
+window.addEventListener("resize", eqSoon);
+document.addEventListener("click", eqSoon, true);
+new MutationObserver(eqSoon).observe(document.body, {childList:true, subtree:true});
 function showView(name){
   if (!VIEWS[name]) name = "cave";
   curView = name; openGroupKey = null; hideAll();
