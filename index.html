@@ -341,9 +341,30 @@ table.kv td:first-child{font-weight:600;white-space:nowrap}
 .lg-test{border:2px dashed var(--accent)}.lg-home{background:var(--water)}
 .world{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--sea);touch-action:none}
 .world-svg{display:block;width:100%;height:auto;cursor:grab}
-.zone-btn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:2;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.18);white-space:nowrap}
+.world{height:min(62vh,520px);border-radius:18px!important;border:none!important;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,30,60,.25)}
+.lmap{position:absolute;inset:0;z-index:1;background:#ece9f1;font:inherit}
+.pick .world{height:52dvh}
+.world .leaflet-control-zoom a{width:36px;height:36px;line-height:34px;font-size:20px;color:var(--ink)}
+.world .leaflet-control-zoom{border:none!important;box-shadow:0 4px 14px -6px rgba(0,0,0,.35)!important;border-radius:12px;overflow:hidden}
+.world .leaflet-control-attribution{font-size:9px;background:rgba(255,255,255,.7)}
+.lp-wrap{background:none;border:none}
+.lp{box-sizing:border-box;border-radius:50%;background:var(--bg);border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:grid;place-items:center;position:relative;transition:transform .15s}
+.lp span{font-size:12px;line-height:1;filter:drop-shadow(0 0 1px rgba(255,255,255,.8))}
+.lp.sel{box-shadow:0 0 0 4px rgba(161,47,127,.35),0 3px 10px rgba(0,0,0,.4)}
+.lp-test{border-width:2px}
+.lp.tester:not(.lp-test){outline:2px dashed #8b5cf6;outline-offset:2px}
+.lp-heart{position:absolute;right:-6px;top:-7px;font-size:10px;font-style:normal}
+.lp-lab,.rp-lab{display:none;position:absolute;top:100%;left:50%;transform:translate(-50%,4px);white-space:nowrap;font:600 11px/1.2 var(--f-body);color:#231c2e;background:rgba(255,255,255,.92);padding:2px 6px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.world.z-lab .lp-lab{display:block}
+.world.z-rlab .rp-lab{display:block;font-weight:500;color:#444}
+.rp{box-sizing:border-box;border-radius:50%;background:#1d1a21;border:2px solid #fff;box-shadow:0 0 0 1.5px #1d1a21,0 1px 4px rgba(0,0,0,.35);display:grid;place-items:center;color:#fff;font:700 11px var(--f-body)}
+.rp.sel{background:#1d1a21;box-shadow:0 0 0 2px #1d1a21,0 0 0 6px rgba(161,47,127,.35)}
+.rp.man{background:var(--accent)}
+.lp-home{width:16px;height:16px;border-radius:50%;background:#2f7de1;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,125,225,.2)}
+.lg-dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.zone-btn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:1001;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.18);white-space:nowrap}
 @media (max-width:640px){.world-svg{height:340px}}
-.world-empty{position:absolute;left:12px;bottom:10px;background:var(--surface);padding:4px 10px;border-radius:8px}
+.world-empty{position:absolute;z-index:1001;left:12px;top:10px;background:var(--surface);padding:4px 10px;border-radius:8px}
 .w-sea{fill:var(--sea)}.w-grat{fill:none;stroke:var(--line);stroke-width:.5;opacity:.6}
 .w-land{fill:var(--land)}.w-border{fill:none;stroke:var(--bg);stroke-width:.6}
 .w-city{font:500 10px var(--f-body);fill:var(--muted);paint-order:stroke;stroke:var(--land);stroke-width:2.5px}
@@ -537,7 +558,7 @@ input.search,select{border-radius:14px!important}
       <div id="near-ext" class="near-acts" style="margin:0 0 10px" hidden></div>
       <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>🔍 Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
       <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ma ville</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
-      <div class="legend" style="margin-top:8px"><span><i class="lg-res"></i> Adresse de la liste (numéro)</span><span><i class="lg-road"></i> Autoroutes et grands axes</span><span>🔥 🛒 ☕ Mes lieux</span><span><i class="lg-test"></i> À tester</span><span><i class="lg-home"></i> Ma ville</span></div>
+      <div class="legend" style="margin-top:8px"><span><i class="lg-dot" style="background:#f2b705"></i>Torréfacteur</span><span><i class="lg-dot" style="background:#2f7de1"></i>Boutique</span><span><i class="lg-dot" style="background:#e8458b"></i>Barista</span><span><i class="lg-dot" style="background:#8b5cf6;width:9px;height:9px"></i>À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
       <div id="world-cap" class="world-cap"></div>
       <div id="near-tools" hidden class="near-tools"><span class="hint" id="near-home"></span></div>
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
@@ -714,6 +735,8 @@ input.search,select{border-radius:14px!important}
 </div>
 <div class="light" id="light" hidden><img id="light-img" alt="Photo du sachet"><button type="button" id="light-close">Fermer</button></div>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script>
@@ -2277,73 +2300,52 @@ $("l-back").onclick = closeLieu; $("l-cancel").onclick = closeLieu;
 /* Carte du monde */
 const CITIES = [["Paris",48.857,2.352,1],["Lyon",45.764,4.836,2],["Marseille",43.297,5.37,2],["Bordeaux",44.838,-0.579,2],["Lille",50.63,3.057,2],["Nantes",47.218,-1.554,2],["Toulouse",43.605,1.444,2],["Strasbourg",48.573,7.752,2],["Rennes",48.117,-1.678,3],["Caen",49.182,-0.37,3],["Rouen",49.443,1.1,3],["Le Havre",49.494,0.108,3],["Nice",43.71,7.262,2],["Montpellier",43.611,3.877,3],["Grenoble",45.188,5.724,3],["Dijon",47.322,5.041,3],["Angers",47.478,-0.563,3],["Tours",47.394,0.685,3],["Brest",48.39,-4.486,3],["Cherbourg",49.639,-1.616,4],["Bruxelles",50.85,4.352,2],["Genève",46.204,6.143,2],["Londres",51.507,-0.128,1],["Amsterdam",52.368,4.904,2],["Berlin",52.52,13.405,1],["Madrid",40.417,-3.704,1],["Barcelone",41.385,2.173,2],["Rome",41.903,12.496,1],["Milan",45.464,9.19,2],["Oslo",59.913,10.752,2],["Copenhague",55.676,12.568,2],["Stockholm",59.329,18.069,2],["Vienne",48.208,16.374,2],["Lisbonne",38.722,-9.139,2],["New York",40.713,-74.006,1],["San Francisco",37.775,-122.419,1],["Seattle",47.606,-122.332,2],["Portland",45.515,-122.679,3],["Montréal",45.502,-73.567,2],["Mexico",19.433,-99.133,1],["Guatemala",14.634,-90.507,2],["San José",9.928,-84.091,2],["Panama",8.983,-79.517,2],["Bogotá",4.711,-74.072,1],["Medellín",6.244,-75.581,2],["Lima",-12.046,-77.043,1],["São Paulo",-23.551,-46.633,1],["Belo Horizonte",-19.917,-43.935,2],["Addis-Abeba",9.03,38.74,1],["Nairobi",-1.292,36.822,1],["Kigali",-1.944,30.062,2],["Sanaa",15.369,44.191,2],["Melbourne",-37.814,144.963,1],["Sydney",-33.869,151.209,1],["Tokyo",35.676,139.65,1],["Séoul",37.566,126.978,1],["Shanghai",31.23,121.474,1],["Taipei",25.033,121.565,2],["Bangkok",13.756,100.502,1],["Hô Chi Minh-Ville",10.823,106.63,2],["Jakarta",-6.208,106.846,1],["Bangalore",12.972,77.595,2],["Dubaï",25.205,55.271,1],["Le Cap",-33.925,18.424,1],["Le Caire",30.044,31.236,1]];
 let world = null;
-function pxScale(){ if (!world || !world.svg) return 1; const r = world.svg.node().getBoundingClientRect(); return r.width ? Math.max(world.W / r.width, world.H / r.height) * 0.75 : 1; }
+/* Carte fluide (Leaflet + fond de carte OpenStreetMap/CARTO) : zoom au doigt, rues, noms des lieux */
+const ROLE_COL = {torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
+function pinStyle(l){
+  const rs = ["torrefaction","achat","degustation"].filter(k => l.roles[k]);
+  if (!rs.length) return {cls:"lp-test", bg:"#8b5cf6", size:14};
+  const cols = rs.map(k => ROLE_COL[k]);
+  const bg = cols.length === 1 ? cols[0] : `conic-gradient(${cols.map((c, i) => `${c} ${i*100/cols.length}% ${(i+1)*100/cols.length}%`).join(",")})`;
+  return {cls:"", bg, size:26};
+}
+function pinIcon(l, sel){
+  const st = pinStyle(l); const sz = st.size + (sel ? 8 : 0);
+  const sym = st.cls ? "" : (l.roles.torrefaction ? "🔥" : l.roles.achat ? "🛍️" : "☕");
+  const html = `<div class="lp ${st.cls}${sel ? " sel" : ""}${l.aTester ? " tester" : ""}" style="--bg:${st.bg};width:${sz}px;height:${sz}px"><span>${sym}</span>${l.coeur ? '<i class="lp-heart">💙</i>' : ""}</div><div class="lp-lab"></div>`;
+  const ic = window.L.divIcon({className:"lp-wrap", html, iconSize:[sz, sz], iconAnchor:[sz/2, sz/2]});
+  return ic;
+}
 async function initWorld(){
-  if (world) return;
+  if (world){ setTimeout(() => world.map.invalidateSize(), 0); return; }
   const box = $("world");
-  if (!window.d3 || !window.topojson){ $("world-cap").textContent = "La carte n'a pas pu se charger. Vérifiez la connexion et rouvrez l'onglet."; return; }
-  world = {loading:true};
-  try {
-    const topo = await (await fetch("world50.json")).json();
-    const W = 960, H = 520;
-    const svg = d3.select(box).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("class","world-svg").attr("role","img").attr("aria-label","Carte du monde de vos lieux");
-    const proj = d3.geoNaturalEarth1().fitExtent([[8,8],[W-8,H-8]], {type:"Sphere"});
-    const path = d3.geoPath(proj);
-    const g = svg.append("g");
-    g.append("path").attr("d", path({type:"Sphere"})).attr("class","w-sea");
-    g.append("path").attr("d", path(d3.geoGraticule10())).attr("class","w-grat");
-    g.append("path").attr("d", path(topojson.feature(topo, topo.objects.countries))).attr("class","w-land");
-    g.append("path").attr("d", path(topojson.mesh(topo, topo.objects.countries, (a,b) => a !== b))).attr("class","w-border");
-    const gd = g.append("g").attr("class","w-detail");
-    const gc = g.append("g").attr("class","w-cities");
-    CITIES.forEach(([n,lat,lon,rank]) => { const [x,y] = proj([lon,lat]); const c = gc.append("g").attr("data-rank", rank).attr("transform",`translate(${x},${y})`); c.append("circle").attr("r",1.6).attr("class","w-city-dot"); c.append("text").attr("x",3).attr("y",3).attr("class","w-city").text(n); });
-    TOWNS.forEach(([n,lat,lon]) => { if (CITIES.some(c => fold(c[0]) === fold(n))) return; const [x,y] = proj([lon,lat]); const c = gc.append("g").attr("data-rank", 4).attr("transform",`translate(${x},${y})`); c.append("circle").attr("r",1.4).attr("class","w-city-dot"); c.append("text").attr("x",3).attr("y",3).attr("class","w-city").text(n); });
-    NEAR_DIR.forEach(d => { if ([...gc.selectAll("text").nodes()].some(t => fold(t.textContent) === fold(d[2]))) return; if (TOWNS.some(t => fold(t[0]) === fold(d[2]))) return; const [x,y] = proj([d[4],d[3]]); const c = gc.append("g").attr("data-rank", 4).attr("transform",`translate(${x},${y})`); c.append("text").attr("x",3).attr("y",-4).attr("class","w-city").text(d[2]); });
-    const gp = g.append("g").attr("class","w-pins");
-    const gr = g.append("g").attr("class","w-res");
-    const zoom = d3.zoom().scaleExtent([1, 8000]).translateExtent([[0,0],[W,H]]).on("zoom", ev => {
-      const k = ev.transform.k; g.attr("transform", ev.transform);
-      g.select(".w-border").attr("stroke-width", .6/k); g.select(".w-grat").attr("stroke-width", .5/k);
-      gc.selectAll("g").attr("display", function(){ const r = +this.getAttribute("data-rank"); return k >= [0,2.2,5,10,22][r] ? null : "none"; })
-        .each(function(){ const t = d3.select(this).attr("transform").replace(/ scale\(.*\)/, ""); d3.select(this).attr("transform", t + ` scale(${pxScale()/k})`); });
-      g.selectAll("g.pin, g.rpin").each(function(){ const t = d3.select(this).attr("data-t"); d3.select(this).attr("transform", t + ` scale(${pxScale()/k})`); });
-      world.k = k; world.t = ev.transform; if (k > 5) loadDetail();
-      if (ev.sourceEvent) $("b-zone").hidden = false;
-    });
-    svg.call(zoom).on("dblclick.zoom", null);
-    world = {svg, g, gp, gr, gc, gd, path, proj, zoom, W, H, k:1, t:d3.zoomIdentity};
-    gc.selectAll("g").attr("display", function(){ return +this.getAttribute("data-rank") <= 0 ? null : "none"; });
-    drawPins(); drawResultPins(); setTimeout(() => { if (shownResults.length) zoomToPoints(shownResults.filter(r => r.lat != null), 1500); else fitAll(); }, 50);
-  } catch (e) { world = null; $("world-cap").textContent = "La carte n'a pas pu se charger."; }
+  if (!window.L){ $("world-cap").textContent = "La carte n'a pas pu se charger. Vérifiez la connexion et rouvrez l'onglet."; return; }
+  const el = document.createElement("div"); el.className = "lmap"; box.prepend(el);
+  const map = window.L.map(el, {zoomControl:false, worldCopyJump:true, minZoom:2, maxZoom:19, zoomSnap:0.5, tap:true}).setView([46.6, 2.4], 5);
+  window.L.control.zoom({position:"topright"}).addTo(map);
+  window.L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {subdomains:"abcd", maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}).addTo(map);
+  const gr = window.L.layerGroup().addTo(map), gp = window.L.layerGroup().addTo(map);
+  world = {map, gp, gr, k:1, prog:false};
+  const upd = () => { const z = map.getZoom(); world.k = Math.pow(2, z - 1); box.classList.toggle("z-lab", z >= 12.5); box.classList.toggle("z-rlab", z >= 15); };
+  map.on("zoomend", upd); upd();
+  map.on("dragend", () => { $("b-zone").hidden = false; });
+  map.on("zoomend", () => { if (!world.prog) $("b-zone").hidden = false; });
+  map.on("moveend", () => { world.prog = false; });
+  drawPins(); drawResultPins();
+  setTimeout(() => { map.invalidateSize(); if (shownResults.length) zoomToPoints(shownResults.filter(r => r.lat != null), 1500); else fitAll(); }, 60);
 }
-/* Routes principales, villes et fleuves (France et pays voisins), chargés au zoom */
-async function loadDetail(){
-  if (!world || world.detail) return; world.detail = "loading";
-  try {
-    const d = await (await fetch("detail-fr.json")).json();
-    const gd = world.gd, path = world.path;
-    gd.append("path").attr("d", path({type:"Polygon", coordinates:[[[-6,41],[-6,51.5],[10,51.5],[10,41],[-6,41]]]})).attr("class","w-sea");
-    gd.append("path").attr("d", path(d.land)).attr("class","w-land");
-    gd.append("g").selectAll("path").data(d.urban.features).join("path").attr("d", path).attr("class","w-urban");
-    gd.append("g").selectAll("path").data(d.rivers.features).join("path").attr("d", path).attr("class","w-river").attr("vector-effect","non-scaling-stroke");
-    gd.append("g").selectAll("path").data(d.roads.features.filter(f => !f.properties.t)).join("path").attr("d", path).attr("class","w-road").attr("vector-effect","non-scaling-stroke");
-    gd.append("g").selectAll("path").data(d.roads.features.filter(f => f.properties.t)).join("path").attr("d", path).attr("class","w-road maj").attr("vector-effect","non-scaling-stroke");
-    world.detail = true;
-  } catch (e) { world.detail = null; }
-}
+function pxScale(){ return 1; }
+let selLieuId = null;
 function drawPins(){
   if (!world || !world.gp) return;
-  const gp = world.gp; gp.selectAll("*").remove();
+  const gp = world.gp; gp.clearLayers();
   const shown = lieux.filter(l => l.lat !== null && l.lon !== null && (lieuFilter === "tous" || (lieuFilter === "tester" ? l.aTester : lieuFilter === "coeur" ? l.coeur : l.roles[lieuFilter])));
   const home = nearHome();
-  if (home){ const [x,y] = world.proj([home.lon, home.lat]); const t = `translate(${x},${y})`; const h = gp.append("g").attr("class","pin").attr("data-t",t).attr("transform", t + ` scale(${pxScale()/world.k})`); h.append("circle").attr("r",7).attr("class","w-home"); h.append("circle").attr("r",2.5).attr("fill","var(--surface)"); h.append("title").text("Ma ville : " + home.label); }
-  shown.forEach(l => {
-    const [x,y] = world.proj([l.lon, l.lat]); const t = `translate(${x},${y})`;
-    const p = gp.append("g").attr("class","pin" + (l.aTester ? " test" : "")).attr("data-t", t).attr("transform", t + ` scale(${pxScale()/world.k})`).attr("tabindex",0).attr("role","button").attr("aria-label", l.nom);
-    p.append("circle").attr("r", 13).attr("class","w-pin-bg");
-    p.append("text").attr("text-anchor","middle").attr("y", 4.5).attr("class","w-pin-sym").text(roleSymbols(l) ? Array.from(roleSymbols(l)).slice(0, 2).join("") : "★");
-    p.append("circle").attr("r", 20).attr("fill","transparent");
-    p.on("click", () => selectLieu(l)).on("keydown", ev => { if (ev.key === "Enter") selectLieu(l); });
+  if (home) window.L.marker([home.lat, home.lon], {icon:window.L.divIcon({className:"lp-wrap", html:'<div class="lp-home"></div>', iconSize:[16,16], iconAnchor:[8,8]}), interactive:false, keyboard:false}).addTo(gp);
+  shown.slice().sort((a, b) => pinStyle(a).size - pinStyle(b).size).forEach(l => {
+    const m = window.L.marker([l.lat, l.lon], {icon:pinIcon(l, l.id === selLieuId), title:l.nom, riseOnHover:true, zIndexOffset: l.id === selLieuId ? 1000 : (pinStyle(l).size > 14 ? 100 : 0)});
+    m.on("click", () => selectLieu(l)); m.addTo(gp);
+    const lab = m.getElement() && m.getElement().querySelector(".lp-lab"); if (lab) lab.textContent = l.nom;
   });
   $("world-empty").hidden = shown.length > 0 || shownResults.length > 0;
 }
@@ -2351,27 +2353,22 @@ function drawPins(){
 let shownResults = [], selResult = -1;
 function drawResultPins(){
   if (!world || !world.gr) return;
-  const gr = world.gr; gr.selectAll("*").remove();
+  const gr = world.gr; gr.clearLayers();
   shownResults.forEach((r, i) => {
     if (r.lat == null || r.lon == null) return;
-    const [x,y] = world.proj([r.lon, r.lat]); const t = `translate(${x},${y})`;
-    const p = gr.append("g").attr("class","rpin" + (i === selResult ? " sel" : "")).attr("data-t", t).attr("transform", t + ` scale(${pxScale()/world.k})`).attr("tabindex",0).attr("role","button").attr("aria-label", (i+1) + ". " + r.nom);
-    p.append("circle").attr("r", i === selResult ? 14 : 11).attr("class","w-res-bg");
-    p.append("text").attr("text-anchor","middle").attr("y", 4).attr("class","w-res-num").text(r.id === "manual" ? "★" : String(i+1));
-    p.append("circle").attr("r", 18).attr("fill","transparent");
-    p.on("click", () => selectResult(i, false)).on("keydown", ev => { if (ev.key === "Enter") selectResult(i, false); });
+    const sel = i === selResult, sz = sel ? 24 : 12;
+    const html = `<div class="rp${sel ? " sel" : ""}${r.id === "manual" ? " man" : ""}" style="width:${sz}px;height:${sz}px">${sel ? (r.id === "manual" ? "★" : i + 1) : ""}</div><div class="rp-lab"></div>`;
+    const m = window.L.marker([r.lat, r.lon], {icon:window.L.divIcon({className:"lp-wrap", html, iconSize:[sz, sz], iconAnchor:[sz/2, sz/2]}), title:(i + 1) + ". " + r.nom, zIndexOffset: sel ? 900 : -100});
+    m.on("click", () => selectResult(i, false)); m.addTo(gr);
+    const lab = m.getElement() && m.getElement().querySelector(".rp-lab"); if (lab) lab.textContent = r.nom || "";
   });
-  if (selResult >= 0){ const n = gr.selectAll("g.rpin.sel").node(); if (n) n.parentNode.append(n); }
   $("world-empty").hidden = true;
 }
 function selectResult(i, fromList){
   const r = shownResults[i]; if (!r) return;
   selResult = i; drawResultPins();
   document.querySelectorAll((pickCtx ? "#pick-list" : "#near-list") + " .near-item").forEach((el, j) => el.classList.toggle("sel", j === i));
-  if (r.lat != null && world && world.zoom){
-    const k = Math.max(world.k || 1, 2500); const [x, y] = world.proj([r.lon, r.lat]);
-    world.svg.transition().duration(600).call(world.zoom.transform, d3.zoomIdentity.translate(world.W/2 - k*x, world.H/2 - k*y).scale(k));
-  }
+  if (r.lat != null && world && world.map){ world.prog = true; world.map.flyTo([r.lat, r.lon], Math.max(world.map.getZoom(), 16), {duration:.6}); }
   const cap = $("world-cap"); cap.textContent = "";
   const pop = document.createElement("div"); pop.className = "pop";
   pop.append(nearItemEl(r, i, true));
@@ -2384,12 +2381,9 @@ const dirAll = () => dirNear({lat:0, lon:0}, Infinity);
 let nearPool = new Map();
 function poolAdd(items){ items.forEach(it => { if (it && it.lat != null && it.lon != null) nearPool.set(it.id || (fold(it.nom) + "|" + it.lat), it); }); }
 function mapBounds(){
-  if (!world || !world.proj) return null;
-  const t = world.t || d3.zoomIdentity, pts = [];
-  for (const [sx, sy] of [[0,0],[world.W,0],[0,world.H],[world.W,world.H],[world.W/2,world.H/2]]){ const ll = world.proj.invert([(sx - t.x)/t.k, (sy - t.y)/t.k]); if (ll && isFinite(ll[0])) pts.push(ll); }
-  if (pts.length < 5) return null;
-  const lons = pts.slice(0,4).map(p => p[0]), lats = pts.slice(0,4).map(p => p[1]);
-  return {w:Math.min(...lons), e:Math.max(...lons), s:Math.min(...lats), n:Math.max(...lats), c:{lon:pts[4][0], lat:pts[4][1]}};
+  if (!world || !world.map) return null;
+  const b = world.map.getBounds(), c = world.map.getCenter();
+  return {w:b.getWest(), e:b.getEast(), s:b.getSouth(), n:b.getNorth(), c:{lon:c.lng, lat:c.lat}};
 }
 function zoneList(){
   const b = mapBounds(); if (!b) return;
@@ -2409,12 +2403,14 @@ function zoneList(){
 $("b-zone").onclick = () => zoneList();
 function showResultsOnMap(){
   selResult = -1; $("world-cap").textContent = "";
-  if (!world || !world.gr){ initWorld(); return; }
+  if (!world || !world.map){ initWorld(); return; }
   drawResultPins();
   const pts = shownResults.filter(r => r.lat != null);
   if (pts.length) zoomToPoints(pts, 1500);
 }
 function selectLieu(l){
+  selLieuId = l.id; drawPins();
+  if (world && world.map && l.lat !== null){ world.prog = true; world.map.panTo([l.lat, l.lon], {animate:true}); }
   const cap = $("world-cap"); cap.textContent = "";
   const h = document.createElement("div"); h.className = "sel-head";
   const t = document.createElement("strong"); t.textContent = `${roleSymbols(l)} ${l.nom}`; const s = document.createElement("span"); s.className = "hint"; s.textContent = [l.ville, l.pays].filter(Boolean).join(", ") + (l.aTester ? " · à tester" : "");
@@ -2428,16 +2424,14 @@ function selectLieu(l){
   else { const e = document.createElement("div"); e.className = "hint"; e.textContent = "Aucun café acheté, torréfié ou dégusté ici pour l'instant."; cap.append(e); }
 }
 function zoomToPoints(pts, maxK){
-  if (!world || !world.zoom) return;
-  if (!pts.length){ world.svg.transition().duration(600).call(world.zoom.transform, d3.zoomIdentity); return; }
-  const xy = pts.map(p => world.proj([p.lon, p.lat]));
-  const xs = xy.map(p => p[0]), ys = xy.map(p => p[1]);
-  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
-  const k = Math.min(maxK || 60, 0.8 / Math.max((x1-x0)/world.W, (y1-y0)/world.H, 1/(maxK || 60)));
-  const cx = (x0+x1)/2, cy = (y0+y1)/2;
-  world.svg.transition().duration(700).call(world.zoom.transform, d3.zoomIdentity.translate(world.W/2 - k*cx, world.H/2 - k*cy).scale(k));
+  if (!world || !world.map) return;
+  const map = world.map; world.prog = true;
+  if (!pts.length){ map.flyTo([30, 5], 2, {duration:.6}); return; }
+  const maxZ = Math.min(17, Math.round(Math.log2(maxK || 60)) + 3);
+  if (pts.length === 1){ map.flyTo([pts[0].lat, pts[0].lon], maxZ, {duration:.7}); return; }
+  map.flyToBounds(window.L.latLngBounds(pts.map(p => [p.lat, p.lon])), {padding:[40, 40], maxZoom:maxZ, duration:.7});
 }
-function fitAll(){ zoomToPoints(lieux.filter(l => l.lat !== null && l.lon !== null).concat(nearHome() ? [nearHome()] : []), 60); }
+function fitAll(){ zoomToPoints(lieux.filter(l => l.lat !== null && l.lon !== null).concat(nearHome() ? [nearHome()] : []), 4000); }
 $("b-fit").onclick = fitAll;
 $("b-home").onclick = () => { const h = nearHome(); if (h) zoomToPoints([h], 120); else { toast("Cherchez d'abord votre ville dans « Autour de moi »."); $("near-q").focus(); } };
 $("b-reset-zoom").onclick = () => zoomToPoints([]);
@@ -2492,7 +2486,7 @@ async function nearSearch(q){
     if (!nearResults.length){ note.textContent = firstErr ? mcpMessage(firstErr.reason, "Mapbox") : "Aucun café trouvé autour de cette adresse."; return; }
     note.hidden = true; $("near-home").textContent = "Autour de : " + home.label;
     renderNear(home);
-    if (!$("v-lieux").hidden) { if (world && world.gp) { drawPins(); } }
+    if (!$("v-lieux").hidden) { if (world && world.map) { drawPins(); } }
   } catch (e) { note.hidden = false; note.textContent = mcpMessage(e, "Mapbox"); }
 }
 /* Sélection embarquée : fonctionne sans compte ni connecteur (vérifiée en novembre 2026) */
@@ -2758,7 +2752,7 @@ async function pickSearch(q){
   if (ex) setTimeout(() => selectResult(out.indexOf(ex), false), 750);
   if (q){
     $("pick-hint").textContent = "Recherche du lieu et de son adresse…";
-    const mb = mapBounds(); const bias = home || (mb && world && world.k > 3 ? {lat:mb.c.lat, lon:mb.c.lon} : nearHome());
+    const mb = mapBounds(); const bias = home || (mb && world && world.map && world.map.getZoom() >= 6 ? {lat:mb.c.lat, lon:mb.c.lon} : nearHome());
     try {
       const more = await placeSearch(q, bias); if (tok !== pickTok || !pickCtx) return;
       const near = (a, b) => a.lat != null && b.lat != null && haversine(a, b) < 120;
@@ -2876,17 +2870,15 @@ function renderLinkPanel(){
   });
 }
 /* Placer le point à la main : un toucher sur la carte */
-function stopPlacing(){ if (!world || !world.svg) return; world.svg.on("click.place", null); $("world").classList.remove("placing"); $("pick-place").textContent = "📍 Placer le point moi-même"; }
+function stopPlacing(){ if (!world || !world.map) return; if (world.placeFn) world.map.off("click", world.placeFn); world.placeFn = null; $("world").classList.remove("placing"); $("pick-place").textContent = "📍 Placer le point moi-même"; }
 $("pick-place").onclick = () => {
-  if (!world || !world.svg) return;
+  if (!world || !world.map) return;
   if ($("world").classList.contains("placing")){ stopPlacing(); return; }
   $("world").classList.add("placing"); $("pick-place").textContent = "Annuler le placement";
-  if ((world.k || 1) < 200) toast("Zoomez d'abord sur la rue, puis touchez l'emplacement exact.");
+  if (world.map.getZoom() < 15) toast("Zoomez d'abord sur la rue, puis touchez l'emplacement exact.");
   $("world").scrollIntoView({behavior:"smooth", block:"start"});
-  world.svg.on("click.place", ev => {
-    const [x, y] = d3.pointer(ev, world.g.node()); const ll = world.proj.invert([x, y]); if (!ll) return;
-    stopPlacing(); placeForm({lon:ll[0], lat:ll[1]});
-  });
+  world.placeFn = ev => { stopPlacing(); placeForm({lon:ev.latlng.lng, lat:ev.latlng.lat}); };
+  world.map.on("click", world.placeFn);
 };
 function nearestTown(p){ let best = null, bd = Infinity; TOWNS.concat(CITIES.map(c => [c[0], c[1], c[2]])).forEach(t => { const d = haversine(p, {lat:t[1], lon:t[2]}); if (d < bd){ bd = d; best = t; } }); return bd < 30000 ? best[0] : ""; }
 function placeForm(p){
