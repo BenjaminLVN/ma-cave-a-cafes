@@ -333,7 +333,10 @@ table.kv td:first-child{font-weight:600;white-space:nowrap}
 .timeline li{position:relative;padding:0 0 14px 18px;display:grid;gap:2px}
 .timeline li::before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--grad);border:2px solid var(--surface)}
 /* Lieux */
-.thumb.sym{font-size:1.5rem;letter-spacing:-.1em;background:var(--sunk)}
+.thumb.sym{font-size:1.5rem;letter-spacing:-.1em;background:var(--sunk);display:flex!important;flex-wrap:wrap;gap:3px;align-content:center;justify-content:center}
+.rbadge{display:inline-grid;place-items:center;border-radius:50%;vertical-align:middle;flex:none;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.legend .rbadge,.chip .rbadge,label .rbadge,.name .rbadge,strong .rbadge,.hint .rbadge{margin-right:6px;vertical-align:-5px}
+.seg button .rbadge{vertical-align:middle}
 .pill-test{font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:999px;white-space:nowrap}
 .row-btns{display:flex;gap:8px;flex-wrap:wrap}
 .legend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:4px 0 10px}
@@ -558,7 +561,7 @@ input.search,select{border-radius:14px!important}
       <div id="near-ext" class="near-acts" style="margin:0 0 10px" hidden></div>
       <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>🔍 Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
       <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ma ville</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
-      <div class="legend" style="margin-top:8px"><span><i class="lg-dot" style="background:#f2b705"></i>Torréfacteur</span><span><i class="lg-dot" style="background:#2f7de1"></i>Boutique</span><span><i class="lg-dot" style="background:#e8458b"></i>Barista</span><span><i class="lg-dot" style="background:#8b5cf6;width:9px;height:9px"></i>À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
+      <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span><i class="lg-dot" style="background:#8b5cf6;width:9px;height:9px"></i>À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
       <div id="world-cap" class="world-cap"></div>
       <div id="near-tools" hidden class="near-tools"><span class="hint" id="near-home"></span></div>
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
@@ -566,14 +569,14 @@ input.search,select{border-radius:14px!important}
     </div>
     <div class="panel">
       <h2>Mes lieux</h2>
-      <div class="legend"><span>🔥 Torréfaction</span><span>🛒 Achat</span><span>☕ Dégustation</span><span>💙 Coup de cœur</span></div>
+      <div class="legend"><span data-role-ico="torrefaction">Torréfacteur</span><span data-role-ico="achat">Boutique</span><span data-role-ico="degustation">Dégustation</span><span>💙 Coup de cœur</span></div>
       <div class="seg compact" role="group" aria-label="Filtrer les lieux" id="lieu-seg" style="margin-bottom:10px">
         <button type="button" data-f="tous" aria-pressed="true">Tous</button>
         <button type="button" data-f="tester" aria-pressed="false">À tester</button>
         <button type="button" data-f="coeur" aria-pressed="false" aria-label="Coups de cœur">💙</button>
-        <button type="button" data-f="torrefaction" aria-pressed="false">🔥</button>
-        <button type="button" data-f="achat" aria-pressed="false">🛒</button>
-        <button type="button" data-f="degustation" aria-pressed="false">☕</button>
+        <button type="button" data-f="torrefaction" aria-pressed="false" aria-label="Torréfacteurs" data-role-ico="torrefaction" data-size="26"></button>
+        <button type="button" data-f="achat" aria-pressed="false" aria-label="Boutiques" data-role-ico="achat" data-size="26"></button>
+        <button type="button" data-f="degustation" aria-pressed="false" aria-label="Dégustation" data-role-ico="degustation" data-size="26"></button>
       </div>
       <div class="tools"><div class="row"><input class="search" id="lieu-q" type="search" placeholder="Chercher dans mes lieux (nom, ville, marque)" aria-label="Chercher un lieu"><button class="btn small ed" id="b-lieu-new" type="button">Ajouter un lieu</button></div></div>
       <div class="list" id="lieu-list"></div>
@@ -2057,6 +2060,13 @@ function normalizeLieu(o, id){
     site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
 }
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
+/* Motifs choisis le 3 novembre 2026 : T7 torréfacteur, B1 boutique, D1 dégustation (barista) */
+const ROLE_ICO = {torrefaction:'<path d="M8 3h6l-1.5 4h-3z"/><rect x="5" y="7" width="12" height="8" rx="3"/><path d="M17 9h2a1.5 1.5 0 0 1 1.5 1.5V12"/><path d="M15 3v-.5M7 15l-1 5M15 15l1 5M4 20h14"/><circle cx="11" cy="11" r="1.5"/>', achat:'<path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>', degustation:'<path d="M5 10h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.5a2.5 2.5 0 0 1 0 5H15.5"/><path d="M8.5 7c-.8-.8.8-1.7 0-3M12.5 7c-.8-.8.8-1.7 0-3"/>'};
+const ROLE_C = {torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
+const roleIcon = (k, size, color) => `<svg viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="${color||"currentColor"}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROLE_ICO[k]}</svg>`;
+const roleBadge = (k, size) => { size = size || 22; return `<span class="rbadge" style="background:${ROLE_C[k]};width:${size}px;height:${size}px">${roleIcon(k, Math.round(size*.66), "#fff")}</span>`; };
+const roleBadges = (l, size) => ROLES.filter(r => l.roles[r.k]).map(r => roleBadge(r.k, size)).join("");
+document.querySelectorAll("[data-role-ico]").forEach(e => e.insertAdjacentHTML("afterbegin", roleBadge(e.dataset.roleIco, +(e.dataset.size || 20))));
 const roleLabel = l => ROLES.filter(r => l.roles[r.k]).map(r => r.l).join(", ");
 // Un nom écrit sur une fiche correspond-il à ce lieu ? (nom exact, autre nom enregistré, ou même marque pour un torréfacteur)
 function lieuMatches(l, name, kind){
@@ -2136,7 +2146,7 @@ function renderLieux(){
 }
 function lieuCard(l){
   const b = document.createElement("button"); b.type = "button"; b.className = "card";
-  const sym = document.createElement("div"); sym.className = "thumb sym"; sym.textContent = roleSymbols(l) || (l.aTester ? "★" : "·");
+  const sym = document.createElement("div"); sym.className = "thumb sym"; if (roleSymbols(l)) sym.innerHTML = roleBadges(l, l.roles.torrefaction + l.roles.achat + l.roles.degustation > 1 ? 28 : 40); else sym.innerHTML = '<span class="rbadge" style="background:#8b5cf6;width:22px;height:22px"></span>';
   const meta = document.createElement("div"); meta.className = "meta";
   const n = document.createElement("div"); n.className = "name"; n.textContent = (l.coeur ? "💙 " : "") + (l.nom || "Lieu sans nom");
   const l2 = document.createElement("div"); l2.className = "line2"; l2.textContent = [l.ville, l.pays].filter(Boolean).join(" · ") || "Ville à compléter";
@@ -2170,7 +2180,7 @@ function openLieu(l, seed){
 }
 function renderLieuRoles(){
   const box = $("l-roles"); box.textContent = "";
-  ROLES.forEach(r => { const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.textContent = r.s + " " + r.l; c.setAttribute("aria-pressed", curLieu.roles[r.k] ? "true" : "false"); c.onclick = () => { curLieu.roles[r.k] = !curLieu.roles[r.k]; renderLieuRoles(); }; box.append(c); });
+  ROLES.forEach(r => { const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.innerHTML = roleBadge(r.k, 20) + " " + r.l; c.setAttribute("aria-pressed", curLieu.roles[r.k] ? "true" : "false"); c.onclick = () => { curLieu.roles[r.k] = !curLieu.roles[r.k]; renderLieuRoles(); }; box.append(c); });
   const t = document.createElement("button"); t.type = "button"; t.className = "chip"; t.textContent = "★ À tester"; t.setAttribute("aria-pressed", curLieu.aTester ? "true" : "false"); t.onclick = () => { curLieu.aTester = !curLieu.aTester; renderLieuRoles(); }; box.append(t);
   const h = document.createElement("button"); h.type = "button"; h.className = "chip"; h.textContent = "💙 Coup de cœur"; h.setAttribute("aria-pressed", curLieu.coeur ? "true" : "false"); h.onclick = () => { curLieu.coeur = !curLieu.coeur; renderLieuRoles(); }; box.append(h);
 }
@@ -2211,7 +2221,7 @@ function renderMarques(force){
   ms.forEach(m => {
     const row = document.createElement("div"); row.className = "near-item";
     const meta = document.createElement("div"); meta.className = "meta";
-    const n = document.createElement("div"); n.className = "name"; n.textContent = "🔥 " + m;
+    const n = document.createElement("div"); n.className = "name"; n.innerHTML = roleBadge("torrefaction", 18); n.append(" " + m);
     const l2 = document.createElement("div"); l2.className = "line2";
     const acts = document.createElement("div"); acts.className = "near-acts";
     const mine = lieux.filter(x => x.id !== curLieu.id && sameBrand(m, x.nom)).sort((a,b) => (b.roles.torrefaction - a.roles.torrefaction));
@@ -2311,7 +2321,7 @@ function pinStyle(l){
 }
 function pinIcon(l, sel){
   const st = pinStyle(l); const sz = st.size + (sel ? 8 : 0);
-  const sym = st.cls ? "" : (l.roles.torrefaction ? "🔥" : l.roles.achat ? "🛍️" : "☕");
+  const sym = st.cls ? "" : roleIcon(l.roles.torrefaction ? "torrefaction" : l.roles.achat ? "achat" : "degustation", 15, "#fff");
   const html = `<div class="lp ${st.cls}${sel ? " sel" : ""}${l.aTester ? " tester" : ""}" style="--bg:${st.bg};width:${sz}px;height:${sz}px"><span>${sym}</span>${l.coeur ? '<i class="lp-heart">💙</i>' : ""}</div><div class="lp-lab"></div>`;
   const ic = window.L.divIcon({className:"lp-wrap", html, iconSize:[sz, sz], iconAnchor:[sz/2, sz/2]});
   return ic;
@@ -2413,7 +2423,7 @@ function selectLieu(l){
   if (world && world.map && l.lat !== null){ world.prog = true; world.map.panTo([l.lat, l.lon], {animate:true}); }
   const cap = $("world-cap"); cap.textContent = "";
   const h = document.createElement("div"); h.className = "sel-head";
-  const t = document.createElement("strong"); t.textContent = `${roleSymbols(l)} ${l.nom}`; const s = document.createElement("span"); s.className = "hint"; s.textContent = [l.ville, l.pays].filter(Boolean).join(", ") + (l.aTester ? " · à tester" : "");
+  const t = document.createElement("strong"); t.innerHTML = roleBadges(l, 22); t.append(" " + l.nom); const s = document.createElement("span"); s.className = "hint"; s.textContent = [l.ville, l.pays].filter(Boolean).join(", ") + (l.aTester ? " · à tester" : "");
   const o = document.createElement("button"); o.type = "button"; o.className = "btn small"; o.textContent = "Fiche du lieu"; o.onclick = () => openLieu(l);
   const gm = document.createElement("a"); gm.className = "btn small ghost"; gm.href = gmapsUrl(l); gm.target = "_blank"; gm.rel = "noopener"; gm.textContent = "Google Maps";
   h.append(t, s); const row = document.createElement("div"); row.className = "row-btns"; row.append(o, gm);
@@ -2677,6 +2687,7 @@ async function showOnMap(l){
   $("world").scrollIntoView({behavior:"smooth", block:"start"});
 }
 function placeBtn(kind, inp, set){
+  const lb = inp.closest(".field") && inp.closest(".field").querySelector("label"); if (lb && ROLE_ICO[kind] && !lb.querySelector(".rbadge")) lb.insertAdjacentHTML("afterbegin", roleBadge(kind, 20));
   const w = document.createElement("div"); w.className = "place-btn";
   const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.textContent = "📍 Choisir sur la carte";
   const h = document.createElement("span"); h.className = "hint";
@@ -2787,7 +2798,7 @@ async function addAlias(nom, written){
   renderLieux();
 }
 /* Relier les fiches à la carte : chaque torréfacteur, boutique et lieu de dégustation des fiches reçoit son point */
-const LINK_KINDS = [["torrefaction", f => f.produit.torrefacteur, "🔥 Torréfacteur"], ["achat", f => f.produit.boutique, "🛒 Achat"], ["degustation", f => f.degustation.lieu, "☕ Dégustation"]];
+const LINK_KINDS = [["torrefaction", f => f.produit.torrefacteur, "Torréfacteur"], ["achat", f => f.produit.boutique, "Boutique"], ["degustation", f => f.degustation.lieu, "Dégustation"]];
 let linkSkip = new Set(); try { linkSkip = new Set(JSON.parse(localStorage.getItem("cave_link_skip") || "[]")); } catch {}
 const linkProps = {};
 function unlinkedNames(){
@@ -2854,7 +2865,7 @@ function renderLinkPanel(){
   items.forEach(it => {
     const row = document.createElement("div"); row.className = "link-row";
     const t = document.createElement("div"); t.className = "link-t"; t.innerHTML = `<span class="hint"></span><strong></strong>`;
-    t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.lastChild.textContent = it.name;
+    t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.firstChild.insertAdjacentHTML("afterbegin", roleBadge(it.kind, 16)); t.lastChild.textContent = it.name;
     const prop = document.createElement("div"); prop.className = "hint link-prop"; prop.textContent = "Recherche sur la carte…";
     const acts = document.createElement("div"); acts.className = "row-btns";
     const ok = document.createElement("button"); ok.type = "button"; ok.className = "btn small primary"; ok.textContent = "C'est ça"; ok.hidden = true;
