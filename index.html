@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103085156";</script><script src="config.js?v=20261103085156"></script>
+<script>window.CAVE_BUILD="20261103085444";</script><script src="config.js?v=20261103085444"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -358,7 +358,9 @@ body{overflow-x:clip}
 .lp span{font-size:12px;line-height:1;filter:drop-shadow(0 0 1px rgba(255,255,255,.8))}
 .lp.sel{box-shadow:0 0 0 4px rgba(161,47,127,.35),0 3px 10px rgba(0,0,0,.4)}
 .lp-test{border-width:2px}
-.lp.tester:not(.lp-test){outline:2px dashed #8b5cf6;outline-offset:2px}
+.lp.tester:not(.lp-test){outline:2px dashed #10b981;outline-offset:2px}
+.tbadge{box-shadow:none!important;background:none!important}
+.lp-z1{line-height:0;position:relative}
 .lp-heart{position:absolute;right:-7px;top:-7px;font-style:normal;line-height:0}
 .lp-lab,.rp-lab{display:none;position:absolute;top:100%;left:50%;transform:translate(-50%,4px);white-space:nowrap;font:600 11px/1.2 var(--f-body);color:#231c2e;background:rgba(255,255,255,.92);padding:2px 6px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;max-width:160px;overflow:hidden;text-overflow:ellipsis}
 .world.z-lab .lp-lab{display:block}
@@ -564,7 +566,7 @@ input.search,select{border-radius:14px!important}
       <div id="near-ext" class="near-acts" style="margin:0 0 10px" hidden></div>
       <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>🔍 Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
       <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ma ville</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
-      <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span><i class="lg-dot" style="background:#8b5cf6;width:9px;height:9px"></i>À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
+      <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span data-role-ico="tester" data-size="20">À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2f7de1;box-shadow:0 0 0 3px rgba(47,125,225,.2)"></i>Ma ville</span></div>
       <div id="world-cap" class="world-cap"></div>
       <div id="near-tools" hidden class="near-tools"><span class="hint" id="near-home"></span></div>
       <figure id="near-map" class="near-map" hidden><img id="near-map-img" alt=""></figure>
@@ -2074,9 +2076,12 @@ function normalizeLieu(o, id){
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 /* Motifs choisis le 3 novembre 2026 : T7 torréfacteur, B1 boutique, D1 dégustation (barista) */
 const ROLE_ICO = {coeur:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>', tester:'<path d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/>', torrefaction:'<path d="M8 3h6l-1.5 4h-3z"/><rect x="5" y="7" width="12" height="8" rx="3"/><path d="M17 9h2a1.5 1.5 0 0 1 1.5 1.5V12"/><path d="M15 3v-.5M7 15l-1 5M15 15l1 5M4 20h14"/><circle cx="11" cy="11" r="1.5"/>', achat:'<path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>', degustation:'<path d="M5 10h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.5a2.5 2.5 0 0 1 0 5H15.5"/><path d="M8.5 7c-.8-.8.8-1.7 0-3M12.5 7c-.8-.8.8-1.7 0-3"/>'};
-const ROLE_C = {coeur:"#a12f7f", tester:"#8b5cf6", torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
+const ROLE_C = {coeur:"#a12f7f", tester:"#10b981", torrefaction:"#f2b705", achat:"#2f7de1", degustation:"#e8458b"};
 const roleIcon = (k, size, color) => `<svg viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="${color||"currentColor"}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROLE_ICO[k]}</svg>`;
-const roleBadge = (k, size) => { size = size || 22; return `<span class="rbadge" style="background:${ROLE_C[k]};width:${size}px;height:${size}px">${roleIcon(k, Math.round(size*.66), "#fff")}</span>`; };
+// Icône « à tester » choisie (Z1) : goutte émeraude avec point d'interrogation
+let z1n = 0;
+const z1Svg = sz => { const id = "z1g" + (++z1n); return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 42 42" aria-hidden="true" style="filter:drop-shadow(0 2px 3px rgba(20,60,40,.35));overflow:visible"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient></defs><path d="M20 38.5S6 27 6 16a14 14 0 0 1 28 0c0 11-14 22.5-14 22.5z" fill="url(#${id})" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><g transform="translate(10 6.5) scale(.84)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.6"/><path d="M12 17h.01"/></g></svg>`; };
+const roleBadge = (k, size) => { size = size || 22; if (k === "tester") return `<span class="rbadge tbadge" style="width:${size}px;height:${size}px">${z1Svg(size)}</span>`; return `<span class="rbadge" style="background:${ROLE_C[k]};width:${size}px;height:${size}px">${roleIcon(k, Math.round(size*.66), "#fff")}</span>`; };
 const roleBadges = (l, size) => ROLES.filter(r => l.roles[r.k]).map(r => roleBadge(r.k, size)).join("");
 document.querySelectorAll("[data-role-ico]").forEach(e => e.insertAdjacentHTML("afterbegin", roleBadge(e.dataset.roleIco, +(e.dataset.size || 20))));
 const roleLabel = l => ROLES.filter(r => l.roles[r.k]).map(r => r.l).join(", ");
@@ -2333,6 +2338,7 @@ function pinStyle(l){
 }
 function pinIcon(l, sel){
   const st = pinStyle(l); const sz = st.size + (sel ? 8 : 0);
+  if (st.cls === "lp-test"){ const z = sel ? 40 : 32; return window.L.divIcon({className:"lp-wrap", html:`<div class="lp-z1">${z1Svg(z)}</div><div class="lp-lab"></div>`, iconSize:[z, z], iconAnchor:[z/2, z - 3]}); }
   const sym = st.cls ? "" : roleIcon(l.roles.torrefaction ? "torrefaction" : l.roles.achat ? "achat" : "degustation", 15, "#fff");
   const html = `<div class="lp ${st.cls}${sel ? " sel" : ""}${l.aTester ? " tester" : ""}" style="--bg:${st.bg};width:${sz}px;height:${sz}px"><span>${sym}</span></div><div class="lp-lab"></div>`;
   const ic = window.L.divIcon({className:"lp-wrap", html, iconSize:[sz, sz], iconAnchor:[sz/2, sz/2]});
