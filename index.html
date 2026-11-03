@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103092237";</script><script src="config.js?v=20261103092237"></script>
+<script>window.CAVE_BUILD="20261103092913";</script><script src="config.js?v=20261103092913"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -364,6 +364,12 @@ body{overflow-x:clip}
 .lp span{font-size:12px;line-height:1;filter:drop-shadow(0 0 1px rgba(255,255,255,.8))}
 .lp.sel{box-shadow:0 0 0 4px rgba(161,47,127,.35),0 3px 10px rgba(0,0,0,.4)}
 .lp-test{border-width:2px}
+.here-list{display:grid;gap:6px;margin-top:10px}
+.here-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.here-item .hi-n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.role-ask{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.test-seg{display:grid!important;grid-template-columns:1fr 1fr;flex-basis:100%;width:100%;margin:4px 0}
+.test-seg button{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .lp.tester:not(.lp-test){outline:2px dashed #10b981;outline-offset:2px}
 .tbadge{box-shadow:none!important;background:none!important}
 .lp-z1{line-height:0;position:relative}
@@ -465,14 +471,14 @@ input.search,select{border-radius:14px!important}
     </header>
     <div class="scan-hero ed">
       <button class="btn primary" id="b-scan" type="button">Scanner un café</button>
-      <button class="btn small" id="b-web" type="button">🔗 Lien de la page web du café</button>
+      <button class="btn small" id="b-web" type="button">Lien de la page web du café</button>
       <div class="hint">Prenez une photo ou choisissez-en dans la galerie (face, dos, étiquette) : l'appli lit le sachet et pré-remplit la fiche.</div>
       <label class="check old-mode"><input type="checkbox" id="old-mode"> Anciens sachets (achetés avant novembre 2026) : cochez pour que les fiches que vous ajoutez soient datées « avant novembre 2026 »</label>
     </div>
     <div class="notice" id="store-note" hidden></div>
     <div class="backup" id="backup" hidden>
       <div class="hint" id="backup-hint">Sauvegardez vos fiches, photos et lieux dans un fichier (sur iPhone : « Enregistrer dans Fichiers »). Vous pourrez les restaurer à tout moment.</div>
-      <div class="row-btns"><button type="button" class="btn small" id="b-backup">💾 Sauvegarder mes fiches</button><button type="button" class="btn small ghost" id="b-restore">Restaurer une sauvegarde</button></div>
+      <div class="row-btns"><button type="button" class="btn small" id="b-backup">Sauvegarder mes fiches</button><button type="button" class="btn small ghost" id="b-restore">Restaurer une sauvegarde</button></div>
       <input class="vh" type="file" id="in-restore" accept=".json,application/json,text/plain" aria-label="Fichier de sauvegarde">
     </div>
     <div class="tools" id="tools" hidden>
@@ -527,7 +533,7 @@ input.search,select{border-radius:14px!important}
     </div>
     <div class="section-label">Historique des fiches</div>
     <div class="list" id="g-list"></div>
-    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" class="ed"><button class="btn primary" id="b-gnew" type="button">🔁 J'ai racheté ce café</button><button class="btn" id="b-gmerge" type="button" hidden>Réunir en une seule fiche</button></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" class="ed"><button class="btn primary" id="b-gnew" type="button">J'ai racheté ce café</button><button class="btn" id="b-gmerge" type="button" hidden>Réunir en une seule fiche</button></div>
   </section>
 
   <section id="v-dash" hidden>
@@ -570,7 +576,7 @@ input.search,select{border-radius:14px!important}
       </form>
       <div class="notice" id="near-note" hidden></div>
       <div id="near-ext" class="near-acts" style="margin:0 0 10px" hidden></div>
-      <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>🔍 Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
+      <div class="world" id="world"><button type="button" class="btn small zone-btn" id="b-zone" hidden>Rechercher dans cette zone</button><div class="world-empty hint" id="world-empty" hidden>Cherchez une ville ou zoomez sur une région.</div></div>
       <div class="row-btns" style="margin-top:10px"><button class="btn small" id="b-fit" type="button">Voir tous mes lieux</button><button class="btn small" id="b-home" type="button">Ici</button><button class="btn small ghost" id="b-reset-zoom" type="button">Monde entier</button></div>
       <div class="legend" style="margin-top:8px"><span data-role-ico="torrefaction" data-size="18">Torréfacteur</span><span data-role-ico="achat" data-size="18">Boutique</span><span data-role-ico="degustation" data-size="18">Barista</span><span data-role-ico="tester" data-size="20">À tester</span><span><i class="lg-dot" style="background:#1d1a21;width:9px;height:9px"></i>Adresse de spécialité possible (touchez-la)</span><span><i class="lg-dot" style="background:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.25)"></i>Ici (votre position)</span></div>
       <div id="world-cap" class="world-cap"></div>
@@ -604,7 +610,7 @@ input.search,select{border-radius:14px!important}
         <div class="field"><label for="l-adresse">Adresse</label><input id="l-adresse" type="text"></div>
         <div class="field full"><label for="l-site">Site web</label><input id="l-site" type="url" inputmode="url" placeholder="https://"></div>
       </div>
-      <div class="place-btn ed"><button class="btn small" id="l-find" type="button">📍 Chercher le lieu sur la carte (adresse et point)</button></div>
+      <div class="place-btn ed"><button class="btn small" id="l-find" type="button">Chercher le lieu sur la carte (adresse et point)</button></div>
     </div>
     <div class="block">
       <div class="block-head"><h2>Rôles</h2><span class="hint">Un lieu peut en cumuler plusieurs</span></div>
@@ -619,7 +625,7 @@ input.search,select{border-radius:14px!important}
     <div class="block">
       <div class="block-head"><h2>Position</h2></div>
       <div class="hint" id="l-pos"></div>
-      <div class="row-btns" style="margin:10px 0"><button class="btn small ed" id="l-geo" type="button">📍 Chercher le lieu et son adresse</button><a class="btn small ghost" id="l-gmaps" target="_blank" rel="noopener" href="#">Ouvrir dans Google Maps</a><a class="btn small ghost" id="l-site-a" target="_blank" rel="noopener" href="#" hidden>Site web</a></div>
+      <div class="row-btns" style="margin:10px 0"><button class="btn small ed" id="l-geo" type="button">Chercher le lieu et son adresse</button><a class="btn small ghost" id="l-gmaps" target="_blank" rel="noopener" href="#">Ouvrir dans Google Maps</a><a class="btn small ghost" id="l-site-a" target="_blank" rel="noopener" href="#" hidden>Site web</a></div>
       <div class="field ed"><label for="l-link">Ou collez un lien Google Maps</label><input id="l-link" type="url" inputmode="url" placeholder="https://www.google.com/maps/place/…"></div>
     </div>
     <div class="block">
@@ -682,8 +688,8 @@ input.search,select{border-radius:14px!important}
         <button class="btn small" id="b-addgal" type="button">Galerie</button>
         <button class="btn small" id="b-read" type="button">Lire les photos avec Claude</button>
         <button class="btn small" id="b-ocr" type="button">Lire le sachet (sur le téléphone)</button>
-        <button class="btn small" id="b-crop" type="button">🔍 Relire une zone</button>
-        <button class="btn small ghost" id="b-paste" type="button">🔗 Lien de la page web ou texte du sachet</button>
+        <button class="btn small" id="b-crop" type="button">Relire une zone</button>
+        <button class="btn small ghost" id="b-paste" type="button">Lien de la page web ou texte du sachet</button>
       </div>
       <div class="paste-box" id="paste-box" hidden>
         <div class="hint">Astuce iPhone : ouvrez la photo du sachet dans Photos, touchez l'icône de texte en bas à droite, puis « Tout sélectionner » et « Copier ». Collez ici :</div>
@@ -706,7 +712,7 @@ input.search,select{border-radius:14px!important}
     </div>
 
     <div class="block hist-block" id="f-hist-block" hidden>
-      <div class="block-head"><span class="block-num">🔁</span><h2>Mes achats de ce café</h2></div>
+      <div class="block-head"><span class="block-num">↻</span><h2>Mes achats de ce café</h2></div>
       <div id="f-hist"></div>
     </div>
 
@@ -743,7 +749,7 @@ input.search,select{border-radius:14px!important}
     <form id="pick-form" class="tools" autocomplete="off"><div class="row"><input class="search" id="pick-q" type="search" placeholder="Nom de la boutique ou ville, ex. Coutume, Saint-Malo" aria-label="Nom de la boutique ou ville"><button class="btn small primary" type="submit">Chercher</button></div></form>
     <div class="hint" id="pick-hint">Touchez un numéro sur la carte ou dans la liste, puis « Choisir ce lieu ». Le point est ajouté à « Ma carte » et relié à cette fiche.</div>
     <div id="pick-slot"></div>
-    <div class="row-btns"><button type="button" class="btn small" id="pick-place">📍 Placer le point moi-même</button><a class="btn small ghost" id="pick-gm" target="_blank" rel="noopener">Chercher sur Google Maps</a></div>
+    <div class="row-btns"><button type="button" class="btn small" id="pick-place">Placer le point moi-même</button><a class="btn small ghost" id="pick-gm" target="_blank" rel="noopener">Chercher sur Google Maps</a></div>
     <div class="list" id="pick-list"></div>
   </div>
 </div>
@@ -912,7 +918,7 @@ function backupState(){
   let t = 0; try { t = +localStorage.getItem(BK_KEY) || 0; } catch {}
   const newer = fiches.concat(lieux).some(x => x.updatedAt && Date.parse(x.updatedAt) > t);
   const box = $("backup"); box.classList.toggle("warn", localMode && newer && fiches.length > 0);
-  $("backup-hint").textContent = (localMode && newer && fiches.length) ? "⚠️ Des fiches ou des lieux ne sont pas encore sauvegardés. Touchez « Sauvegarder mes fiches » pour ne pas les perdre." + (t ? " Dernière sauvegarde : " + new Date(t).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"}) + "." : "")
+  $("backup-hint").textContent = (localMode && newer && fiches.length) ? "Des fiches ou des lieux ne sont pas encore sauvegardés. Touchez « Sauvegarder mes fiches » pour ne pas les perdre." + (t ? " Dernière sauvegarde : " + new Date(t).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"}) + "." : "")
     : "Sauvegardez vos fiches, photos et lieux dans un fichier (sur iPhone : « Enregistrer dans Fichiers »). Vous pourrez les restaurer à tout moment." + (t ? " Dernière sauvegarde : " + new Date(t).toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"}) + "." : "");
 }
 $("b-backup").onclick = async () => {
@@ -933,7 +939,7 @@ $("b-backup").onclick = async () => {
     toast(`Sauvegarde prête : ${fiches.length} fiche${fiches.length>1?"s":""}, ${lieux.length} lieu${lieux.length>1?"x":""}, ${Object.keys(photos).length} photo${Object.keys(photos).length>1?"s":""}.`);
     backupState();
   } catch (e) { toast("La sauvegarde n'a pas pu être créée."); }
-  finally { b.disabled = false; b.textContent = "💾 Sauvegarder mes fiches"; }
+  finally { b.disabled = false; b.textContent = "Sauvegarder mes fiches"; }
 };
 $("b-restore").onclick = () => $("in-restore").click();
 $("in-restore").addEventListener("change", async e => {
@@ -1140,7 +1146,7 @@ async function boot(){
   if (window.CAVE_CFG && window.CAVE_CFG.url){
     remote = remoteStore(window.CAVE_CFG, await ensureKey());
     db = remote.db; assets = remote.assets; localMode = false;
-    showStoreNote('<strong>Enregistrement automatique en ligne</strong> (cave n° ' + caveKey().slice(-4) + '). Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">🔗 Copier le lien de ma cave</button> <button type="button" class="btn small" id="b-merge-link">Récupérer les fiches d\'un autre lien</button>');
+    showStoreNote('<strong>Enregistrement automatique en ligne</strong> (cave n° ' + caveKey().slice(-4) + '). Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">Copier le lien de ma cave</button> <button type="button" class="btn small" id="b-merge-link">Récupérer les fiches d\'un autre lien</button>');
     setTimeout(() => { const bm = document.getElementById("b-merge-link"); if (bm) bm.onclick = async () => {
       const v = prompt("Collez le lien de l'autre cave (il contient « ?k= »). Ses fiches seront copiées dans celle-ci, rien n'est effacé.") || "";
       const m = v.trim().match(/[?&]k=([A-Za-z0-9_-]{24,64})/) || v.trim().match(/^([A-Za-z0-9_-]{24,64})$/); if (!m){ if (v) toast("Ce n'est pas un lien de cave valide."); return; }
@@ -1305,7 +1311,7 @@ function groupsOf(list){
 
 function thumbEl(f){
   const th = document.createElement(f.photos[0] ? "img" : "div"); th.className="thumb";
-  if (f.photos[0]){ th.src = blobUrl(f.photos[0].id); th.alt=""; th.loading="lazy"; th.onerror=()=>{th.replaceWith(Object.assign(document.createElement("div"),{className:"thumb",textContent:"photo"}));}; } else th.textContent = "☕";
+  if (f.photos[0]){ th.src = blobUrl(f.photos[0].id); th.alt=""; th.loading="lazy"; th.onerror=()=>{th.replaceWith(Object.assign(document.createElement("div"),{className:"thumb",textContent:"photo"}));}; } else th.innerHTML = roleIcon("degustation", 26, "var(--muted)");
   return th;
 }
 function pillEl(note){ const p = document.createElement("div"); p.className = "note-pill" + (note === null ? " none" : ""); p.textContent = note === null ? "non noté" : fmtNote(note); return p; }
@@ -1785,7 +1791,7 @@ const GRIND_HTML = `<div class="grind-head"><span>Plus fin</span><span class="gr
 <div class="grind-card"><div class="grind-top"><strong>${n}</strong><span class="grind-um">${a}–${b} µm</span></div>
 <div class="grind-bar" aria-hidden="true"><span style="left:${a/1500*100}%;width:${(b-a)/1500*100}%"></span></div>
 <div class="grind-tex hint">Texture : ${tex}</div>
-<div class="grind-stats"><span title="Ratio café/eau">⚖️ ${ratio}</span><span title="Température de l'eau">🌡️ ${eau}</span><span title="Temps de contact">⏱️ ${t}</span></div></div></li>`; }).join("")}</ol>
+<div class="grind-stats"><span title="Ratio café/eau">Ratio ${ratio}</span><span title="Température de l'eau">Eau ${eau}</span><span title="Temps de contact">⏱️ ${t}</span></div></div></li>`; }).join("")}</ol>
 <div class="grind-foot hint">Repères courants pour commencer : ajustez selon votre moulin et le café, en changeant un seul réglage à la fois.</div>`;
 const DIAG = `<svg viewBox="0 0 480 300" class="schema" role="img" aria-label="Diagnostic du goût">
 <line x1="16" y1="150" x2="464" y2="150" class="axis"/><line x1="240" y1="20" x2="240" y2="280" class="axis"/>
@@ -2077,7 +2083,7 @@ function normalizeLieu(o, id){
   const num = v => (v === null || v === undefined || v === "" || !isFinite(Number(v))) ? null : Number(v);
   return {id: id || o.id || uid(), nom:o.nom||"", ville:o.ville||"", pays:o.pays||"", adresse:o.adresse||"", lat:num(o.lat), lon:num(o.lon),
     roles:{torrefaction:!!r.torrefaction, achat:!!r.achat, degustation:!!r.degustation}, aTester:!!o.aTester, coeur:!!o.coeur, marques: splitMarques(o.marques), remarques:o.remarques||"",
-    site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], auto:!!o.auto, createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
+    site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], auto:!!o.auto, testeLe:o.testeLe||"", createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
 }
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 /* Motifs choisis le 3 novembre 2026 : T7 torréfacteur, B1 boutique, D1 dégustation (barista) */
@@ -2205,7 +2211,9 @@ function openLieu(l, seed){
 function renderLieuRoles(){
   const box = $("l-roles"); box.textContent = "";
   ROLES.forEach(r => { const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.innerHTML = roleBadge(r.k, 20) + " " + r.l; c.setAttribute("aria-pressed", curLieu.roles[r.k] ? "true" : "false"); c.onclick = () => { curLieu.roles[r.k] = !curLieu.roles[r.k]; renderLieuRoles(); }; box.append(c); });
-  const t = document.createElement("button"); t.type = "button"; t.className = "chip"; t.innerHTML = roleBadge("tester", 20) + " À tester"; t.setAttribute("aria-pressed", curLieu.aTester ? "true" : "false"); t.onclick = () => { curLieu.aTester = !curLieu.aTester; renderLieuRoles(); }; box.append(t);
+  const st = document.createElement("div"); st.className = "seg compact test-seg"; st.setAttribute("role", "group"); st.setAttribute("aria-label", "Statut");
+  [[true, roleBadge("tester", 18) + " À tester"], [false, testedIco(18) + " Testé"]].forEach(([v, lab]) => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = lab; b.setAttribute("aria-pressed", curLieu.aTester === v ? "true" : "false"); b.onclick = () => { curLieu.aTester = v; if (!v && !curLieu.testeLe) curLieu.testeLe = new Date().toISOString().slice(0, 10); renderLieuRoles(); }; st.append(b); });
+  box.append(st);
   const h = document.createElement("button"); h.type = "button"; h.className = "chip"; h.innerHTML = roleBadge("coeur", 20) + " Coup de cœur"; h.setAttribute("aria-pressed", curLieu.coeur ? "true" : "false"); h.onclick = () => { curLieu.coeur = !curLieu.coeur; renderLieuRoles(); }; box.append(h);
 }
 function renderLieuPos(){
@@ -2357,13 +2365,16 @@ async function initWorld(){
   const box = $("world");
   if (!window.L){ $("world-cap").textContent = "La carte n'a pas pu se charger. Vérifiez la connexion et rouvrez l'onglet."; return; }
   const el = document.createElement("div"); el.className = "lmap"; box.prepend(el);
-  const map = window.L.map(el, {zoomControl:false, worldCopyJump:true, minZoom:2, maxZoom:19, zoomSnap:0.5, tap:true}).setView([46.6, 2.4], 5);
+  // Ouverture directe sur ma dernière position connue (aucune animation), puis mise à jour discrète
+  let last = null; try { last = JSON.parse(localStorage.getItem("cave_here") || "null"); } catch {}
+  if (last && isFinite(last.lat) && !herePos) herePos = {lat:last.lat, lon:last.lon, label:"Ici"};
+  const map = window.L.map(el, {zoomControl:false, worldCopyJump:true, minZoom:2, maxZoom:19, zoomSnap:0.5, tap:true}).setView(herePos ? [herePos.lat, herePos.lon] : [46.6, 2.4], herePos ? 14 : 5);
   window.L.control.zoom({position:"topright"}).addTo(map);
   const Ici = window.L.Control.extend({options:{position:"topright"}, onAdd(){ const b = window.L.DomUtil.create("button", "ici-ctl"); b.type = "button"; b.title = "Ici : ma position"; b.setAttribute("aria-label", "Ici : ma position");
     b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Ici</span>';
     window.L.DomEvent.disableClickPropagation(b); b.onclick = () => locateMe(); return b; }});
   new Ici().addTo(map);
-  if (!herePos && !sessionStorage.getItem("cave_geo_asked")){ try { sessionStorage.setItem("cave_geo_asked", "1"); } catch {} setTimeout(() => locateMe({silent:true, explain:true, zoomK:800}), 400); }
+  setTimeout(() => locateMe({silent:true, explain:true, instant:true}), 0);
   // Fond de carte OpenStreetMap (sans clé), avec un second serveur si le premier ne répond pas
   const OSM_ATTR = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
   let tl = window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:OSM_ATTR}).addTo(map);
@@ -2372,11 +2383,12 @@ async function initWorld(){
   world = {map, gp, gr, k:1, prog:false};
   const upd = () => { const z = map.getZoom(); world.k = Math.pow(2, z - 1); box.classList.toggle("z-lab", z >= 12.5); box.classList.toggle("z-rlab", z >= 15); };
   map.on("zoomend", upd); upd();
+  map.on("dragstart zoomstart", () => { if (!world.prog) world.userMoved = true; });
   map.on("dragend", () => { $("b-zone").hidden = false; });
   map.on("zoomend", () => { if (!world.prog) $("b-zone").hidden = false; });
   map.on("moveend", () => { world.prog = false; });
   drawPins(); drawResultPins();
-  setTimeout(() => { map.invalidateSize(); if (shownResults.length) zoomToPoints(shownResults.filter(r => r.lat != null), 1500); else fitAll(); }, 60);
+  setTimeout(() => map.invalidateSize(), 60);
 }
 function pxScale(){ return 1; }
 let selLieuId = null;
@@ -2452,6 +2464,21 @@ function showResultsOnMap(){
   const pts = shownResults.filter(r => r.lat != null);
   if (pts.length) zoomToPoints(pts, 1500);
 }
+const testedIco = size => `<span class="rbadge" style="background:linear-gradient(135deg,#34D399,#059669);width:${size}px;height:${size}px"><svg viewBox="0 0 24 24" width="${Math.round(size*.62)}" height="${Math.round(size*.62)}" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>`;
+async function saveLieu(l){ l.updatedAt = new Date().toISOString(); const o = JSON.parse(JSON.stringify(l)); delete o.id; delete o.isNew; await db.collection("lieux").doc(l.id).set(o); if (!lieux.some(x => x.id === l.id)) lieux.push(l); }
+async function markTested(l, quiet){
+  if (!l || !db || ro) return; l.aTester = false; l.testeLe = new Date().toISOString().slice(0, 10);
+  try { await saveLieu(l); if (!quiet) toast(`${l.nom} est maintenant « testé ».`); } catch { if (!quiet) toast("Enregistrement impossible."); }
+  renderLieux(); drawPins();
+}
+// Nouvelle fiche café déjà reliée à ce lieu
+function newFicheAt(l){
+  const f = blankFiche();
+  if (l.roles.torrefaction && !l.roles.achat) f.produit.torrefacteur = l.nom; else f.produit.boutique = l.nom;
+  if (!f.produit.dateAchat) f.produit.dateAchat = new Date().toISOString().slice(0, 10);
+  if (l.aTester && (l.roles.achat || !l.roles.torrefaction)) markTested(l, true);
+  openForm(null, f);
+}
 function selectLieu(l){
   selLieuId = l.id; drawPins();
   if (world && world.map && l.lat !== null){ world.prog = true; world.map.panTo([l.lat, l.lon], {animate:true}); }
@@ -2461,8 +2488,17 @@ function selectLieu(l){
   const o = document.createElement("button"); o.type = "button"; o.className = "btn small"; o.textContent = "Fiche du lieu"; o.onclick = () => openLieu(l);
   const gm = document.createElement("a"); gm.className = "btn small ghost"; gm.href = gmapsUrl(l); gm.target = "_blank"; gm.rel = "noopener"; gm.textContent = "Google Maps";
   h.append(t, s); const row = document.createElement("div"); row.className = "row-btns"; row.append(o, gm);
+  if (!pickCtx && !ro){
+    const nf = document.createElement("button"); nf.type = "button"; nf.className = "btn small"; nf.textContent = "Ajouter un café acheté ici"; nf.onclick = () => newFicheAt(l); row.prepend(nf);
+    if (l.aTester){ const tb = document.createElement("button"); tb.type = "button"; tb.className = "btn small primary"; tb.innerHTML = testedIco(18) + " J'ai testé"; tb.onclick = async () => { tb.disabled = true; await markTested(l); selectLieu(l); }; row.prepend(tb); }
+  }
   if (pickCtx){ o.remove(); const ch = document.createElement("button"); ch.type = "button"; ch.className = "btn small primary"; ch.textContent = "Choisir ce lieu"; ch.onclick = () => pickChoose(null, l); row.prepend(ch); }
   cap.append(h, row);
+  if (!pickCtx && !ro && !l.aTester && !ROLES.some(x => l.roles[x.k])){
+    const ask = document.createElement("div"); ask.className = "role-ask"; const lab = document.createElement("span"); lab.className = "hint"; lab.textContent = "C'était plutôt :"; ask.append(lab);
+    ROLES.forEach(x => { const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.innerHTML = roleBadge(x.k, 18) + " " + ({torrefaction:"Torréfacteur", achat:"Boutique", degustation:"Barista"})[x.k]; c.onclick = async () => { l.roles[x.k] = true; try { await saveLieu(l); } catch {} renderLieux(); drawPins(); selectLieu(l); }; ask.append(c); });
+    cap.append(ask);
+  }
   const cs = cafesAt(l);
   if (cs.length){ const lst = document.createElement("div"); lst.className = "list"; cs.forEach(({f, rel}) => lst.append(ficheCard(f, rel.join(", ")))); cap.append(lst); }
   else { const e = document.createElement("div"); e.className = "hint"; e.textContent = "Aucun café acheté, torréfié ou dégusté ici pour l'instant."; cap.append(e); }
@@ -2484,14 +2520,44 @@ function locateMe(opts){
   btns.forEach(b => b.classList.add("busy"));
   navigator.geolocation.getCurrentPosition(p => {
     btns.forEach(b => b.classList.remove("busy"));
-    herePos = {lat:p.coords.latitude, lon:p.coords.longitude, label:"Ici"};
-    drawPins(); zoomToPoints([herePos], opts.zoomK || 4000);
+    const prev = herePos; herePos = {lat:p.coords.latitude, lon:p.coords.longitude, label:"Ici"};
+    try { localStorage.setItem("cave_here", JSON.stringify({lat:herePos.lat, lon:herePos.lon})); } catch {}
+    drawPins();
+    if (opts.instant){ if (world && world.map && !(world.userMoved) && (!prev || haversine(prev, herePos) > 150)){ world.prog = true; world.map.setView([herePos.lat, herePos.lon], 14, {animate:false}); } }
+    else zoomToPoints([herePos], opts.zoomK || 4000);
+    if (!opts.silent && !pickCtx) showHereCard(herePos);
   }, e => {
     btns.forEach(b => b.classList.remove("busy"));
     if (!opts.silent || (e && e.code === 1 && opts.explain)) toast(e && e.code === 1 ? "La localisation est bloquée : Réglages > Confidentialité > Service de localisation > Safari (ou l'appli), puis « Lorsque l'app est active »." : "Position introuvable pour le moment, réessayez.");
   }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
 }
 $("b-home").onclick = () => locateMe();
+// « Ici » : ce qui est autour de moi, et ajout d'un nouveau lieu à ma position
+async function showHereCard(h){
+  const cap = $("world-cap"); cap.textContent = ""; selLieuId = null;
+  const head = document.createElement("div"); head.className = "sel-head";
+  const t = document.createElement("strong"); t.textContent = "Vous êtes ici"; const sub = document.createElement("span"); sub.className = "hint"; sub.textContent = "Recherche de l'adresse…";
+  head.append(t, sub); cap.append(head);
+  const row = document.createElement("div"); row.className = "row-btns";
+  const add = document.createElement("button"); add.type = "button"; add.className = "btn small primary"; add.textContent = "Ajouter un lieu ici"; row.append(add); cap.append(row);
+  const mine = lieux.filter(l => l.lat !== null && haversine(h, l) < 300).sort((a, b) => haversine(h, a) - haversine(h, b));
+  const list = document.createElement("div"); list.className = "here-list"; cap.append(list);
+  const item = (lab, dist, badge, act) => { const b = document.createElement("button"); b.type = "button"; b.className = "here-item"; b.innerHTML = badge + '<span class="hi-n"></span><span class="hint"></span>'; b.querySelector(".hi-n").textContent = lab; b.querySelector(".hint").textContent = fmtDist(dist); b.onclick = act; list.append(b); };
+  mine.forEach(l => item(l.nom, haversine(h, l), roleBadges(l, 18) || roleBadge("tester", 18), () => selectLieu(l)));
+  let where = {ville:nearestTown(h), pays:"", adresse:""}, pois = [];
+  try {
+    const u = new URL("https://photon.komoot.io/reverse"); u.searchParams.set("lat", h.lat.toFixed(6)); u.searchParams.set("lon", h.lon.toFixed(6)); u.searchParams.set("limit", "12"); u.searchParams.set("radius", "0.25"); u.searchParams.set("lang", "fr");
+    const j = await (await fetch(u.toString())).json();
+    const items = photonItems(j, h);
+    const adr = items.find(x => x.ville); if (adr) where = {ville:adr.ville, pays:adr.pays, adresse:adr.adresse};
+    pois = items.filter(x => COFFEE_KIND.test(x.genre || "") && !lieux.some(l => fold(l.nom) === fold(x.nom)));
+  } catch {}
+  sub.textContent = [where.adresse || where.ville, where.pays].filter(Boolean).join(", ") || "Position trouvée";
+  pois.slice(0, 6).forEach(x => item(x.nom, x.dist || 0, roleBadge("tester", 18), () => openLieu(null, {nom:x.nom, ville:x.ville || where.ville, pays:x.pays || where.pays, adresse:x.adresse, lat:x.lat, lon:x.lon, aTester:true})));
+  if (!mine.length && !pois.length){ const e = document.createElement("div"); e.className = "hint"; e.textContent = "Aucun lieu de café enregistré à moins de 300 m. Touchez « Ajouter un lieu ici » pour en créer un."; list.append(e); }
+  else { const e = document.createElement("div"); e.className = "hint"; e.textContent = "Touchez un lieu pour l'ouvrir. Ceux qui ne sont pas encore dans vos lieux s'ajoutent en « à tester »."; list.prepend(e); }
+  add.onclick = () => openLieu(null, {nom:"", ville:where.ville, pays:where.pays, adresse:where.adresse, lat:h.lat, lon:h.lon, aTester:true, roles:{achat:true}});
+}
 $("b-reset-zoom").onclick = () => zoomToPoints([]);
 
 /* Autour de moi (Mapbox) */
@@ -2737,12 +2803,12 @@ async function showOnMap(l){
 function placeBtn(kind, inp, set){
   const lb = inp.closest(".field") && inp.closest(".field").querySelector("label"); if (lb && ROLE_ICO[kind] && !lb.querySelector(".rbadge")) lb.insertAdjacentHTML("afterbegin", roleBadge(kind, 20));
   const w = document.createElement("div"); w.className = "place-btn";
-  const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.textContent = "📍 Choisir sur la carte";
+  const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.textContent = "Choisir sur la carte";
   const h = document.createElement("span"); h.className = "hint";
   const go = document.createElement("button"); go.type = "button"; go.className = "btn small ghost"; go.hidden = true;
   const sync = () => { const l = lieuByName(inp.value, kind); h.textContent = l ? (l.lat !== null ? "" : "Dans vos lieux, sans point sur la carte") : "";
-    go.hidden = !(l && l.lat !== null); if (l) go.textContent = "🗺️ Voir sur Ma carte" + (l.ville ? " · " + l.ville : "");
-    b.textContent = l && l.lat !== null ? "📍 Changer" : "📍 Choisir sur la carte"; };
+    go.hidden = !(l && l.lat !== null); if (l) go.textContent = "Voir sur Ma carte" + (l.ville ? " · " + l.ville : "");
+    b.textContent = l && l.lat !== null ? "Changer" : "Choisir sur la carte"; };
   inp.addEventListener("input", sync); sync();
   inp.addEventListener("change", async () => { const v = inp.value.trim(); if (!isMapsUrl(v) || !db || ro) return;
     h.textContent = "Lecture du lien Google Maps…"; const r = await resolveMapsLink(v);
@@ -2785,7 +2851,9 @@ async function placeSearch(q, bias){
   const u = new URL("https://photon.komoot.io/api/"); u.searchParams.set("q", q); u.searchParams.set("limit", "15"); u.searchParams.set("lang", "fr");
   if (bias && isFinite(bias.lat)){ u.searchParams.set("lat", (+bias.lat).toFixed(4)); u.searchParams.set("lon", (+bias.lon).toFixed(4)); }
   const r = await fetch(u.toString()); if (!r.ok) throw new Error("photon " + r.status);
-  const j = await r.json();
+  return photonItems(await r.json(), bias);
+}
+function photonItems(j, bias){
   return (j.features || []).map(f => { const p = f.properties || {}, c = (f.geometry || {}).coordinates || [];
     const ville = p.city || p.town || p.village || p.municipality || p.county || "";
     const ad = [[p.housenumber, p.street].filter(Boolean).join(" "), [p.postcode, ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
@@ -2967,7 +3035,7 @@ async function autoLinkFiches(){
       try { const l = await saveFound(r, it.kind, it.name); placed.push(l); if (isUrl(it.name)) await renameInFiches(it.kind, it.name, l.nom); } catch {}
     }
   } finally { autoLinking = false; }
-  if (placed.length){ renderLieux(); if (curView === "lieux"){ await initWorld(); zoomToPoints(lieux.filter(l => l.lat !== null), 800); }
+  if (placed.length){ renderLieux(); if (curView === "lieux" && world) drawPins();
     toast(`${placed.length} lieu${placed.length>1?"x":""} de vos fiches placé${placed.length>1?"s":""} sur la carte : ${placed.map(l => l.nom).join(", ")}.`); }
   renderLinkPanel();
 }
@@ -2983,12 +3051,12 @@ function renderLinkPanel(){
     const row = document.createElement("div"); row.className = "link-row";
     const t = document.createElement("div"); t.className = "link-t"; t.innerHTML = `<span class="hint"></span><strong></strong>`;
     t.firstChild.textContent = it.lab + (it.n > 1 ? ` · ${it.n} fiches` : ""); t.firstChild.insertAdjacentHTML("afterbegin", roleBadge(it.kind, 16));
-    if (isUrl(it.name)){ t.lastChild.textContent = ""; const a = document.createElement("a"); a.href = it.name; a.target = "_blank"; a.rel = "noopener"; a.textContent = isMapsUrl(it.name) ? "📍 Lien Google Maps ↗" : "Lien ↗"; t.lastChild.append(a); }
+    if (isUrl(it.name)){ t.lastChild.textContent = ""; const a = document.createElement("a"); a.href = it.name; a.target = "_blank"; a.rel = "noopener"; a.textContent = isMapsUrl(it.name) ? "Lien Google Maps ↗" : "Lien ↗"; t.lastChild.append(a); }
     else t.lastChild.textContent = it.name;
     const prop = document.createElement("div"); prop.className = "hint link-prop"; prop.textContent = "Recherche sur la carte…";
     const acts = document.createElement("div"); acts.className = "row-btns";
     const ok = document.createElement("button"); ok.type = "button"; ok.className = "btn small primary"; ok.textContent = "C'est ça"; ok.hidden = true;
-    const other = document.createElement("button"); other.type = "button"; other.className = "btn small"; other.textContent = "📍 Chercher";
+    const other = document.createElement("button"); other.type = "button"; other.className = "btn small"; other.textContent = "Chercher";
     const skip = document.createElement("button"); skip.type = "button"; skip.className = "btn small ghost"; skip.textContent = "Ignorer";
     acts.append(ok, other, skip); row.append(t, prop, acts); list.append(row);
     const show = r => { if (!r){ prop.textContent = "Pas trouvé automatiquement : touchez « Chercher » pour le placer."; ok.hidden = true; return; }
@@ -3000,7 +3068,7 @@ function renderLinkPanel(){
   });
 }
 /* Placer le point à la main : un toucher sur la carte */
-function stopPlacing(){ if (!world || !world.map) return; if (world.placeFn) world.map.off("click", world.placeFn); world.placeFn = null; $("world").classList.remove("placing"); $("pick-place").textContent = "📍 Placer le point moi-même"; }
+function stopPlacing(){ if (!world || !world.map) return; if (world.placeFn) world.map.off("click", world.placeFn); world.placeFn = null; $("world").classList.remove("placing"); $("pick-place").textContent = "Placer le point moi-même"; }
 $("pick-place").onclick = () => {
   if (!world || !world.map) return;
   if ($("world").classList.contains("placing")){ stopPlacing(); return; }
@@ -3255,7 +3323,7 @@ function renderHist(){
     d.append(body); li.append(d); tl.append(li);
   });
   box.append(tl);
-  if (!ro && !cur.isNew){ const b = document.createElement("button"); b.type = "button"; b.className = "btn primary"; b.textContent = "🔁 J'ai racheté ce café"; b.onclick = startRebuy; box.append(b); }
+  if (!ro && !cur.isNew){ const b = document.createElement("button"); b.type = "button"; b.className = "btn primary"; b.textContent = "J'ai racheté ce café"; b.onclick = startRebuy; box.append(b); }
 }
 // Nouvel achat du même café : l'achat actuel part dans l'historique, la fiche repart pour une nouvelle dégustation
 function startRebuy(){
@@ -4043,6 +4111,7 @@ $("b-save").onclick = async () => {
     const now = new Date().toISOString();
     cur.updatedAt = now; if (!cur.createdAt) cur.createdAt = now; cur.v = SCHEMA;
     await coll().doc(cur.id).set(toDoc(cur));
+    { const sv = cur; [[sv.produit.boutique, "achat"], [sv.degustation && sv.degustation.lieu, "degustation"], [sv.produit.torrefacteur, "torrefaction"]].forEach(([n, k]) => { const l = n && lieuByName(n, k); if (!l) return; const need = l.aTester && k !== "torrefaction"; const role = !l.roles[k]; if (!need && !role) return; l.roles[k] = true; if (need){ l.aTester = false; l.testeLe = new Date().toISOString().slice(0, 10); } saveLieu(l).catch(() => {}); }); }
     const gone = removed.slice(); removed = [];
     if (assets) gone.forEach(id => assets.delete(id).catch(() => {}));
     toast(cur.isNew ? "Fiche enregistrée." : "Modifications enregistrées.");
