@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261103091526";</script><script src="config.js?v=20261103091526"></script>
+<script>window.CAVE_BUILD="20261103092237";</script><script src="config.js?v=20261103092237"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -353,6 +353,10 @@ body{overflow-x:clip}
 .panel,.pop,.link-row,.world-cap,.near-item,.card .meta{overflow-wrap:anywhere;min-width:0}
 .pick .world{height:52dvh}
 .world .leaflet-control-zoom a{width:36px;height:36px;line-height:34px;font-size:20px;color:var(--ink)}
+.world .ici-ctl{display:flex;align-items:center;gap:5px;height:36px;padding:0 11px 0 9px;border:none;border-radius:12px;background:#fff;color:#2563EB;font:600 .9rem var(--f-body,inherit);box-shadow:0 4px 14px -6px rgba(0,0,0,.35);cursor:pointer;margin-top:8px!important}
+.world .ici-ctl.busy svg{animation:spin 1s linear infinite}
+#b-home.busy{opacity:.6}
+@keyframes spin{to{transform:rotate(360deg)}}
 .world .leaflet-control-zoom{border:none!important;box-shadow:0 4px 14px -6px rgba(0,0,0,.35)!important;border-radius:12px;overflow:hidden}
 .world .leaflet-control-attribution{font-size:9px;background:rgba(255,255,255,.7)}
 .lp-wrap{background:none;border:none}
@@ -2073,7 +2077,7 @@ function normalizeLieu(o, id){
   const num = v => (v === null || v === undefined || v === "" || !isFinite(Number(v))) ? null : Number(v);
   return {id: id || o.id || uid(), nom:o.nom||"", ville:o.ville||"", pays:o.pays||"", adresse:o.adresse||"", lat:num(o.lat), lon:num(o.lon),
     roles:{torrefaction:!!r.torrefaction, achat:!!r.achat, degustation:!!r.degustation}, aTester:!!o.aTester, coeur:!!o.coeur, marques: splitMarques(o.marques), remarques:o.remarques||"",
-    site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
+    site:o.site||"", mapboxId:o.mapboxId||"", alias:Array.isArray(o.alias) ? o.alias.filter(Boolean) : [], auto:!!o.auto, createdAt:o.createdAt||"", updatedAt:o.updatedAt||""};
 }
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 /* Motifs choisis le 3 novembre 2026 : T7 torréfacteur, B1 boutique, D1 dégustation (barista) */
@@ -2355,6 +2359,11 @@ async function initWorld(){
   const el = document.createElement("div"); el.className = "lmap"; box.prepend(el);
   const map = window.L.map(el, {zoomControl:false, worldCopyJump:true, minZoom:2, maxZoom:19, zoomSnap:0.5, tap:true}).setView([46.6, 2.4], 5);
   window.L.control.zoom({position:"topright"}).addTo(map);
+  const Ici = window.L.Control.extend({options:{position:"topright"}, onAdd(){ const b = window.L.DomUtil.create("button", "ici-ctl"); b.type = "button"; b.title = "Ici : ma position"; b.setAttribute("aria-label", "Ici : ma position");
+    b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="8"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Ici</span>';
+    window.L.DomEvent.disableClickPropagation(b); b.onclick = () => locateMe(); return b; }});
+  new Ici().addTo(map);
+  if (!herePos && !sessionStorage.getItem("cave_geo_asked")){ try { sessionStorage.setItem("cave_geo_asked", "1"); } catch {} setTimeout(() => locateMe({silent:true, explain:true, zoomK:800}), 400); }
   // Fond de carte OpenStreetMap (sans clé), avec un second serveur si le premier ne répond pas
   const OSM_ATTR = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
   let tl = window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:OSM_ATTR}).addTo(map);
@@ -2468,18 +2477,21 @@ function zoomToPoints(pts, maxK){
 }
 function fitAll(){ zoomToPoints(lieux.filter(l => l.lat !== null && l.lon !== null).concat(nearHome() ? [nearHome()] : []), 4000); }
 $("b-fit").onclick = fitAll;
-$("b-home").onclick = () => {
-  if (!navigator.geolocation){ toast("La localisation n'est pas disponible sur cet appareil."); return; }
-  const b = $("b-home"); b.disabled = true; b.textContent = "Localisation…";
+function locateMe(opts){
+  opts = opts || {};
+  if (!navigator.geolocation){ if (!opts.silent) toast("La localisation n'est pas disponible sur cet appareil."); return; }
+  const btns = [$("b-home"), document.querySelector(".ici-ctl")].filter(Boolean);
+  btns.forEach(b => b.classList.add("busy"));
   navigator.geolocation.getCurrentPosition(p => {
-    b.disabled = false; b.textContent = "Ici";
+    btns.forEach(b => b.classList.remove("busy"));
     herePos = {lat:p.coords.latitude, lon:p.coords.longitude, label:"Ici"};
-    drawPins(); zoomToPoints([herePos], 4000);
+    drawPins(); zoomToPoints([herePos], opts.zoomK || 4000);
   }, e => {
-    b.disabled = false; b.textContent = "Ici";
-    toast(e && e.code === 1 ? "Autorisez la localisation pour ce site dans les réglages du téléphone (Safari > Position)." : "Position introuvable pour le moment, réessayez.");
+    btns.forEach(b => b.classList.remove("busy"));
+    if (!opts.silent || (e && e.code === 1 && opts.explain)) toast(e && e.code === 1 ? "La localisation est bloquée : Réglages > Confidentialité > Service de localisation > Safari (ou l'appli), puis « Lorsque l'app est active »." : "Position introuvable pour le moment, réessayez.");
   }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
-};
+}
+$("b-home").onclick = () => locateMe();
 $("b-reset-zoom").onclick = () => zoomToPoints([]);
 
 /* Autour de moi (Mapbox) */
@@ -2856,7 +2868,7 @@ async function saveFound(r, kind, written){
   const now = new Date().toISOString();
   let l = lieux.find(x => lieuMatches(x, written, kind) || (r.lat != null && x.lat !== null && haversine(x, r) < 40 && fold(x.nom) === fold(r.nom)));
   if (l){ l.roles[kind] = true; if (l.lat === null){ l.lat = r.lat; l.lon = r.lon; } if (!l.adresse) l.adresse = r.adresse || ""; if (!l.ville) l.ville = r.ville || ""; if (!l.pays) l.pays = r.pays || ""; }
-  else { l = normalizeLieu({nom:r.nom, ville:r.ville, pays:r.pays, adresse:r.adresse, lat:r.lat, lon:r.lon, site:r.site, roles:{[kind]:true}}); l.createdAt = now; }
+  else { l = normalizeLieu({nom:r.nom, ville:r.ville, pays:r.pays, adresse:r.adresse, lat:r.lat, lon:r.lon, site:r.site, roles:{[kind]:true}, auto:true}); l.createdAt = now; }
   if (fold(written) !== fold(l.nom) && !(l.alias || []).some(a => fold(a) === fold(written))) l.alias = (l.alias || []).concat(written);
   l.updatedAt = now; const o = JSON.parse(JSON.stringify(l)); delete o.id;
   await db.collection("lieux").doc(l.id).set(o);
@@ -2869,8 +2881,9 @@ const isUrl = v => /^https?:\/\//i.test(String(v || "").trim());
 const placeLabel = v => isUrl(v) ? (isMapsUrl(v) ? "lien Google Maps" : "lien") : v;
 function mapsInfo(url, html){
   const out = {}; const u = decodeURIComponent(String(url || ""));
-  const ll = parseMapsLink(u) || parseMapsLink(html || "") || (/center=(-?\d+\.\d+)(?:%2C|,)(-?\d+\.\d+)/.exec(html || "") ? {lat:+RegExp.$1, lon:+RegExp.$2} : null);
-  if (ll){ out.lat = ll.lat; out.lon = ll.lon; }
+  const lu = parseMapsLink(u);
+  const ll = lu || parseMapsLink(html || "") || (/center=(-?\d+\.\d+)(?:%2C|,)(-?\d+\.\d+)/.exec(html || "") ? {lat:+RegExp.$1, lon:+RegExp.$2} : null);
+  if (ll){ out.lat = ll.lat; out.lon = ll.lon; out.llSure = !!lu; }
   let m = /\/maps\/place\/([^/@?]+)/.exec(u);
   let full = m ? m[1].replace(/\+/g, " ") : "";
   if (!full && html){ const t = /<meta[^>]+property="og:title"[^>]+content="([^"]+)"/i.exec(html) || /<title>([^<]+)<\/title>/i.exec(html); if (t) full = t[1].replace(/\s*-\s*Google Maps\s*$/i, "").replace(/&amp;/g, "&").replace(/&#39;/g, "'"); }
@@ -2887,7 +2900,8 @@ async function resolveMapsLink(url){
   ];
   for (const f of tries){ try { const i = await f(); info = Object.assign({}, i, info.nom ? {nom:info.nom} : {}); if (info.nom && info.lat != null) break; } catch {} }
   if (!info.nom) return null;
-  if (info.lat == null){ try { const res = await placeSearch([info.nom, info.adresse].filter(Boolean).join(" "), nearHome()); if (res[0]){ info.lat = res[0].lat; info.lon = res[0].lon; info.ville = info.ville || res[0].ville; info.pays = res[0].pays; if (!info.adresse) info.adresse = res[0].adresse; } } catch {} }
+  if (info.lat != null && !info.llSure && !plausible(info)){ info.lat = null; info.lon = null; }
+  if (info.lat == null){ try { const res = (await placeSearch([info.nom, info.adresse].filter(Boolean).join(" "), refArea())).filter(plausible); if (res[0]){ info.lat = res[0].lat; info.lon = res[0].lon; info.ville = info.ville || res[0].ville; info.pays = res[0].pays; if (!info.adresse) info.adresse = res[0].adresse; } } catch {} }
   return info.lat != null ? Object.assign({site:url, pays:"France", genre:"Google Maps"}, info) : null;
 }
 // Remplace le lien collé dans les fiches par le vrai nom du lieu
@@ -2895,14 +2909,43 @@ async function renameInFiches(kind, from, to){
   const get = {torrefaction:f => f.produit, achat:f => f.produit, degustation:f => f.degustation}[kind], key = {torrefaction:"torrefacteur", achat:"boutique", degustation:"lieu"}[kind];
   for (const f of fiches.filter(x => (get(x)[key] || "").trim() === from)){ const d = JSON.parse(JSON.stringify(f)); get(d)[key] = to; d.updatedAt = new Date().toISOString(); try { await coll().doc(f.id).set(toDoc(d)); } catch {} }
 }
+/* Zone de référence : votre position, votre ville, ou le centre de vos lieux déjà placés (la France par défaut).
+   Un lieu trouvé automatiquement à l'autre bout du monde est refusé (homonyme, ou mauvaise lecture d'un lien). */
+function refArea(exceptId, lieuxOnly){
+  if (lieuxOnly){ const pts = lieux.filter(l => l.id !== exceptId && l.lat !== null && l.lon !== null); if (!pts.length) return {lat:46.6, lon:2.4, km:1000}; }
+  if (herePos && !lieuxOnly) return {lat:herePos.lat, lon:herePos.lon, km:400};
+  const h = lieuxOnly ? null : nearHome(); if (h) return {lat:h.lat, lon:h.lon, km:400};
+  const pts = lieux.filter(l => l.id !== exceptId && l.lat !== null && l.lon !== null);
+  if (pts.length){ const med = a => { a = a.slice().sort((x, y) => x - y); return a[a.length >> 1]; }; return {lat:med(pts.map(l => l.lat)), lon:med(pts.map(l => l.lon)), km:500}; }
+  return {lat:46.6, lon:2.4, km:1000};
+}
+function plausible(p, ref){ ref = ref || refArea(); return p && isFinite(p.lat) && haversine(ref, p) <= ref.km * 1000; }
+// Répare les lieux placés automatiquement très loin de tous les autres
+let healDone = false;
+async function healFarLieux(){
+  if (healDone || ro || !db || !lieuxLoaded) return; healDone = true;
+  const placed = lieux.filter(l => l.lat !== null && l.lon !== null); if (placed.length < 2) return;
+  for (const l of placed){
+    const ref = refArea(l.id, true); if (haversine(ref, l) <= 1500e3) continue;
+    if (!(l.auto || (l.alias || []).length || isMapsUrl(l.site))) continue;
+    const kind = l.roles.torrefaction ? "torrefaction" : l.roles.achat ? "achat" : "degustation";
+    let r = null; try { r = await findPlaceFor(l.nom, kind, ref); } catch {}
+    if (r && plausible(r, ref)){ l.lat = r.lat; l.lon = r.lon; l.ville = r.ville || l.ville; l.pays = r.pays || l.pays; if (r.adresse) l.adresse = r.adresse; }
+    else { l.lat = null; l.lon = null; }
+    l.updatedAt = new Date().toISOString(); const o = JSON.parse(JSON.stringify(l)); delete o.id;
+    try { await db.collection("lieux").doc(l.id).set(o); } catch {}
+    toast(l.lat !== null ? `${l.nom} était mal placé : je l'ai replacé à ${l.ville || "sa vraie adresse"}.` : `${l.nom} était mal placé sur la carte : touchez « Chercher » dans « Relier mes fiches » pour le replacer.`);
+  }
+  renderLieux(); renderLinkPanel(); if (world) { drawPins(); }
+}
 const COFFEE_KIND = /café|boutique de café|salon de thé|épicerie fine|torréf|roast|shop|boulangerie/i;
-async function findPlaceFor(name, kind){
-  const want = fold(name); const bias = nearHome();
+async function findPlaceFor(name, kind, ref){
+  const want = fold(name); const bias = ref || refArea();
   const qs = kind === "torrefaction" ? [name + " torréfaction", name + " café", name] : [name, name + " café"];
   let best = null, bestScore = 0;
   for (const q of qs){
     let res = []; try { res = await placeSearch(q, bias); } catch { continue; }
-    res.forEach((r, i) => { const n = fold(r.nom);
+    res.forEach((r, i) => { if (!plausible(r, bias)) return; const n = fold(r.nom);
       let sc = n === want ? 6 : sameBrand(r.nom, name) ? 4 : (n.includes(want) && want.length >= 4) ? 3 : 0; if (!sc) return;
       if (COFFEE_KIND.test(r.genre || "")) sc += 3; if (/rue|ville|quartier|adresse/.test(r.genre || "")) sc -= 4;
       sc -= i * 0.1; if (sc > bestScore){ bestScore = sc; best = r; } });
@@ -2913,6 +2956,7 @@ async function findPlaceFor(name, kind){
 // Place automatiquement sur la carte les lieux des fiches qu'on retrouve sans ambiguïté
 let autoLinking = false, lieuxLoaded = false; const autoTried = new Set();
 async function autoLinkFiches(){
+  if (lieuxLoaded && !healDone) await healFarLieux();
   if (autoLinking || ro || !db || !fiches.length || !lieuxLoaded) return; autoLinking = true; renderLinkPanel();
   let placed = [];
   try {
@@ -3009,7 +3053,7 @@ function showView(name){
   curView = name; openGroupKey = null; hideAll();
   $(VIEWS[name]).hidden = false; $("tabs").hidden = false;
   [...$("tabs").children].forEach(a => a.setAttribute("aria-current", a.dataset.view === name ? "page" : "false"));
-  if (name === "tableau") renderDash(); else if (name === "actu") openActu(); else if (name === "apprendre") renderLearn(); else if (name === "lieux"){ renderLieux(); initWorld(); setTimeout(autoLinkFiches, 300); const h = nearHome(); if (h && !$("near-q").value) $("near-q").value = h.label; } else renderList();
+  if (name === "tableau") renderDash(); else if (name === "actu") openActu(); else if (name === "apprendre") renderLearn(); else if (name === "lieux"){ renderLieux(); initWorld(); setTimeout(autoLinkFiches, 300); } else renderList();
   window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", () => { closePick(); if (cur) closeForm(true); curLieu = null; showView(location.hash.slice(1)); });
