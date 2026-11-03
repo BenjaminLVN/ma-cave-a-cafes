@@ -261,6 +261,8 @@ body.ro .ed, body.ro .ph .x{display:none!important}
 .schema-box.narrow{max-width:520px}
 .schema{width:100%;height:auto;display:block;min-width:260px}
 .schema.wide{min-width:520px}
+.schema.grind-v{display:none;max-width:320px;margin:0 auto}
+@media (max-width:640px){.schema.grind-h{display:none}.schema.grind-v{display:block}}
 .schema .lbl{fill:var(--ink);font-size:12px;font-family:var(--f-body)}
 .schema .lbl.small{font-size:11px;fill:var(--muted)}
 .schema .lbl.strong{font-weight:600;font-size:13px}
@@ -875,7 +877,7 @@ function ensureKey(){
     g.querySelector("#kg-go").onclick = () => { const v = inp.value.trim(); const m = v.match(/[?&]k=([A-Za-z0-9_-]{24,64})/) || v.match(/^([A-Za-z0-9_-]{24,64})$/);
       if (!m){ err.hidden = false; err.textContent = "Ce n'est pas un lien de cave valide. Il doit contenir « ?k= » suivi d'un long code."; return; } done(m[1]); };
     g.querySelector("#kg-new").onclick = () => { if (!confirm("Créer une nouvelle cave VIDE ? Vos fiches existantes restent dans votre ancienne cave, accessible seulement par son lien.")) return;
-      const a = new Uint8Array(24); crypto.getRandomValues(a); done(Array.from(a, b => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[b % 64]).join("") + "x" + Date.now().toString(36)); };
+      const a = new Uint8Array(24); crypto.getRandomValues(a); try { Object.keys(localStorage).filter(x => /^cave_remote_|^cave_outbox$/.test(x)).forEach(x => localStorage.removeItem(x)); localStorage.setItem("cave_nomerge", "1"); } catch {} done(Array.from(a, b => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[b % 64]).join("") + "x" + Date.now().toString(36)); };
     setTimeout(() => inp.focus(), 50);
   });
 }
@@ -898,11 +900,48 @@ function remoteStore(cfg, key){
   async function flush(){ if (flushing) return; flushing = true; try { while (outbox.length){ try { await send(outbox[0]); outbox.shift(); saveOut(); lastErr = ""; } catch (e) { lastErr = (e && e.status) ? "refusé par le serveur (" + e.status + ")" : ""; break; } } } finally { flushing = false; syncNote(); } }
   function syncNote(){ const b = document.getElementById("sync-band"); if (!b) return; b.hidden = !outbox.length;
     b.innerHTML = lastErr ? "<strong>Enregistrement en ligne " + lastErr + ".</strong> Vos modifications sont gardées sur le téléphone ; signalez-le pour que je corrige." : "<strong>Hors ligne.</strong> Vos dernières modifications sont gardées sur le téléphone et seront envoyées dès le retour du réseau."; }
+  // Fiches déjà vues sur le serveur pour CETTE cave : une fiche du téléphone jamais vue en ligne n'est jamais jetée, elle est renvoyée
+  const seenK = "cave_seen_" + key; let seen = new Set(); try { seen = new Set(JSON.parse(localStorage.getItem(seenK) || "[]")); } catch {}
+  const saveSeen = () => { try { localStorage.setItem(seenK, JSON.stringify([...seen])); } catch {} };
   async function pull(n){
     const r = await api(`items?select=id,data&cave=eq.${enc(key)}&coll=eq.${enc(n)}`); if (!r.ok) throw {code:"http_" + r.status};
-    const rows = await r.json(); const o = {}; rows.forEach(x => o[x.id] = x.data);
+    const rows = await r.json(); const o = {}; rows.forEach(x => { o[x.id] = x.data; seen.add(n + "/" + x.id); });
+    const prev = cache[n] || {}, heal = [];
+    for (const [id, d] of Object.entries(prev)){
+      if (o[id] || seen.has(n + "/" + id) || outbox.some(op => op.n === n && op.id === id)) continue;
+      o[id] = d; heal.push({t:"set", n, id, data:d});
+    }
     outbox.filter(op => op.n === n).forEach(op => { if (op.t === "set") o[op.id] = op.data; else delete o[op.id]; });
-    cache[n] = o; save(n); emit(n);
+    cache[n] = o; save(n); saveSeen(); emit(n);
+    if (heal.length){ for (const op of heal){ await adoptPhotos(op.data); outbox.push(op); } saveOut(); flush(); if (n === "fiches") toast(`${heal.length} fiche${heal.length>1?"s":""} du téléphone remise${heal.length>1?"s":""} en ligne.`); }
+  }
+  // Photos d'une fiche venue d'une autre cave : recopiées dans celle-ci (depuis le téléphone ou depuis l'autre cave)
+  const knownKeys = () => { try { return JSON.parse(localStorage.getItem("cave_keys") || "[]").filter(k => k !== key); } catch { return []; } };
+  async function photoExists(id){ try { const r = await api(`photos?select=id&cave=eq.${enc(key)}&id=eq.${enc(id)}`); return r.ok && (await r.json()).length > 0; } catch { return true; } }
+  async function adoptPhotos(data, from){
+    for (const p of (data && data.photos) || []){
+      const id = String(p.id || ""); if (!id.startsWith("sb_") || await photoExists(id)) continue;
+      let du = null;
+      try { const b = await idbGet(id); if (b) du = await blobToDataUrl(b); } catch {}
+      for (const k of du ? [] : [from, ...knownKeys()].filter(Boolean)){
+        try { const r = await api(`photos?select=data&cave=eq.${enc(k)}&id=eq.${enc(id)}`, {headers:{"x-cave":k}}); if (r.ok){ const row = (await r.json())[0]; if (row){ du = row.data; break; } } } catch {}
+      }
+      if (du){ try { await api("photos", {method:"POST", headers:{"Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body:JSON.stringify({cave:key, id, data:du})}); } catch {} }
+    }
+  }
+  // Récupère toutes les fiches et lieux d'une autre cave (sans rien effacer nulle part)
+  async function importFrom(other){
+    if (!other || other === key) return 0;
+    const r = await api(`items?select=coll,id,data&cave=eq.${enc(other)}`, {headers:{"x-cave":other}}); if (!r.ok) throw {code:"http_" + r.status};
+    const rows = await r.json(); let nf = 0;
+    for (const n of new Set(rows.map(x => x.coll))){ if (!cache[n]) { try { await pull(n); } catch {} } }
+    for (const x of rows){
+      const c = cache[x.coll] = cache[x.coll] || {}; if (c[x.id]) continue;
+      await adoptPhotos(x.data, other);
+      c[x.id] = x.data; seen.add(x.coll + "/" + x.id); outbox.push({t:"set", n:x.coll, id:x.id, data:x.data}); if (x.coll === "fiches") nf++;
+    }
+    saveOut(); saveSeen(); Object.keys(cache).forEach(n => { save(n); emit(n); }); await flush();
+    return nf;
   }
   const refresh = () => { flush().then(() => Promise.all(Object.keys(subs).map(n => pull(n).catch(() => {})))); };
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
@@ -944,7 +983,7 @@ function remoteStore(cfg, key){
       return got;
     }
   };
-  return {db, assets};
+  return {db, assets, importFrom};
 }
 function idbReq(mode, fn){ return idb().then(d => new Promise((res, rej) => { const t = d.transaction("p", mode); const r = fn(t.objectStore("p")); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); })); }
 const idbGet = id => idbReq("readonly", st => st.get(id));
@@ -981,7 +1020,22 @@ async function boot(){
   if (window.CAVE_CFG && window.CAVE_CFG.url){
     remote = remoteStore(window.CAVE_CFG, await ensureKey());
     db = remote.db; assets = remote.assets; localMode = false;
-    showStoreNote('<strong>Enregistrement automatique en ligne.</strong> Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">🔗 Copier le lien de ma cave</button>');
+    showStoreNote('<strong>Enregistrement automatique en ligne</strong> (cave n° ' + caveKey().slice(-4) + '). Pour retrouver votre cave sur un autre téléphone, ouvrez-y ce lien secret. <button type="button" class="btn small" id="b-share-link">🔗 Copier le lien de ma cave</button> <button type="button" class="btn small" id="b-merge-link">Récupérer les fiches d\'un autre lien</button>');
+    setTimeout(() => { const bm = document.getElementById("b-merge-link"); if (bm) bm.onclick = async () => {
+      const v = prompt("Collez le lien de l'autre cave (il contient « ?k= »). Ses fiches seront copiées dans celle-ci, rien n'est effacé.") || "";
+      const m = v.trim().match(/[?&]k=([A-Za-z0-9_-]{24,64})/) || v.trim().match(/^([A-Za-z0-9_-]{24,64})$/); if (!m){ if (v) toast("Ce n'est pas un lien de cave valide."); return; }
+      if (m[1] === caveKey()){ toast("C'est déjà le lien de cette cave."); return; }
+      try { const n = await remote.importFrom(m[1]); setCaveKey(caveKey()); try { const all = JSON.parse(localStorage.getItem("cave_keys") || "[]"); if (!all.includes(m[1])){ all.push(m[1]); localStorage.setItem("cave_keys", JSON.stringify(all)); } } catch {}
+        toast(n ? `${n} fiche${n>1?"s":""} récupérée${n>1?"s":""}.` : "Aucune nouvelle fiche dans cette cave."); } catch { toast("Récupération impossible pour l'instant, réessayez avec du réseau."); } }; }, 0);
+    (async () => { // Toutes les caves déjà ouvertes sur ce téléphone sont réunies dans la cave actuelle
+      let nomerge = false; try { nomerge = localStorage.getItem("cave_nomerge") === "1"; } catch {}
+      const cur = caveKey(); let done = []; try { done = JSON.parse(localStorage.getItem("cave_merged_" + cur) || "[]"); } catch {}
+      let others = []; try { others = JSON.parse(localStorage.getItem("cave_keys") || "[]").filter(k => k !== cur && !done.includes(k)); } catch {}
+      if (nomerge){ try { localStorage.setItem("cave_merged_" + cur, JSON.stringify(done.concat(others))); localStorage.removeItem("cave_nomerge"); } catch {} return; }
+      let tot = 0;
+      for (const k of others){ try { tot += await remote.importFrom(k); done.push(k); localStorage.setItem("cave_merged_" + cur, JSON.stringify(done)); } catch {} }
+      if (tot) toast(`${tot} fiche${tot>1?"s":""} d'une autre cave réunie${tot>1?"s":""} ici.`);
+    })();
     setTimeout(() => { const bt = document.getElementById("b-share-link"); if (bt) bt.onclick = async () => { const u = location.origin + location.pathname + "?k=" + encodeURIComponent(caveKey());
       try { if (navigator.share){ await navigator.share({title:"Ma cave à cafés", url:u}); return; } } catch (e) { if (e && e.name === "AbortError") return; }
       try { await navigator.clipboard.writeText(u); toast("Lien copié. Gardez-le pour vous : il donne accès à votre cave."); } catch { prompt("Copiez ce lien :", u); } }; }, 0);
@@ -1559,12 +1613,21 @@ ${L(160,150,186,226,"Mouture grosse")}
 ${L(160,100,186,90,"Eau froide filtrée")}
 </svg>`
 };
-const GRIND_SCALE = `<svg viewBox="0 0 640 170" class="schema wide" role="img" aria-label="Échelle de mouture par méthode">
+const GRIND_SCALE = `<svg viewBox="0 0 640 170" class="schema wide grind-h" role="img" aria-label="Échelle de mouture par méthode">
 <defs><linearGradient id="gr" x1="0" x2="1"><stop offset="0" stop-color="var(--coffee)" stop-opacity=".95"/><stop offset="1" stop-color="var(--coffee)" stop-opacity=".25"/></linearGradient></defs>
 <rect x="20" y="70" width="600" height="16" rx="8" fill="url(#gr)"/>
 <text x="20" y="108" class="lbl small">Très fine</text><text x="620" y="108" class="lbl small" text-anchor="end">Très grosse</text>
 <text x="20" y="124" class="lbl small muted">sucre glace</text><text x="200" y="124" class="lbl small muted" text-anchor="middle">sel fin</text><text x="400" y="124" class="lbl small muted" text-anchor="middle">sable</text><text x="620" y="124" class="lbl small muted" text-anchor="end">gros sel</text>
 ${[["Espresso",90,1],["Moka",170,0],["V60",250,1],["Origami",300,0],["Filtre élec.",370,1],["Chemex",440,0],["Piston",520,1],["Cold brew",590,0]].map(([t,x,up]) => `<line x1="${x}" y1="${up?60:90}" x2="${x}" y2="${up?40:150}" class="lead"/><circle cx="${x}" cy="78" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="${x}" y="${up?34:164}" text-anchor="middle" class="lbl">${t}</text>`).join("")}
+</svg>
+<svg viewBox="0 0 320 600" class="schema grind-v" role="img" aria-label="Échelle de mouture par méthode, de la plus fine en haut à la plus grosse en bas">
+<defs><linearGradient id="grv" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--coffee)" stop-opacity=".95"/><stop offset="1" stop-color="var(--coffee)" stop-opacity=".25"/></linearGradient></defs>
+<rect x="112" y="30" width="16" height="540" rx="8" fill="url(#grv)"/>
+<text x="100" y="40" class="lbl strong" text-anchor="end">Très fine</text><text x="100" y="56" class="lbl small muted" text-anchor="end">sucre glace</text>
+<text x="100" y="${30+180*540/600}" class="lbl small muted" text-anchor="end">sel fin</text>
+<text x="100" y="${30+380*540/600}" class="lbl small muted" text-anchor="end">sable</text>
+<text x="100" y="548" class="lbl small muted" text-anchor="end">gros sel</text><text x="100" y="566" class="lbl strong" text-anchor="end">Très grosse</text>
+${[["Espresso",90],["Moka",170],["V60",250],["Origami",300],["Filtre élec.",370],["Chemex",440],["Piston",520],["Cold brew",590]].map(([t,x]) => { const y = Math.round(30 + (x - 20) * 540 / 600); return `<line x1="128" y1="${y}" x2="160" y2="${y}" class="lead"/><circle cx="120" cy="${y}" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><text x="166" y="${y + 5}" class="lbl strong">${t}</text>`; }).join("")}
 </svg>`;
 const DIAG = `<svg viewBox="0 0 480 300" class="schema" role="img" aria-label="Diagnostic du goût">
 <line x1="16" y1="150" x2="464" y2="150" class="axis"/><line x1="240" y1="20" x2="240" y2="280" class="axis"/>
