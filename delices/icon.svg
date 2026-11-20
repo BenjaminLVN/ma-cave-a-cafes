@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2a13b"/><stop offset=".5" stop-color="#c4582e"/><stop offset="1" stop-color="#7e2441"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#g)"/><g fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"><path d="M178 92h156c12 66 6 128-22 167a72 72 0 0 1-56 27 72 72 0 0 1-56-27c-28-39-34-101-22-167z"/><path d="M256 286v108"/><path d="M190 420h132"/></g><path d="M182 168h148c-2 36-10 66-24 86a62 62 0 0 1-50 24 62 62 0 0 1-50-24c-14-20-22-50-24-86z" fill="#fff" opacity=".9"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>
+<linearGradient id="td" x1="0" y1="0" x2="1" y2="1"><stop offset="0.00" stop-color="#ff9a3d"/><stop offset="0.33" stop-color="#e83d84"/><stop offset="0.67" stop-color="#7b35e0"/><stop offset="1.00" stop-color="#13a37a"/></linearGradient>
+<linearGradient id="ld" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#b6f09c"/><stop offset="0.50" stop-color="#3cc98a"/><stop offset="1.00" stop-color="#0f8f6a"/></linearGradient>
+<radialGradient id="hd" cx=".25" cy=".18" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<clipPath id="cd"><path d="M206 100C190 166 164 226 174 280C184 326 216 348 256 348C296 348 328 326 338 280C348 226 322 166 306 100Z"/></clipPath>
+<filter id="sd" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#2a0f2a" flood-opacity=".28"/></filter></defs>
+<rect width="512" height="512" rx="112" fill="url(#td)"/><rect width="512" height="512" rx="112" fill="url(#hd)"/>
+<g filter="url(#sd)"><path d="M206 100C190 166 164 226 174 280C184 326 216 348 256 348C296 348 328 326 338 280C348 226 322 166 306 100Z" fill="#fff" opacity=".96"/>
+<rect x="246" y="344" width="20" height="62" fill="#fff"/><ellipse cx="256" cy="410" rx="74" ry="16" fill="#fff"/></g>
+<g clip-path="url(#cd)"><path d="M150 236C190 222 222 250 256 240C290 230 320 220 362 236V360H150Z" fill="url(#ld)"/></g>
+<path d="M200 150C192 190 186 222 190 252" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".0"/>
+<path d="M214 128C206 160 198 196 198 226" fill="none" stroke="#e83d84" stroke-opacity=".25" stroke-width="9" stroke-linecap="round"/>
+</svg>
