@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261120211055";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120211055"></script>
+<script>window.CAVE_BUILD="20261120212810";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120212810"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1023,7 +1023,7 @@ function lockView(id){ if (!ro) return; $(id).querySelectorAll("input,textarea,s
 function localDb(){
   const subs = {};
   const read = n => { try { return JSON.parse(localStorage.getItem("delices_local_" + n) || "{}"); } catch { return {}; } };
-  const write = (n, o) => { localStorage.setItem("delices_local_" + n, JSON.stringify(o)); (subs[n] || []).forEach(fn => fn(snap(n))); };
+  const write = (n, o) => { localStorage.setItem("delices_local_" + n, JSON.stringify(o)); (subs[n] || []).forEach(fn => { try { fn(snap(n)); } catch (e) { console.error(e); } }); };
   const snap = n => { const o = read(n); return {docs:Object.keys(o).map(id => ({id, exists:true, data:() => o[id], metadata:{fromCache:false, hasPendingWrites:false}})), metadata:{fromCache:false, hasPendingWrites:false}}; };
   return {collection: n => ({
     onSnapshot(next){ (subs[n] = subs[n] || []).push(next); setTimeout(() => next(snap(n)), 0); return () => {}; },
@@ -1141,7 +1141,7 @@ function remoteStore(cfg, key){
   const enc = encodeURIComponent, cache = {}, subs = {}, errs = {};
   const ck = n => "delices_remote_" + n;
   const save = n => { try { localStorage.setItem(ck(n), JSON.stringify(cache[n] || {})); } catch {} };
-  const emit = n => { const o = cache[n] || {}; const snap = {docs:Object.keys(o).map(id => ({id, exists:true, data:() => o[id]})), metadata:{fromCache:false, hasPendingWrites:false}}; (subs[n] || []).forEach(fn => fn(snap)); };
+  const emit = n => { const o = cache[n] || {}; const snap = {docs:Object.keys(o).map(id => ({id, exists:true, data:() => o[id]})), metadata:{fromCache:false, hasPendingWrites:false}}; (subs[n] || []).forEach(fn => { try { fn(snap); } catch (e) { console.error(e); } }); };
   // File d'attente : une écriture qui échoue (pas de réseau) est rejouée dès que possible
   let outbox = []; try { outbox = JSON.parse(localStorage.getItem("delices_outbox") || "[]"); } catch {}
   const saveOut = () => { try { localStorage.setItem("delices_outbox", JSON.stringify(outbox)); } catch {} };
@@ -1197,7 +1197,7 @@ function remoteStore(cfg, key){
     saveOut(); saveSeen(); Object.keys(cache).forEach(n => { save(n); emit(n); }); await flush();
     return nf;
   }
-  const refresh = () => { flush().then(() => Promise.all(Object.keys(subs).map(n => pull(n).catch(() => {})))); };
+  const refresh = () => { flushPhotos(); flush().then(() => Promise.all(Object.keys(subs).map(n => pull(n).catch(() => {})))); };
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
   window.addEventListener("online", refresh); window.addEventListener("focus", refresh);
   setInterval(() => { if (!document.hidden) refresh(); }, 60000);
@@ -1216,14 +1216,30 @@ function remoteStore(cfg, key){
       async delete(){ if (cache[n]) delete cache[n][id]; save(n); emit(n); await queue({t:"del", n, id}); }
     })
   })};
+  // Photos en attente d'envoi : gardées sur l'appareil et renvoyées dès que le serveur répond
+  const PH_OUT = "delices_photo_outbox";
+  const photoOut = () => { try { return JSON.parse(localStorage.getItem(PH_OUT) || "[]"); } catch { return []; } };
+  const photoLater = id => { const a = photoOut(); if (!a.includes(id)){ a.push(id); try { localStorage.setItem(PH_OUT, JSON.stringify(a)); } catch {} } };
+  async function sendPhoto(id, blob){
+    const du = await blobToDataUrl(blob);
+    const r = await api("photos", {method:"POST", headers:{"Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body:JSON.stringify({cave:key, id, data:du})});
+    if (!r.ok) throw {code:"http_" + r.status};
+  }
+  let phBusy = false;
+  async function flushPhotos(){
+    if (phBusy) return; phBusy = true;
+    try { for (const id of photoOut()){ let b = null; try { b = await idbGet(id); } catch {} if (b){ try { await sendPhoto(id, b); } catch { break; } }
+      const a = photoOut().filter(x => x !== id); try { localStorage.setItem(PH_OUT, JSON.stringify(a)); } catch {} } } finally { phBusy = false; }
+  }
+  setTimeout(flushPhotos, 3000);
   // Photos : en ligne (table photos) et gardées sur l'appareil pour s'afficher vite
   const assets = {
     async upload(blob){
-      const id = "sb_" + uid() + uid(); const du = await blobToDataUrl(blob);
-      const r = await api("photos", {method:"POST", headers:{"Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body:JSON.stringify({cave:key, id, data:du})});
-      if (!r.ok) throw {code:"http_" + r.status};
+      const id = "sb_" + uid() + uid();
       try { await idbPut(id, blob); } catch {}
-      const url = URL.createObjectURL(blob); localUrls.set(id, url); return {id, url};
+      const url = URL.createObjectURL(blob); localUrls.set(id, url);
+      try { await sendPhoto(id, blob); } catch (e) { photoLater(id); }
+      return {id, url};
     },
     async delete(id){ await api(`photos?cave=eq.${enc(key)}&id=eq.${enc(id)}`, {method:"DELETE"}); localUrls.delete(id); try { await idbDel(id); } catch {} return {deleted:true}; },
     async ensure(ids){
@@ -3500,7 +3516,7 @@ let ocrLib = null, ocrWorker = null, ocrStop = false;
 function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("script")); document.head.append(s); }); }
 async function getOcr(progress){
   if (ocrWorker) return ocrWorker;
-  if (!window.Tesseract) await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+  if (!window.Tesseract){ try { await loadScript("tesseract.min.js"); } catch { await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"); } }
   const base = new URL(window.DELICES_TESS || "../tess/", location.href).href;
   const opts = {workerPath: base + "worker.min.js", corePath: base, langPath: base, workerBlobURL: false, logger: m => progress && progress(m)};
   try { ocrWorker = await Tesseract.createWorker(["fra","eng"], 1, opts); }
@@ -3677,7 +3693,7 @@ async function ocrPhotos(){
   } catch (e) {
     console.error(e);
     $("paste-box").hidden = false;
-    toast("La lecture sur le téléphone n'a pas pu aboutir ici. Utilisez « Relire une zone » ou collez le texte de l'étiquette.");
+    toast("La lecture sur le téléphone n'a pas pu aboutir (" + String((e && (e.message || e.code)) || e || "erreur").slice(0, 80) + "). Utilisez « Relire une zone » ou collez le texte de l'étiquette.");
   } finally { $("reading").hidden = true; $("b-ocr").disabled = false; }
 }
 $("b-ocr").onclick = () => ocrPhotos();
@@ -3848,6 +3864,7 @@ $("b-save").onclick = async () => {
     }
   }
   const btn = $("b-save"); btn.disabled = true; btn.textContent = "Enregistrement…";
+  let saved = false;
   try {
     if (pending.length){
       if (!assets) toast("Les photos ne peuvent pas être enregistrées avec ce compte ; la fiche est enregistrée sans elles.");
@@ -3860,16 +3877,19 @@ $("b-save").onclick = async () => {
     const now = new Date().toISOString();
     cur.updatedAt = now; if (!cur.createdAt) cur.createdAt = now; cur.v = SCHEMA;
     await coll().doc(cur.id).set(toDoc(cur));
-    { const sv = cur; [[sv.produit.boutique, "achat"], [sv.degustation && sv.degustation.lieu, "degustation"], [prodName(sv), "production"]].forEach(([n, k]) => { const l = n && lieuByName(n, k); if (!l) return; const need = l.aTester && k !== "production"; const role = !l.roles[k]; if (!need && !role) return; l.roles[k] = true; if (need){ l.aTester = false; l.testeLe = new Date().toISOString().slice(0, 10); } saveLieu(l).catch(() => {}); }); }
+    saved = true;
+    try { const sv = cur; [[sv.produit.boutique, "achat"], [sv.degustation && sv.degustation.lieu, "degustation"], [prodName(sv), "production"]].forEach(([n, k]) => { const l = n && lieuByName(n, k); if (!l) return; const need = l.aTester && k !== "production"; const role = !l.roles[k]; if (!need && !role) return; l.roles[k] = true; if (need){ l.aTester = false; l.testeLe = new Date().toISOString().slice(0, 10); } saveLieu(l).catch(() => {}); }); } catch (e) { console.error(e); }
     const gone = removed.slice(); removed = [];
-    if (assets) gone.forEach(id => assets.delete(id).catch(() => {}));
-    logJournal(merged || wasRebuy ? "rachat" : wasNew ? (cur.source ? "scan" : "saisie") : "modification", cur);
+    if (assets) gone.forEach(id => { try { assets.delete(id).catch(() => {}); } catch {} });
+    try { logJournal(merged || wasRebuy ? "rachat" : wasNew ? (cur.source ? "scan" : "saisie") : "modification", cur); } catch (e) { console.error(e); }
     const kc = catOf(cur), moved = kc !== env;
-    if (moved) setEnv(kc);
+    try { if (moved) setEnv(kc); } catch (e) { console.error(e); }
     toast(wasNew || merged ? `Fiche enregistrée dans « ${catName(kc)} »${moved ? " : l'environnement s'ouvre sur ce spiritueux" : ""}.` : "Modifications enregistrées.");
-    closeForm();
+    try { closeForm(); } catch (e) { console.error(e); try { cur = null; showView("cave"); } catch {} }
   } catch (e) {
-    toast("L'enregistrement a échoué (" + (e && e.code || "erreur") + "). Vos saisies sont toujours là : réessayez.");
+    console.error(e);
+    if (saved){ toast("Fiche enregistrée."); try { closeForm(); } catch {} return; }
+    toast("L'enregistrement a échoué (" + ((e && (e.code || e.message)) || "erreur") + "). Vos saisies sont toujours là : réessayez, et envoyez-moi ce message s'il revient.");
     renderPhotos();
   } finally { btn.disabled = false; btn.textContent = "Enregistrer la fiche"; }
 };
