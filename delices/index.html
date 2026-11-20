@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#e6dcea">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261120142245";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120142245"></script>
+<script>window.CAVE_BUILD="20261120145340";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120145340"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -453,7 +453,7 @@ body::before{background:rgba(217,212,227,.9)!important}
 input.search,select{border-radius:14px!important}
 .link-row{border:none!important;background:var(--sunk)!important;border-radius:16px!important}
 /* Univers « Ma cave à Délices » : cuivre, magenta, violet et émeraude (sœur du café), formes arrondies, toujours clair */
-:root,:root[data-theme]{--bg:#e6dcea!important;--surface:#fcf9fd!important;--sunk:#f1eaf4!important;--line:#d9cde0!important;--ink:#241b2e!important;--muted:#675c74!important;--accent:#b8306f!important;--accent-soft:#f8dfeb!important;--grad:linear-gradient(120deg,#ff9a3d 0%,#e83d84 33%,#7b35e0 66%,#13a37a 100%)!important;--green:#13a37a;--glow:0 8px 20px -10px rgba(184,48,111,.55)!important;--coffee:#8a4b23!important;--sea:#ece5f0!important;--land:#d8cce0!important;--env:#C2410C;--env-g:linear-gradient(135deg,#FDBA74,#C2410C)}
+:root,:root[data-theme]{--bg:#e6dcea!important;--surface:#fcf9fd!important;--sunk:#f1eaf4!important;--line:#d9cde0!important;--ink:#241b2e!important;--muted:#675c74!important;--accent:#b8306f!important;--accent-soft:#f8dfeb!important;--grad:linear-gradient(120deg,#ff9a3d 0%,#e83d84 33%,#7b35e0 66%,#13a37a 100%)!important;--green:#13a37a;--glow:0 8px 20px -10px rgba(184,48,111,.55)!important;--coffee:#8a4b23!important;--sea:#ece5f0!important;--land:#d8cce0!important;--env:#EA580C;--env-g:linear-gradient(135deg,#FFB15C,#EA580C)}
 .tabs{background:rgba(230,220,234,.92)!important}
 .tabs a[aria-current="page"]::after{background:var(--green)!important}
 .tabs a{white-space:nowrap}
@@ -795,11 +795,11 @@ const SCHEMA = 1;
 
 /* ---------- Référentiels : 4 spiritueux de rang 1 (environnement dédié chacun) et un environnement unique « Autres » (rang 2) ---------- */
 const CATS = [
-  {k:"rhum", l:"Rhum", rang:1, g:"linear-gradient(135deg,#FDBA74,#C2410C)", c:"#C2410C"},
-  {k:"whisky", l:"Whisky", rang:1, g:"linear-gradient(135deg,#FDE68A,#A16207)", c:"#A16207"},
-  {k:"calvados", l:"Calvados", rang:1, g:"linear-gradient(135deg,#BEF264,#15803D)", c:"#15803D"},
-  {k:"gin", l:"Gin", rang:1, g:"linear-gradient(135deg,#A5F3FC,#0E7490)", c:"#0E7490"},
-  {k:"autres", l:"Autres spiritueux", s:"Autres", rang:2, g:"linear-gradient(135deg,#E9D5FF,#7E22CE)", c:"#7E22CE"}
+  {k:"rhum", l:"Rhum", rang:1, g:"linear-gradient(135deg,#FFB15C,#EA580C)", c:"#EA580C"},
+  {k:"whisky", l:"Whisky", rang:1, g:"linear-gradient(135deg,#FFD95A,#E39B00)", c:"#E39B00"},
+  {k:"calvados", l:"Calvados", rang:1, g:"linear-gradient(135deg,#5EEB9A,#0E9F6E)", c:"#0E9F6E"},
+  {k:"gin", l:"Gin", rang:1, g:"linear-gradient(135deg,#67E8F9,#0284C7)", c:"#0284C7"},
+  {k:"autres", l:"Autres spiritueux", s:"Autres", rang:2, g:"linear-gradient(135deg,#F9A8D4,#C026D3)", c:"#C026D3"}
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.k, c]));
 const catOf = f => (f && CAT[f.categorie]) ? f.categorie : "autres";
