@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261120165050";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120165050"></script>
+<script>window.CAVE_BUILD="20261120211055";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120211055"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -452,19 +452,28 @@ body::before{background:rgba(217,212,227,.9)!important}
 .schema-box{border:none!important;border-radius:16px!important}
 input.search,select{border-radius:14px!important}
 .link-row{border:none!important;background:var(--sunk)!important;border-radius:16px!important}
-/* Univers « Ma cave à Délices » : ambre, cuivre et bordeaux, formes arrondies, toujours clair */
-:root,:root[data-theme]{--bg:#e6dfd6!important;--surface:#fbf8f4!important;--sunk:#efe9e1!important;--line:#d8cfc3!important;--ink:#2a1f1a!important;--muted:#6e6258!important;--accent:#8e2c3c!important;--accent-soft:#f3dfe0!important;--grad:linear-gradient(120deg,#e2a13b 0%,#c4582e 50%,#7e2441 100%)!important;--glow:0 8px 20px -10px rgba(142,44,60,.55)!important;--coffee:#8a4b23!important;--sea:#ebe5dc!important;--land:#d9cfc2!important;--env:#C2410C;--env-g:linear-gradient(135deg,#FDBA74,#C2410C)}
-.tabs{background:rgba(230,223,214,.92)!important}
+/* Univers « Ma cave à Délices » : cuivre, magenta, violet et émeraude (sœur du café), formes arrondies, toujours clair */
+:root,:root[data-theme]{--bg:#fde6ee!important;--surface:#fcf9fd!important;--sunk:#fff3f8!important;--line:#d9cde0!important;--ink:#241b2e!important;--muted:#675c74!important;--accent:#b8306f!important;--accent-soft:#f8dfeb!important;--grad:linear-gradient(120deg,#ff9a3d 0%,#e83d84 33%,#7b35e0 66%,#13a37a 100%)!important;--green:#13a37a;--glow:0 8px 20px -10px rgba(184,48,111,.55)!important;--coffee:#8a4b23!important;--sea:#ece5f0!important;--land:#d8cce0!important;--env:#EA580C;--env-g:linear-gradient(135deg,#FFB15C,#EA580C)}
+.tabs{background:rgba(253,236,243,.72)!important;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+/* Fond « Aurore » : le dégradé du logo en très doux, fixe derrière la page */
+html body{background:transparent!important}
+html{background:#fde6ee}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(165deg,#ffe3cc 0%,#fddbeb 38%,#ecdcff 72%,#d4f3e5 100%)}
+html body::before{background:rgba(255,227,204,.92)!important}
+.keygate{background:linear-gradient(165deg,#ffe3cc 0%,#fddbeb 38%,#ecdcff 72%,#d4f3e5 100%)!important}
+/* Le dégradé couvre aussi la bordure transparente : plus de liseré de couleur sur les bords des boutons */
+button,.btn,.tabs a,.seg button{background-origin:border-box!important}
+.tabs a[aria-current="page"]::after{background:var(--green)!important}
 .tabs a{white-space:nowrap}
-.cbadge{display:inline-grid;place-items:center;border-radius:30%;flex:none;vertical-align:middle;box-shadow:0 1px 2px rgba(42,31,26,.18)}
+.cbadge{display:inline-grid;place-items:center;border-radius:30%;flex:none;vertical-align:middle;box-shadow:0 1px 2px rgba(36,27,46,.18)}
 .cbadge svg{display:block}
 /* Barre des environnements : 5 boutons de même taille */
 .envbar,.catseg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 16px}
 .catseg{margin:4px 0 6px}
-.env-b{display:grid;justify-items:center;align-content:center;gap:4px;min-height:84px;padding:10px 4px 8px;border-radius:18px;border:2px solid transparent;background:var(--surface);color:var(--ink);font-weight:600;font-size:.86rem;box-shadow:0 1px 2px rgba(42,31,26,.05),0 8px 20px -14px rgba(60,30,30,.3);cursor:pointer;min-width:0}
+.env-b{display:grid;justify-items:center;align-content:center;gap:4px;min-height:84px;padding:10px 4px 8px;border-radius:18px;border:2px solid transparent;background:var(--surface);color:var(--ink);font-weight:600;font-size:.86rem;box-shadow:0 1px 2px rgba(36,27,46,.05),0 8px 20px -14px rgba(60,20,60,.3);cursor:pointer;min-width:0}
 .env-b span:not(.cbadge){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .env-b small{font-size:.74rem;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
-.env-b[aria-pressed="true"]{border-color:var(--ink);background:#fff}
+.env-b[aria-pressed="true"]{border-color:var(--green);background:#fff}
 .catseg .env-b{min-height:72px;font-size:.8rem}
 @media (max-width:380px){.env-b{font-size:.76rem;padding:8px 2px}.envbar,.catseg{gap:6px}}
 .top h1::after{background:var(--env-g)!important}
@@ -477,7 +486,7 @@ input.search,select{border-radius:14px!important}
 .jseg button{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:4px;font-size:.84rem}
 .jseg button span:not(.cbadge){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:520px){.jseg{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.jrow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:none;border-radius:20px;padding:12px;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,30,30,.22);cursor:pointer;color:var(--ink)}
+.jrow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:none;border-radius:20px;padding:12px;box-shadow:0 1px 2px rgba(43,34,48,.05),0 10px 28px -14px rgba(60,20,60,.22);cursor:pointer;color:var(--ink)}
 .jrow .meta{min-width:0}.jrow .name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .jrow .line2{color:var(--muted);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .jpill{font-size:.74rem;font-weight:600;border-radius:999px;padding:4px 10px;background:var(--sunk);color:var(--ink);white-space:nowrap}
@@ -794,24 +803,24 @@ const SCHEMA = 1;
 
 /* ---------- Référentiels : 4 spiritueux de rang 1 (environnement dédié chacun) et un environnement unique « Autres » (rang 2) ---------- */
 const CATS = [
-  {k:"rhum", l:"Rhum", rang:1, g:"linear-gradient(135deg,#FDBA74,#C2410C)", c:"#C2410C"},
-  {k:"whisky", l:"Whisky", rang:1, g:"linear-gradient(135deg,#FDE68A,#A16207)", c:"#A16207"},
-  {k:"calvados", l:"Calvados", rang:1, g:"linear-gradient(135deg,#BEF264,#15803D)", c:"#15803D"},
-  {k:"gin", l:"Gin", rang:1, g:"linear-gradient(135deg,#A5F3FC,#0E7490)", c:"#0E7490"},
-  {k:"autres", l:"Autres spiritueux", s:"Autres", rang:2, g:"linear-gradient(135deg,#E9D5FF,#7E22CE)", c:"#7E22CE"}
+  {k:"rhum", l:"Rhum", rang:1, g:"linear-gradient(135deg,#FFB15C,#EA580C)", c:"#EA580C"},
+  {k:"whisky", l:"Whisky", rang:1, g:"linear-gradient(135deg,#FFD95A,#E39B00)", c:"#E39B00"},
+  {k:"calvados", l:"Calvados", rang:1, g:"linear-gradient(135deg,#5EEB9A,#0E9F6E)", c:"#0E9F6E"},
+  {k:"gin", l:"Gin", rang:1, g:"linear-gradient(135deg,#67E8F9,#0284C7)", c:"#0284C7"},
+  {k:"autres", l:"Autres spiritueux", s:"Autres", rang:2, g:"linear-gradient(135deg,#F9A8D4,#C026D3)", c:"#C026D3"}
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.k, c]));
 const catOf = f => (f && CAT[f.categorie]) ? f.categorie : "autres";
 const catName = k => (CAT[k] || CAT.autres).l;
 let env = "rhum"; try { const e = localStorage.getItem("delices_env"); if (CAT[e]) env = e; } catch {}
 
-/* Icônes des spiritueux : canne à sucre, verre de whisky, pomme, baies de genièvre, bouteille */
+/* Icônes des spiritueux : fût, verre de whisky avec glaçon, pomme, baies de genièvre, verre à cocktail et bouteille */
 const CAT_ICO = {
-  rhum:'<path d="M12 21.5V2.5"/><path d="M10 8.5h4M10 15h4"/><path d="M12 6.5c2.5-3 5.5-3.4 8-2.5M12 12.5c-2.5-3-5.5-3.4-8-2.5M12 18c2-2.2 4.5-2.6 6.5-2"/>',
-  whisky:'<path d="M5 6h14l-1.6 12.6A2 2 0 0 1 15.4 20.5H8.6a2 2 0 0 1-2-1.9z"/><path d="M5.7 11.5h12.6"/><rect x="8.6" y="13" width="4" height="4" rx="1"/><rect x="12.4" y="14.2" width="3.4" height="3.4" rx="1"/>',
+  rhum:'<path d="M7 3h10c1.7 2.6 2.4 5.6 2.4 9s-.7 6.4-2.4 9H7c-1.7-2.6-2.4-5.6-2.4-9S5.3 5.6 7 3z"/><path d="M5.4 7.5h13.2M5.4 16.5h13.2"/><path d="M10 3.2c-.6 2.6-.8 5.6-.8 8.8s.2 6.2.8 8.8M14 3.2c.6 2.6.8 5.6.8 8.8s-.2 6.2-.8 8.8" stroke-width="1.4"/>',
+  whisky:'<path d="M4.5 5h15l-1.7 14.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M5.6 12.5c2 .8 4.2.8 6.4 0s4.4-.8 6.4 0"/><rect x="8.2" y="7.4" width="5.2" height="5.2" rx="1.2" transform="rotate(-12 10.8 10)"/>',
   calvados:'<path d="M12 7.6c-2.2-1.6-6.4-1.4-7.3 2.6-.9 4.1 1.7 9.9 4.7 10.4 1 .2 1.7-.5 2.6-.5s1.6.7 2.6.5c3-.5 5.6-6.3 4.7-10.4-.9-4-5.1-4.2-7.3-2.6z"/><path d="M12 7.6c0-2.2 1-3.7 3.2-4.4"/><path d="M12.6 5.4c1.6.2 2.8-.4 3.6-1.6"/>',
   gin:'<circle cx="8.6" cy="15" r="3.1"/><circle cx="15.4" cy="15.6" r="3.1"/><circle cx="12" cy="9.6" r="3.1"/><path d="M12 6.5c.6-2 2.6-3.6 5.6-3.8M14.2 4.6l3.4 1.6"/>',
-  autres:'<path d="M10 2.5h4v4l1.9 2.8c.2.3.3.7.3 1.1V20a1.5 1.5 0 0 1-1.5 1.5h-5.4A1.5 1.5 0 0 1 7.8 20v-9.6c0-.4.1-.8.3-1.1L10 6.5z"/><path d="M7.8 13.5h8.4M7.8 17.5h8.4"/>'
+  autres:'<path d="M6.5 21.5h5M9 21.5v-6.2L3.8 9.5h10.4L9 15.3"/><path d="M5.5 11.4h7"/><path d="M15.5 21.5V9.8c0-1.6 1.5-2.2 1.5-3.6V2.5h2.6v3.7c0 1.4 1.5 2 1.5 3.6v11.7z"/>'
 };
 const catIcon = (k, size, color) => `<svg viewBox="0 0 24 24" width="${size||18}" height="${size||18}" fill="none" stroke="${color||"currentColor"}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CAT_ICO[k] || CAT_ICO.autres}</svg>`;
 const catBadge = (k, size) => { size = size || 22; const c = CAT[k] || CAT.autres; return `<span class="cbadge" title="${c.l}" style="background:${c.g};width:${size}px;height:${size}px">${catIcon(c.k, Math.round(size*.66), "#fff")}</span>`; };
@@ -2019,7 +2028,7 @@ function normalizeLieu(o, id){
 const roleSymbols = l => ROLES.filter(r => l.roles[r.k]).map(r => r.s).join("");
 /* Motifs : alambic (distillerie), sac (caviste), verre tulipe (dégustation) */
 const ROLE_ICO = {coeur:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>', tester:'<path d="M12 3.8l2.5 5.1 5.6.8-4 3.9.9 5.6-5-2.6-5 2.6.9-5.6-4-3.9 5.6-.8z"/>', production:'<path d="M5 21h10"/><path d="M6.5 21v-3"/><path d="M13.5 21v-3"/><path d="M4.5 18a5.5 5.5 0 0 1 11 0z"/><path d="M10 12.5V9"/><path d="M8 9h4"/><path d="M12 9c3.6 0 6.5 1.3 7.5 4.5V21"/>', achat:'<path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>', degustation:'<path d="M8 3h8c.6 3.4.3 6.6-1.2 8.6A3.8 3.8 0 0 1 12 13a3.8 3.8 0 0 1-2.8-1.4C7.7 9.6 7.4 6.4 8 3z"/><path d="M12 13v6"/><path d="M8.5 21h7"/><path d="M8.2 7h7.6"/>'};
-const ROLE_C = {coeur:"#8e2c3c", tester:"#10b981", production:"linear-gradient(135deg,#FCD34D,#B45309)", achat:"linear-gradient(135deg,#22D3EE,#2563EB)", degustation:"linear-gradient(135deg,#FDA4AF,#9F1239)"};
+const ROLE_C = {coeur:"#b8306f", tester:"#10b981", production:"linear-gradient(135deg,#FCD34D,#B45309)", achat:"linear-gradient(135deg,#22D3EE,#2563EB)", degustation:"linear-gradient(135deg,#FDA4AF,#9F1239)"};
 const ROLE_SOLID = {production:"#D97706", achat:"#0EA5E9", degustation:"#BE123C"};
 const roleIcon = (k, size, color) => `<svg viewBox="0 0 24 24" width="${size||16}" height="${size||16}" fill="none" stroke="${color||"currentColor"}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROLE_ICO[k]}</svg>`;
 // Icône « à tester » choisie (Z1) : goutte émeraude avec point d'interrogation
