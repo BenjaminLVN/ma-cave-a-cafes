@@ -2,10 +2,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Délices">
-<meta name="theme-color" content="#e6dcea">
+<meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261120145543";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120145543"></script>
+<script>window.CAVE_BUILD="20261120151807";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120151807"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -453,8 +453,15 @@ body::before{background:rgba(217,212,227,.9)!important}
 input.search,select{border-radius:14px!important}
 .link-row{border:none!important;background:var(--sunk)!important;border-radius:16px!important}
 /* Univers « Ma cave à Délices » : cuivre, magenta, violet et émeraude (sœur du café), formes arrondies, toujours clair */
-:root,:root[data-theme]{--bg:#e6dcea!important;--surface:#fcf9fd!important;--sunk:#f1eaf4!important;--line:#d9cde0!important;--ink:#241b2e!important;--muted:#675c74!important;--accent:#b8306f!important;--accent-soft:#f8dfeb!important;--grad:linear-gradient(120deg,#ff9a3d 0%,#e83d84 33%,#7b35e0 66%,#13a37a 100%)!important;--green:#13a37a;--glow:0 8px 20px -10px rgba(184,48,111,.55)!important;--coffee:#8a4b23!important;--sea:#ece5f0!important;--land:#d8cce0!important;--env:#EA580C;--env-g:linear-gradient(135deg,#FFB15C,#EA580C)}
-.tabs{background:rgba(230,220,234,.92)!important}
+:root,:root[data-theme]{--bg:#fde6ee!important;--surface:#fcf9fd!important;--sunk:#fff3f8!important;--line:#d9cde0!important;--ink:#241b2e!important;--muted:#675c74!important;--accent:#b8306f!important;--accent-soft:#f8dfeb!important;--grad:linear-gradient(120deg,#ff9a3d 0%,#e83d84 33%,#7b35e0 66%,#13a37a 100%)!important;--green:#13a37a;--glow:0 8px 20px -10px rgba(184,48,111,.55)!important;--coffee:#8a4b23!important;--sea:#ece5f0!important;--land:#d8cce0!important;--env:#EA580C;--env-g:linear-gradient(135deg,#FFB15C,#EA580C)}
+.tabs{background:rgba(253,236,243,.72)!important;-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+/* Fond « Aurore » : le dégradé du logo en très doux, fixe derrière la page */
+html body{background:transparent!important}
+html{background:#fde6ee}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(165deg,#ffe3cc 0%,#fddbeb 38%,#ecdcff 72%,#d4f3e5 100%)}
+html body::before{background:rgba(255,227,204,.92)!important}
+/* Le dégradé couvre aussi la bordure transparente : plus de liseré de couleur sur les bords des boutons */
+button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 .tabs a[aria-current="page"]::after{background:var(--green)!important}
 .tabs a{white-space:nowrap}
 .cbadge{display:inline-grid;place-items:center;border-radius:30%;flex:none;vertical-align:middle;box-shadow:0 1px 2px rgba(36,27,46,.18)}
