@@ -1,0 +1,25 @@
+# Garde le projet Supabase éveillé : l'offre gratuite le met en pause après une semaine sans activité.
+# Deux petites lectures par semaine (lundi et jeudi), avec la clé publique déjà présente dans config.js.
+name: Supabase keep-alive
+on:
+  schedule:
+    - cron: "17 6 * * 1,4"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Petite lecture sur Supabase
+        run: |
+          URL=$(grep -o '"url": *"[^"]*"' config.js | sed 's/.*"\(https[^"]*\)"/\1/')
+          KEY=$(grep -o '"key": *"[^"]*"' config.js | sed 's/.*"\([^"]*\)"$/\1/')
+          for i in 1 2 3; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/items?select=id&limit=1" -H "apikey: $KEY" -H "x-cave: keepalive-keepalive-keepalive")
+            echo "Réponse : $CODE"
+            [ "$CODE" = "200" ] && exit 0
+            sleep 20
+          done
+          echo "Supabase ne répond pas (projet en pause ?)"; exit 1
