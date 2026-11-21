@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261121001933";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121001933"></script>
+<script>window.CAVE_BUILD="20261121003134";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121003134"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1158,7 +1158,9 @@ function ensureKey(){
 }
 function remoteStore(cfg, key){
   const H = {apikey:cfg.key, "x-cave":key}; if (/^eyJ/.test(cfg.key)) H.Authorization = "Bearer " + cfg.key; // clé « anon » (JWT) ou « publishable »
-  const api = (path, opt = {}) => fetch(cfg.url.replace(/\/$/, "") + "/rest/v1/" + path, Object.assign({}, opt, {headers:Object.assign({}, H, opt.headers || {})}));
+  // Délai maximal : une requête qui reste suspendue (réseau mobile capricieux) ne bloque plus l'envoi des modifications
+  const api = (path, opt = {}) => { const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), /^photos/.test(path) && opt.method === "POST" ? 90000 : 20000);
+    return fetch(cfg.url.replace(/\/$/, "") + "/rest/v1/" + path, Object.assign({}, opt, {signal:ctl.signal, headers:Object.assign({}, H, opt.headers || {})})).finally(() => clearTimeout(tm)); };
   const enc = encodeURIComponent, cache = {}, subs = {}, errs = {};
   const ck = n => "delices_remote_" + n;
   const save = n => { try { localStorage.setItem(ck(n), JSON.stringify(cache[n] || {})); } catch {} };
