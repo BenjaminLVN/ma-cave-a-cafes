@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261121003134";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121003134"></script>
+<script>window.CAVE_BUILD="20261121003437";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121003437"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,6 +136,10 @@ button{cursor:pointer}
 .profil-row{display:grid;grid-template-columns:5.5em minmax(0,1fr) 2.6em;align-items:center;gap:8px;font-size:.92rem}
 .profil-row input{accent-color:var(--accent);width:100%}
 .profil-row output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.struct .sub{font-size:.85rem;font-weight:600;color:var(--muted);margin:10px 0 6px}
+.struct .chips{display:flex;flex-wrap:wrap;gap:6px}
+.struct .chip{min-height:38px}
+.struct .chip[aria-pressed="true"]{background:var(--grad);border-color:transparent;color:#fff}
 .field label{font-size:.85rem;font-weight:600;color:var(--muted)}
 input[type=date],input[type=time],input[type=month]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;text-align:left}
 input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
@@ -1006,7 +1010,7 @@ function normalize(d, id){
   return f;
 }
 /* Achats successifs d'une même bouteille : une seule fiche, chaque achat garde sa date, son lieu, sa dégustation et ses notes */
-const ACHAT_PROD = ["dateAchat","anterieur","anneeAchat","boutique","prix","niveau","nez","bouche","finale","notesAromatiques","profil"];
+const ACHAT_PROD = ["dateAchat","anterieur","anneeAchat","boutique","prix","niveau","nez","bouche","finale","notesAromatiques","profil","caractere","attaque","structure"];
 function snapshotOf(f){
   const o = JSON.parse(JSON.stringify({produit:{}, degustation:f.degustation, noteGlobale:f.noteGlobale, extractions:f.extractions}));
   ACHAT_PROD.forEach(k => { if (f.produit[k] !== undefined && f.produit[k] !== "") o.produit[k] = JSON.parse(JSON.stringify(f.produit[k])); });
@@ -3108,20 +3112,59 @@ function profilSvg(p, size, prof){
   prof.forEach(([k, l], i) => { const [x, y] = pt(i, R + 14); const t = sv("text", {x, y, "text-anchor": Math.abs(x - c) < 6 ? "middle" : x > c ? "start" : "end", "dominant-baseline":"middle", class:"pr-lbl"}, s); t.textContent = l; });
   return s;
 }
+let profRedraw = () => {};
+/* En bouche : caractère (puces), attaque (un choix), et quatre curseurs de structure */
+const CARACT = [["mineral","Minéral"],["salin","Salin"],["fruite","Fruité"],["floral","Floral"],["sec","Sec"],["rond","Rond"],["gras","Gras, huileux"],["vif","Vif, frais"]];
+const ATTAQUES = ["Douce","Franche","Vive","Dure"];
+const STRUCT = [["longueur","Longueur"],["amertume","Amertume"],["complexite","Complexité"],["richesse","Richesse"]];
+function structEl(prod){
+  const w = document.createElement("div"); w.className = "field full profil struct";
+  const lab = document.createElement("div"); lab.className = "plab"; lab.textContent = "En bouche"; w.append(lab);
+  // Caractère : les axes déjà présents dans le profil de ce spiritueux ne sont pas répétés
+  const axes = new Set(profOf(catOf(cur)).map(x => x[0]));
+  const car = new Set(Array.isArray(prod.caractere) ? prod.caractere : []);
+  const s1 = document.createElement("div"); s1.className = "sub"; s1.textContent = "Caractère"; const chips = document.createElement("div"); chips.className = "chips";
+  CARACT.filter(([k]) => !axes.has(k) || car.has(k)).forEach(([k, l]) => { const c = document.createElement("button"); c.type = "button"; c.className = "chip"; c.textContent = l; c.disabled = ro;
+    c.setAttribute("aria-pressed", car.has(k) ? "true" : "false");
+    c.onclick = () => { car.has(k) ? car.delete(k) : car.add(k); c.setAttribute("aria-pressed", car.has(k) ? "true" : "false"); prod.caractere = CARACT.map(x => x[0]).filter(x => car.has(x)); if (!prod.caractere.length) delete prod.caractere; };
+    chips.append(c); });
+  w.append(s1, chips);
+  const s2 = document.createElement("div"); s2.className = "sub"; s2.id = "att_l"; s2.textContent = "Attaque";
+  const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-labelledby", "att_l");
+  ATTAQUES.forEach(opt => { const b = document.createElement("button"); b.type = "button"; b.textContent = opt; b.disabled = ro; b.setAttribute("aria-pressed", prod.attaque === opt ? "true" : "false");
+    b.onclick = () => { prod.attaque = prod.attaque === opt ? "" : opt; if (!prod.attaque) delete prod.attaque; [...seg.children].forEach(x => x.setAttribute("aria-pressed", x.textContent === prod.attaque ? "true" : "false")); }; seg.append(b); });
+  w.append(s2, seg);
+  const s3 = document.createElement("div"); s3.className = "sub"; s3.textContent = "Structure (0 à 4)";
+  const grid = document.createElement("div"); grid.className = "profil-grid";
+  STRUCT.forEach(([k, l]) => {
+    const get = () => k === "longueur" ? (prod.profil || {}).longueur : (prod.structure || {})[k];
+    const row = document.createElement("label"); row.className = "profil-row";
+    const name = document.createElement("span"); name.textContent = l;
+    const rg = document.createElement("input"); rg.type = "range"; rg.min = "0"; rg.max = "4"; rg.step = "1"; rg.value = String(get() || 0); rg.disabled = ro; rg.setAttribute("aria-label", l + " (0 à 4)");
+    const val = document.createElement("output"); val.textContent = get() ? get() + "/4" : "–";
+    rg.addEventListener("input", () => { const v = +rg.value; const o = k === "longueur" ? (prod.profil = Object.assign({}, prod.profil || {})) : (prod.structure = Object.assign({}, prod.structure || {}));
+      if (v) o[k] = v; else delete o[k]; if (k !== "longueur" && !Object.keys(o).length) delete prod.structure; val.textContent = v ? v + "/4" : "–"; if (k === "longueur") profRedraw(); });
+    row.append(name, rg, val); grid.append(row);
+  });
+  const hint = document.createElement("div"); hint.className = "hint"; hint.textContent = "Tout est facultatif : touchez seulement ce qui vous parle. 0 = non renseigné.";
+  w.append(s3, grid, hint); return w;
+}
 function profilEl(prod){
   const prof = profOf(catOf(cur));
   const w = document.createElement("div"); w.className = "field full profil" + (cur && cur.ai && cur.ai.profil ? " ai" : "");
   const lab = document.createElement("div"); lab.className = "plab"; lab.textContent = "Profil en verre (0 à 4)";
-  const p = Object.assign({}, prod.profil || {});
-  const fig = document.createElement("div"); fig.className = "profil-fig"; fig.append(profilSvg(p, 240, prof));
+  const p = Object.assign({}, prod.profil || {}); delete p.longueur; // la longueur se règle dans « En bouche »
+  const fig = document.createElement("div"); fig.className = "profil-fig"; fig.append(profilSvg(Object.assign({}, prod.profil || {}), 240, prof));
+  profRedraw = () => fig.replaceChildren(profilSvg(Object.assign({}, prod.profil || {}), 240, prof));
   const grid = document.createElement("div"); grid.className = "profil-grid";
   const est = document.createElement("div"); est.className = "hint est"; est.textContent = "Estimé d'après les arômes lus sur l'étiquette : ajustez selon ce que vous goûtez."; est.hidden = !(cur && cur.ai && cur.ai.profil);
   prof.forEach(([k, l]) => {
+    if (k === "longueur") return;
     const row = document.createElement("label"); row.className = "profil-row";
     const name = document.createElement("span"); name.textContent = l;
     const rg = document.createElement("input"); rg.type = "range"; rg.min = "0"; rg.max = "4"; rg.step = "1"; rg.value = String(p[k] || 0); rg.disabled = ro; rg.setAttribute("aria-label", l + " (0 à 4)");
     const val = document.createElement("output"); val.textContent = p[k] ? p[k] + "/4" : "–";
-    rg.addEventListener("input", () => { const v = +rg.value; if (v) p[k] = v; else delete p[k]; val.textContent = v ? v + "/4" : "–"; prod.profil = Object.assign({}, prod.profil || {}, p); if (!v) delete prod.profil[k]; if (cur && cur.ai) delete cur.ai.profil; w.classList.remove("ai"); est.hidden = true; fig.textContent = ""; fig.append(profilSvg(p, 240, prof)); });
+    rg.addEventListener("input", () => { const v = +rg.value; if (v) p[k] = v; else delete p[k]; val.textContent = v ? v + "/4" : "–"; prod.profil = Object.assign({}, prod.profil || {}, p); if (!v) delete prod.profil[k]; profRedraw(); if (cur && cur.ai) delete cur.ai.profil; w.classList.remove("ai"); est.hidden = true; fig.textContent = ""; fig.append(profilSvg(p, 240, prof)); });
     row.append(name, rg, val); grid.append(row);
   });
   const hint = document.createElement("div"); hint.className = "hint"; hint.textContent = "Situez ce que vous goûtez sur chaque axe. 0 = non renseigné.";
@@ -3223,6 +3266,7 @@ function renderDegust(){
   const hint = document.createElement("div"); hint.className = "hint full"; hint.textContent = "Nez, bouche et finale sont pré-remplis avec ce qu'annonce l'étiquette quand elle le dit. Ajustez-les selon ce que vous goûtez.";
   g.append(hint);
   F_DEGUST_PROD.forEach(def => { const el = fieldEl(def, cur.produit[def.k], v => { cur.produit[def.k] = v; delete cur.ai[def.k]; }); if (cur.ai[def.k]) el.classList.add("ai"); g.append(el); });
+  g.append(structEl(cur.produit));
   g.append(profilEl(cur.produit));
   g.append(fieldEl({k:"avis",l:"Avis général",ta:true}, d.avis, v => d.avis = v, {prefix:"dg_"}));
   const w = document.createElement("div"); w.className="field full";
@@ -3234,6 +3278,9 @@ function renderDegust(){
   g.append(ratingEl("Note globale", "n_globale", cur.noteGlobale, v => cur.noteGlobale = v));
 }
 
+function structTxt(p){ const c = (Array.isArray(p.caractere) ? p.caractere : []).map(k => (CARACT.find(x => x[0] === k) || [k, k])[1].toLowerCase());
+  const st = STRUCT.map(([k, l]) => { const n = k === "longueur" ? (p.profil || {}).longueur : (p.structure || {})[k]; return n ? l.toLowerCase() + " " + n + "/4" : ""; }).filter(Boolean);
+  return [c.join(", "), p.attaque ? "attaque " + p.attaque.toLowerCase() : "", st.join(", ")].filter(Boolean).join(" · "); }
 function achatLine(v){ return [achatLabel(v), v.produit.boutique ? "chez " + placeLabel(v.produit.boutique) : "", degustLabel(v)].filter(Boolean).join(" · ") || "Date inconnue"; }
 function renderHist(){
   const blk = $("f-hist-block"), box = $("f-hist"); box.textContent = "";
@@ -3251,7 +3298,7 @@ function renderHist(){
     sm.append(t, pillEl(ratingOf(v))); d.append(sm);
     const body = document.createElement("div"); body.className = "tl-body";
     const ex = METHODS.filter(m => v.extractions[m.k] && v.extractions[m.k].active).map(m => { const e = v.extractions[m.k]; return m.l + (e.note !== null ? " " + fmtNote(e.note) : "") + (e.remarques ? " : " + e.remarques : ""); });
-    [["Avis", v.degustation.avis], ["Nez", v.produit.nez], ["Bouche", v.produit.bouche], ["Finale", v.produit.finale], ["Arômes", v.produit.notesAromatiques], ["Dégustée", ex.join(" · ")], ["Racheter", v.degustation.racheter], ["Lieu", v.degustation.lieu]].forEach(([k, x]) => { if (!x) return; const p = document.createElement("p"); const b = document.createElement("b"); b.textContent = k + " : "; p.append(b, document.createTextNode(x)); body.append(p); });
+    [["Avis", v.degustation.avis], ["Nez", v.produit.nez], ["Bouche", v.produit.bouche], ["Finale", v.produit.finale], ["Arômes", v.produit.notesAromatiques], ["En bouche", structTxt(v.produit)], ["Dégustée", ex.join(" · ")], ["Racheter", v.degustation.racheter], ["Lieu", v.degustation.lieu]].forEach(([k, x]) => { if (!x) return; const p = document.createElement("p"); const b = document.createElement("b"); b.textContent = k + " : "; p.append(b, document.createTextNode(x)); body.append(p); });
     if (j === 0) { const p = document.createElement("p"); p.className = "hint"; p.textContent = "C'est l'achat affiché dans les blocs 1 à 3."; body.append(p); }
     else if (!ro){ const rm = document.createElement("button"); rm.type = "button"; rm.className = "btn small ghost"; rm.textContent = "Retirer cet achat";
       rm.onclick = () => { if (!confirm("Retirer cet achat de l'historique ? (pensez à enregistrer la fiche)")) return; cur.achats.splice(v.achatIdx, 1); renderHist(); }; body.append(rm); }
