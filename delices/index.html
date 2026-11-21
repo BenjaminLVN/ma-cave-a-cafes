@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261121001539";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121001539"></script>
+<script>window.CAVE_BUILD="20261121001933";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121001933"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -506,7 +506,7 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 </style>
 
 <div class="wrap">
-  <div class="ro-band" id="sync-band" hidden><strong>Hors ligne.</strong> Vos dernières modifications sont gardées sur le téléphone et seront envoyées dès le retour du réseau.</div>
+  <div class="ro-band" id="sync-band" hidden><strong>Envoi en cours…</strong></div>
   <div class="ro-band" id="ro-band" hidden><strong>Lecture seule.</strong> Vous consultez une cave à Délices partagée : bouteilles, notes, dégustations et lieux. Seul son propriétaire peut les modifier.</div>
   <nav class="tabs" id="tabs" aria-label="Sections">
     <a href="#cave" data-view="cave">Ma cave</a>
@@ -1172,9 +1172,35 @@ function remoteStore(cfg, key){
   }
   let flushing = false;
   let lastErr = "";
-  async function flush(){ if (flushing) return; flushing = true; try { while (outbox.length){ try { await send(outbox[0]); outbox.shift(); saveOut(); lastErr = ""; } catch (e) { lastErr = (e && e.status) ? "refusé par le serveur (" + e.status + ")" : ""; break; } } } finally { flushing = false; syncNote(); } }
-  function syncNote(){ const b = document.getElementById("sync-band"); if (!b) return; b.hidden = !outbox.length;
-    b.innerHTML = lastErr ? "<strong>Enregistrement en ligne " + lastErr + ".</strong> Vos modifications sont gardées sur le téléphone ; signalez-le pour que je corrige." : "<strong>Hors ligne.</strong> Vos dernières modifications sont gardées sur le téléphone et seront envoyées dès le retour du réseau."; }
+  // Envoi de la file : une modification qui échoue ne bloque plus les suivantes, et la cause exacte est affichée
+  let lastFail = null, lastOk = 0;
+  async function probe(){ try { const r = await api(`items?select=id&cave=eq.${enc(key)}&limit=1`); return r.ok ? "ok" : "http_" + r.status; } catch { return "down"; } }
+  async function flush(){ if (flushing) return; flushing = true; lastErr = ""; lastFail = null;
+    try {
+      let tries = outbox.length;
+      while (outbox.length && tries-- > 0){
+        const op = outbox[0];
+        try { await send(op); outbox.shift(); saveOut(); lastOk = Date.now(); }
+        catch (e) {
+          if (e && e.status){ lastFail = {kind:"refused", status:e.status, size:JSON.stringify(op.data || "").length}; }
+          else if (navigator.onLine === false){ lastFail = {kind:"offline"}; break; }
+          else { const pr = await probe(); lastFail = pr === "down" ? {kind:"down", msg:String((e && e.message) || e || "")} : {kind:"blocked", size:JSON.stringify(op.data || "").length, msg:String((e && e.message) || e || "")};
+            if (pr === "down") break; }
+          outbox.push(outbox.shift()); saveOut(); // on passe à la suivante, celle-ci sera retentée
+        }
+      }
+    } finally { flushing = false; syncNote(); } }
+  function syncNote(){ const b = document.getElementById("sync-band"); if (!b) return; b.hidden = !outbox.length; if (!outbox.length) return;
+    const n = outbox.length, what = `${n} modification${n>1?"s":""} en attente, gardée${n>1?"s":""} sur ce téléphone`, F = lastFail || {};
+    const kb = x => x > 2048 ? Math.round(x / 1024) + " Ko" : x + " o";
+    const msg = F.kind === "offline" ? "<strong>Pas de réseau sur le téléphone.</strong> " + what + " ; l'envoi reprendra tout seul."
+      : F.kind === "down" ? "<strong>Le serveur d'enregistrement ne répond pas.</strong> " + what + ". Le réseau du téléphone marche, mais le serveur en ligne est injoignable" + (F.msg ? " (" + F.msg.slice(0, 60) + ")" : "") + "."
+      : F.kind === "blocked" ? "<strong>Envoi bloqué alors que le serveur répond.</strong> " + what + " (taille " + kb(F.size) + (F.msg ? ", " + F.msg.slice(0, 60) : "") + "). Signalez-le pour que je corrige."
+      : F.kind === "refused" ? "<strong>Envoi refusé par le serveur (" + F.status + ").</strong> " + what + ". Signalez-le pour que je corrige."
+      : "<strong>Envoi en cours…</strong> " + what + ".";
+    b.innerHTML = msg + ' <button class="btn small" type="button" id="sync-retry">Réessayer</button>';
+    const rb = document.getElementById("sync-retry"); if (rb) rb.onclick = () => { rb.disabled = true; rb.textContent = "Envoi…"; flushPhotos(); flush(); };
+  }
   // Fiches déjà vues sur le serveur pour CETTE cave : une fiche du téléphone jamais vue en ligne n'est jamais jetée, elle est renvoyée
   const seenK = "delices_seen_" + key; let seen = new Set(); try { seen = new Set(JSON.parse(localStorage.getItem(seenK) || "[]")); } catch {}
   const saveSeen = () => { try { localStorage.setItem(seenK, JSON.stringify([...seen])); } catch {} };
