@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261120212810";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261120212810"></script>
+<script>window.CAVE_BUILD="20261121001539";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121001539"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -837,19 +837,19 @@ const MATIERE_RHUM = ["Pur jus de canne (agricole)","Mélasse (traditionnel)","S
 const STYLE_RHUM = ["Blanc","Paille / élevé sous bois","Ambré","Vieux","Hors d'âge / extra vieux","Épicé (spiced)","Arrangé","Overproof (très fort)"];
 const APPEL_RHUM = ["AOC Martinique","IG Guadeloupe","IG La Réunion","IG Guyane","IG Jamaïque","DOC Ron de Venezuela","Aucune"];
 const DISTIL_RHUM = ["Colonne créole","Alambic (pot still)","Colonne multiple (moderne)","Assemblage alambic et colonne","Double distillation (charentais)"];
-const AGE_RHUM = ["Blanc (non vieilli)","Élevé sous bois (≥ 12 mois)","VO / Très vieux (≥ 3 ans)","VSOP / Réserve spéciale (≥ 4 ans)","XO / Hors d'âge / Extra vieux (≥ 6 ans)","5 ans","8 ans","10 ans","12 ans","15 ans","18 ans","20 ans et plus","Solera"];
+const AGE_RHUM = ["Blanc (non vieilli)","Élevé sous bois (≥ 12 mois)","VO / Très vieux (≥ 3 ans)","VSOP / Réserve spéciale (≥ 4 ans)","XO / Hors d'âge / Extra vieux (≥ 6 ans)","5 ans","8 ans","10 ans","12 ans","15 ans","18 ans","20 ans et plus"];
 const TYPE_WHISKY = ["Single Malt","Blended Malt","Blended","Single Grain","Single Pot Still","Bourbon","Straight Bourbon","Rye","Tennessee whiskey","Corn whiskey","Wheat whiskey"];
 const TOURBE = ["Non tourbé","Légèrement tourbé","Tourbé","Très tourbé"];
 const AGE_WHISKY = ["Sans mention d'âge (NAS)","3 ans","5 ans","8 ans","10 ans","12 ans","14 ans","15 ans","16 ans","18 ans","21 ans","25 ans","30 ans et plus"];
 const DISTIL_WHISKY = ["Alambic (double distillation)","Triple distillation","Colonne (Coffey)","Colonne et doubler"];
 const APPEL_CALVA = ["AOC Calvados","AOC Calvados Pays d'Auge","AOC Calvados Domfrontais"];
-const AGE_CALVA = ["Fine / VS / *** (≥ 2 ans)","Vieux / Réserve (≥ 3 ans)","VO / Vieille Réserve / VSOP (≥ 4 ans)","XO / Hors d'âge / Très Vieille Réserve / Extra (≥ 6 ans)","10 ans","12 ans","15 ans","18 ans","20 ans","25 ans","30 ans et plus","Millésime"];
+const AGE_CALVA = ["Fine / VS / *** (≥ 2 ans)","Vieux / Réserve (≥ 3 ans)","VO / Vieille Réserve / VSOP (≥ 4 ans)","XO / Hors d'âge / Très Vieille Réserve / Extra (≥ 6 ans)","10 ans","12 ans","15 ans","18 ans","20 ans","25 ans","30 ans et plus"];
 const DISTIL_CALVA = ["Colonne (simple distillation)","Alambic à repasse (double distillation)"];
 const FRUITS_CALVA = ["Pommes","Pommes et poires","Poires majoritaires (Domfrontais)"];
 const STYLE_GIN = ["London Dry Gin","Distilled Gin","Gin","Old Tom Gin","Plymouth Gin","Navy Strength","Gin vieilli en fût","Sloe gin (liqueur)","Genever / jenever","Gin aromatisé (pink, fruits…)"];
 const BASE_GIN = ["Céréales (blé, orge, seigle)","Raisin","Pomme","Mélasse ou canne","Pomme de terre","Petit-lait","Riz"];
 const DISTIL_GIN = ["Macération puis distillation","Infusion vapeur (panier)","Distillation sous vide","Distillats séparés assemblés","Gin composé (sans redistillation)"];
-const AGE_AUTRES = ["Non vieilli / blanc","VS","VSOP","XO","Hors d'âge","Reposado","Añejo","Extra añejo","5 ans","10 ans","15 ans","20 ans et plus","Millésime"];
+const AGE_AUTRES = ["Non vieilli / blanc","VS","VSOP","XO","Hors d'âge","Reposado","Añejo","Extra añejo","5 ans","10 ans","15 ans","20 ans et plus"];
 const FUTS = ["Chêne américain (ex-bourbon)","Chêne français","Chêne neuf","Ex-sherry","Ex-sherry (oloroso)","Ex-sherry (pedro ximénez)","Ex-porto","Ex-madère","Ex-vin rouge","Ex-sauternes","Ex-cognac","Ex-armagnac","Ex-rhum","Ex-calvados","Mizunara (chêne japonais)","Foudre","Double maturation","Solera"];
 const EMB = ["Embouteillage officiel","Embouteilleur indépendant","Single cask (fût unique)","Brut de fût (cask strength)","Édition limitée","Non filtré à froid","Couleur naturelle (sans caramel)"];
 const NIVEAUX = ["Pleine","Entamée","À moitié","Presque vide","Vide"];
@@ -857,7 +857,7 @@ const NIVEAUX = ["Pleine","Entamée","À moitié","Presque vide","Vide"];
 /* Champs de la fiche, dans l'ordre d'une étiquette, propres à chaque spiritueux */
 const fM = ph => ({k:"marque", l:"Marque / maison", ph});
 const fN = ph => ({k:"nom", l:"Nom / cuvée", ph});
-const fD = (l, ph) => ({k:"distillerie", l:l || "Distillerie / producteur", ph:ph || "distillerie, domaine, embouteilleur"});
+const fD = (l, ph) => ({k:"distillerie", l:l || "Distillerie (si autre que la marque)", ph:ph || "distillerie d'origine, embouteilleur indépendant…"});
 const fP = list => ({k:"pays", l:"Pays / île", list});
 const fR = list => ({k:"region", l:"Région", list});
 const fAge = list => ({k:"age", l:"Âge / compte d'âge", list});
@@ -874,25 +874,44 @@ const F_ACHAT = [
   {k:"texte", l:"Autres infos de l'étiquette", ta:true, full:true, ph:"n° de bouteille, n° de fût, date de mise en bouteille, mentions…"}
 ];
 const F_CAT = {
-  rhum: [fM("ex. Clément, Hampden, Diplomático"), fN("ex. XO, Cuvée Homère, 8 ans"), fD(), fP(PAYS_RHUM), fR(REG_RHUM),
-    {k:"matiere", l:"Matière première", list:MATIERE_RHUM}, {k:"style", l:"Style", list:STYLE_RHUM}, {k:"appellation", l:"Appellation", list:APPEL_RHUM},
+  rhum: [fM("ex. Neisson, Hampden, Bielle"), fN("ex. XO, Cuvée Homère, 8 ans"), fD(), fP(PAYS_RHUM), fR(REG_RHUM),
+    {k:"matiere", l:"Matière première", list:MATIERE_RHUM}, {k:"appellation", l:"Appellation", list:APPEL_RHUM},
     {k:"distillation", l:"Distillation", list:DISTIL_RHUM}, fAge(AGE_RHUM), fMil, fDeg, fCl, fFut(), fEmb],
   whisky: [fM("ex. Lagavulin, Nikka, Armorik"), fN("ex. 16 ans, From the Barrel"), fD(), {k:"type", l:"Type", list:TYPE_WHISKY}, fP(PAYS_WHISKY), fR(REG_WHISKY),
     {k:"tourbe", l:"Tourbe", list:TOURBE, ph:"non tourbé, tourbé… (ppm si indiqué)"}, fAge(AGE_WHISKY), fMil, fDeg, fCl, fFut(), {k:"distillation", l:"Distillation", list:DISTIL_WHISKY}, fEmb],
   calvados: [fM("ex. Christian Drouin, Roger Groult"), fN("ex. Hors d'âge, Réserve"), fD("Producteur / domaine", "domaine, ferme, maison de négoce"), {k:"appellation", l:"Appellation", list:APPEL_CALVA}, fR(REG_CALVA),
     fAge(AGE_CALVA), fMil, {k:"fruits", l:"Fruits", list:FRUITS_CALVA}, {k:"distillation", l:"Distillation", list:DISTIL_CALVA}, fDeg, fCl, fFut(), fEmb],
-  gin: [fM("ex. Monkey 47, Citadelle, Hendrick's"), fN("ex. Dry Gin, Navy Strength"), fD(), {k:"style", l:"Style", list:STYLE_GIN}, fP(PAYS_GIN), fR([]),
+  gin: [fM("ex. Monkey 47, Citadelle, Audemus"), fN("ex. Dry Gin, Navy Strength"), fD(), {k:"style", l:"Style", list:STYLE_GIN}, fP(PAYS_GIN), Object.assign(fR([]), {legacy:true}),
     {k:"botaniques", l:"Botaniques", full:true, ph:"genièvre, coriandre, angélique, agrumes…"}, {k:"base", l:"Alcool de base", list:BASE_GIN}, {k:"distillation", l:"Distillation", list:DISTIL_GIN}, fDeg, fCl, fFut("seulement s'il est vieilli en fût")],
   autres: [{k:"type", l:"Type de spiritueux", list:TYPES_AUTRES, ph:"choisissez ou écrivez : cognac, tequila…"}, fM("ex. Frapin, Fortaleza, Chartreuse"), fN("ex. VSOP, Reposado"), fD(), fP(PAYS_AUTRES), fR([]),
     fAge(AGE_AUTRES), fMil, {k:"matiere", l:"Matière première", ph:"raisin, agave, prune, plantes…"}, fDeg, fCl, fFut(), fEmb]
 };
+/* Rubriques retirées d'un spiritueux : on ne les montre plus que si une ancienne fiche les a remplies (rien n'est perdu) */
+const RHUM_STYLE_AGE = {"Blanc":"Blanc (non vieilli)", "Paille / élevé sous bois":"Élevé sous bois (≥ 12 mois)", "Vieux":"VO / Très vieux (≥ 3 ans)", "Hors d'âge / extra vieux":"XO / Hors d'âge / Extra vieux (≥ 6 ans)"};
+function addMention(p, m){ if (!m) return; const t = String(p.texte || ""); if (!fold(t).includes(fold(m))) p.texte = t ? t + " · " + m : m; }
+function migrateProduit(cat, p, ai){
+  if (!p) return p; ai = ai || {};
+  // Rhum : l'ancien « Style » doublait l'âge ; il passe dans l'âge, ou dans les autres infos
+  if (cat === "rhum" && p.style){
+    const s = String(p.style), a = RHUM_STYLE_AGE[s];
+    if (a){ if (!p.age){ p.age = a; if (ai.style) ai.age = true; } else if (s !== "Vieux" && fold(p.age) !== fold(a)) addMention(p, s); }
+    else if (!(/overproof/i.test(s) && p.degre)) addMention(p, /épic|spiced/i.test(s) ? "Rhum épicé" : /arrang/i.test(s) ? "Rhum arrangé" : s);
+    delete p.style; delete ai.style;
+  }
+  // « Solera » et « Millésime » n'étaient pas des âges : ils rejoignent le fût ou les mentions
+  if (p.age === "Solera"){ if (!p.fut) p.fut = "Solera"; else addMention(p, "Solera"); delete p.age; }
+  if (p.age === "Millésime"){ if (!p.millesime) addMention(p, "Millésimé"); delete p.age; }
+  // Distillerie identique à la marque : un doublon, on garde la marque
+  if (p.distillerie && p.marque && fold(p.distillerie) === fold(p.marque)) delete p.distillerie;
+  return p;
+}
 const fieldsFor = cat => (F_CAT[cat] || F_CAT.autres).concat(F_ACHAT);
 const FIELD_KEYS = [...new Set(Object.values(F_CAT).flat().concat(F_ACHAT).map(d => d.k))];
 /* Rubrique de classement propre à chaque spiritueux (filtres et tableau de bord) */
-const STYLE_KEY = {rhum:["style","Style"], whisky:["type","Type"], calvados:["appellation","Appellation"], gin:["style","Style"], autres:["type","Type"]};
+const STYLE_KEY = {rhum:["matiere","Matière première"], whisky:["type","Type"], calvados:["appellation","Appellation"], gin:["style","Style"], autres:["type","Type"]};
 /* Profil en verre : 8 curseurs de 0 à 4, propres à chaque spiritueux */
 const PROFILS = {
-  rhum: [["canne","Canne, végétal"],["fruite","Fruité"],["exotique","Exotique"],["epice","Épicé"],["vanille","Vanillé, sucré"],["boise","Boisé"],["fume","Torréfié"],["longueur","Longueur"]],
+  rhum: [["canne","Canne, végétal"],["fruite","Fruité"],["exotique","Exotique"],["epice","Épicé"],["vanille","Vanillé, sucré"],["boise","Boisé"],["fume","Fumé, grillé"],["longueur","Longueur"]],
   whisky: [["tourbe","Tourbé, fumé"],["fruite","Fruité"],["floral","Floral"],["cereale","Céréale, malt"],["vanille","Vanillé, miel"],["epice","Épicé"],["boise","Boisé"],["longueur","Longueur"]],
   calvados: [["pomme","Pomme fraîche"],["cuite","Pomme cuite"],["poire","Poire"],["floral","Floral"],["vanille","Vanillé, caramel"],["epice","Épicé"],["boise","Boisé"],["longueur","Longueur"]],
   gin: [["genievre","Genièvre"],["agrumes","Agrumes"],["floral","Floral"],["herbace","Herbacé"],["epice","Épicé, poivré"],["racines","Racines, terreux"],["douceur","Douceur"],["longueur","Longueur"]],
@@ -973,6 +992,8 @@ function normalize(d, id){
   f.favori = !!o.favori;
   f.photos = Array.isArray(o.photos) ? o.photos.filter(p => p && p.id).map(p => ({id:String(p.id)})) : [];
   f.ai = Object.assign({}, o.ai || {});
+  migrateProduit(f.categorie, f.produit, f.ai);
+  if (Array.isArray(o.achats)) o.achats.forEach(a => { if (a && a.produit) migrateProduit(f.categorie, a.produit); });
   const ex = o.extractions || {};
   METHODS.forEach(m => { const e = ex[m.k] || {}; f.extractions[m.k] = {active:!!e.active, reglages:Object.assign({}, e.reglages||{}), note:parseNote(e.note), remarques:e.remarques||""}; });
   Object.keys(ex).forEach(k => { if (!f.extractions[k]) f.extractions[k] = ex[k]; });
@@ -1003,7 +1024,7 @@ function ficheSub(f){
   const p = f.produit, sk = STYLE_KEY[catOf(f)][0];
   const nom = (p.marque || "").trim() ? p.nom : "";
   const age = p.age && !(nom && fold(nom).includes(fold(p.age).replace(/\s*\(.*$/, ""))) ? String(p.age).replace(/\s*\(.*\)\s*$/, "") : "";
-  const t = catOf(f) === "autres" ? p.type : p[sk];
+  const t = String((catOf(f) === "autres" ? p.type : p[sk]) || "").replace(/\s*\(.*\)\s*$/, "");
   return [nom, age, t, p.pays && catOf(f) !== "calvados" ? p.pays : p.region].filter(Boolean).join(" · ");
 }
 const prodName = f => (f.produit.distillerie || "").trim() || (f.produit.marque || "").trim();
@@ -1697,11 +1718,11 @@ const EXAMPLES = (() => {
     Object.assign(f.produit, {marque, nom, pays, notesAromatiques:notes, dateAchat:date}); f.produit[sk] = style; if (cat === "calvados") f.produit.region = pays;
     f.noteGlobale = note; f.degustation.date = date; f.updatedAt = date; if (ex) ex.forEach(([k,n]) => { f.extractions[k].active = true; f.extractions[k].note = n; }); return f; };
   return {
-    rhum: [mk("rhum","Exemple · Maison A","Hors d'âge","Martinique","Hors d'âge / extra vieux","vanille, cannelle, banane flambée, cuir",4.4,"2026-03-12",[["pur",4.5]]),
-      mk("rhum","Exemple · Maison B","Blanc 50","Guadeloupe","Blanc","canne fraîche, citron vert, poivre, herbe coupée",3.9,"2026-04-02",[["tipunch",4.2]]),
-      mk("rhum","Exemple · Maison C","8 ans","Jamaïque","Vieux","ananas, banane, vernis, épices",4.6,"2026-05-15",[["pur",4.6],["cocktail",4.3]]),
-      mk("rhum","Exemple · Maison D","Solera 15","Guatemala","Vieux","caramel, raisins secs, vanille, chocolat",3.4,"2026-06-03",[["glace",3.6]]),
-      mk("rhum","Exemple · Maison A","XO","Martinique","Hors d'âge / extra vieux","fruits secs, vanille, tabac, orange confite",4.7,"2026-09-08",[["pur",4.7]])],
+    rhum: [mk("rhum","Exemple · Maison A","Hors d'âge","Martinique","Pur jus de canne (agricole)","vanille, cannelle, banane flambée, cuir",4.4,"2026-03-12",[["pur",4.5]]),
+      mk("rhum","Exemple · Maison B","Blanc 50","Guadeloupe","Pur jus de canne (agricole)","canne fraîche, citron vert, poivre, herbe coupée",3.9,"2026-04-02",[["tipunch",4.2]]),
+      mk("rhum","Exemple · Maison C","8 ans","Jamaïque","Mélasse (traditionnel)","ananas, banane, vernis, épices",4.6,"2026-05-15",[["pur",4.6],["cocktail",4.3]]),
+      mk("rhum","Exemple · Maison D","Solera 15","Guatemala","Sirop ou miel de canne","caramel, raisins secs, vanille, chocolat",3.4,"2026-06-03",[["glace",3.6]]),
+      mk("rhum","Exemple · Maison A","XO","Martinique","Pur jus de canne (agricole)","fruits secs, vanille, tabac, orange confite",4.7,"2026-09-08",[["pur",4.7]])],
     whisky: [mk("whisky","Exemple · Distillerie A","16 ans","Écosse","Single Malt","tourbe, iode, fumée, vanille",4.5,"2026-03-10",[["pur",4.5],["eau",4.7]]),
       mk("whisky","Exemple · Distillerie B","12 ans","Écosse","Single Malt","miel, pomme, fleurs, malt",4.0,"2026-04-12",[["pur",4.0]]),
       mk("whisky","Exemple · Distillerie C","Small Batch","États-Unis","Bourbon","caramel, vanille, cerise, chêne",3.8,"2026-05-20",[["pur",3.7],["cocktail",4.1]]),
@@ -3126,6 +3147,7 @@ function renderProduit(){
   const cat = catOf(cur);
   const brands = () => [...new Set(fiches.filter(f => catOf(f) === cat).map(f => f.produit.marque).concat(HOUSES.filter(h => h.cat === cat && !h.reco).map(h => h.nom)).filter(Boolean))].sort((a,b) => a.localeCompare(b, "fr"));
   fieldsFor(cat).forEach(def => {
+    if (def.legacy && !cur.produit[def.k]) return;
     let d2 = def;
     if (def.k === "boutique" || def.k === "distillerie") d2 = Object.assign({}, def, {list: lieuNames()});
     if (def.k === "marque") d2 = Object.assign({}, def, {list: brands()});
@@ -3373,6 +3395,14 @@ const SP = (() => {
   function findBrand(x, known){
     let best = null;
     HOUSES.forEach(h => { if (h.re && h.re.test(x)){ const m = x.match(h.re); const len = m ? m[2].length : 0; if (!best || len > best.len) best = Object.assign({len}, h); } });
+    if (!best){ // lecture imparfaite : on cherche la maison la plus proche, à une ou deux lettres près
+      const toks = x.replace(/[^a-z0-9' ]+/g, " ").split(/\s+/).filter(Boolean);
+      const cands = new Set(toks.filter(t => t.length >= 4)); for (let i = 0; i < toks.length - 1; i++) if ((toks[i] + toks[i+1]).length >= 6) cands.add(toks[i] + toks[i+1]);
+      const dist = (a, b) => { if (Math.abs(a.length - b.length) > 2) return 9; const d = Array.from({length:a.length+1}, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[a.length][b.length]; };
+      let bestD = 9;
+      HOUSES.forEach(h => { const key = f(h.nom).replace(/^(the|la|le|les|l') /, "").replace(/[^a-z0-9]+/g, ""); if (key.length < 5) return; const tol = key.length >= 8 ? 2 : 1;
+        cands.forEach(c => { const dd = dist(c, key); if (dd <= tol && (dd < bestD || (dd === bestD && best && key.length > best.len))){ bestD = dd; best = Object.assign({len:key.length, fuzzy:true}, h); } }); });
+    }
     (known || []).forEach(([nom, cat]) => { const k = f(nom); if (k.length >= 3 && new RegExp("(^|[^a-z0-9])" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "($|[^a-z0-9])").test(x) && (!best || k.length > best.len)) best = {cat, nom, len:k.length, pays:"", region:"", type:""}; });
     return best;
   }
@@ -3419,6 +3449,7 @@ const SP = (() => {
       out.appellation = /appellation (d'origine )?(controlee )?martinique|aoc martinique|martinique a\.?o\.?c|rhum agricole martinique/.test(x) ? "AOC Martinique" : /indication geographique.*guadeloupe|rhum de la guadeloupe/.test(x) ? "IG Guadeloupe" : /rhum de la reunion|indication geographique.*reunion/.test(x) ? "IG La Réunion" : /jamaica rum|jamaican rum/.test(x) ? "IG Jamaïque" : /ron de venezuela/.test(x) ? "DOC Ron de Venezuela" : "";
       out.distillation = /colonne creole/.test(x) ? "Colonne créole" : /pure single rum|pot still|alambic/.test(x) ? "Alambic (pot still)" : /single blended rum|pot (and|&) column/.test(x) ? "Assemblage alambic et colonne" : /double distillation|charentais/.test(x) ? "Double distillation (charentais)" : /column|colonne/.test(x) ? "Colonne multiple (moderne)" : "";
     }
+    if (cat === "rhum") migrateProduit("rhum", out);
     if (cat === "whisky"){
       out.type = /single pot still/.test(x) ? "Single Pot Still" : /single grain/.test(x) ? "Single Grain" : /blended malt|pure malt|vatted malt/.test(x) ? "Blended Malt" : /single malt/.test(x) ? "Single Malt" : /straight bourbon/.test(x) ? "Straight Bourbon" : /\bbourbon\b/.test(x.replace(CASK_RE, " ")) ? "Bourbon" : /\brye\b/.test(x) ? "Rye" : /tennessee/.test(x) ? "Tennessee whiskey" : /\bcorn whisk/.test(x) ? "Corn whiskey" : /\bblend(ed)?\b/.test(x) ? "Blended" : "";
       const ppm = /(\d{1,3})\s*ppm/.exec(x);
@@ -3465,7 +3496,7 @@ const SP = (() => {
     if (!out.marque && cand[0] && cand[0].length <= 30) out.marque = cand[0].replace(/\b\w+/g, w => w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w);
     const nom = cand.find(s => !out.marque || f(s) !== f(out.marque));
     if (nom && nom.length <= 36) out.nom = nom; else if (out.age && /^\d+ ans$/.test(out.age)) out.nom = out.age;
-    if (extra.length) out.texte = extra.join(" · ");
+    if (extra.length) out.texte = [out.texte].concat(extra).filter(Boolean).join(" · ");
     Object.keys(out).forEach(k => { if (out[k] === "" || out[k] == null) delete out[k]; });
     return out;
   }
@@ -3624,14 +3655,63 @@ function bestCands(c){ const out = {}; Object.entries(c).forEach(([k, vs]) => { 
 const LAYOUT_TXT = {nez:"Nez", bouche:"Bouche", finale:"Finale", fut:"Fût", distillerie:"Distillerie"};
 const layoutText = f => Object.entries(f).map(([k, v]) => LAYOUT_TXT[k] + " : " + v).join("\n");
 async function readBitmap(blob){ try { return await createImageBitmap(blob); } catch { const u = URL.createObjectURL(blob); try { const im = new Image(); im.src = u; await im.decode(); return await createImageBitmap(im); } finally { URL.revokeObjectURL(u); } } }
+/* Code-barres de la bouteille (EAN) : lu sur la photo, puis la fiche du produit est cherchée dans Open Food Facts (base ouverte, gratuite) */
+let zxLoaded = null;
+function loadZx(){ return zxLoaded || (zxLoaded = loadScript("zxing.min.js").catch(() => loadScript("https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"))); }
+async function readBarcode(blob){
+  const bm = await readBitmap(blob);
+  // 1. Détecteur intégré au téléphone (Android / Chrome), rapide et fiable
+  if ("BarcodeDetector" in window){
+    try { const bd = new window.BarcodeDetector({formats:["ean_13", "ean_8", "upc_a", "upc_e"]}); const r = await bd.detect(bm); const t = r && r[0] && r[0].rawValue; if (t && /^\d{8,14}$/.test(t)) return t; } catch {}
+  }
+  // 2. Lecture logicielle (iPhone et le reste), à plusieurs tailles et dans les deux sens
+  await loadZx(); const Z = window.ZXing; if (!Z) return "";
+  const hints = new Map(); hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E]); hints.set(Z.DecodeHintType.TRY_HARDER, true);
+  const rd = new Z.MultiFormatReader(); rd.setHints(hints);
+  // decodeWithState garde les réglages « chercher partout » (decode() les efface)
+  const W = bm.width, H = bm.height;
+  for (const size of [1600, 2800, 1000]) for (const rot of [0, 90]){
+    const k = Math.min(1, size / Math.max(W, H)); const w = Math.round(W * k), h = Math.round(H * k);
+    const c = document.createElement("canvas"); c.width = rot ? h : w; c.height = rot ? w : h; const x = c.getContext("2d"); x.imageSmoothingQuality = "high";
+    if (rot){ x.translate(h, 0); x.rotate(Math.PI / 2); } x.drawImage(bm, 0, 0, w, h);
+    try { const r = rd.decodeWithState(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.HTMLCanvasElementLuminanceSource(c)))); const t = r && r.getText(); if (t && /^\d{8,14}$/.test(t)) return t; } catch {}
+    await new Promise(r => setTimeout(r, 0));
+  }
+  return "";
+}
+const OFF_CAT = [[/rums?\b|rhums?\b/, "rhum"], [/whisk(e)?ys?|bourbons?|scotch/, "whisky"], [/calvados/, "calvados"], [/\bgins?\b/, "gin"]];
+async function offLookup(code){
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 12000);
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_fr,generic_name_fr,brands,quantity,categories_tags,origins,countries,nutriments,labels`, {signal:ctl.signal});
+    if (!r.ok) return null; const j = await r.json(); const p = j && j.product; if (!p || j.status === 0) return null;
+    const cats = (p.categories_tags || []).join(" ").replace(/[a-z]{2}:/g, "").replace(/-/g, " ");
+    const out = {}; for (const [re, k] of OFF_CAT) if (re.test(cats)){ out.categorie = k; break; }
+    const brand = String(p.brands || "").split(",")[0].trim(); if (brand) out.marque = brand;
+    const nom = (p.product_name_fr || p.product_name || "").trim(); if (nom) out.nom = brand && fold(nom).startsWith(fold(brand)) ? nom.slice(brand.length).replace(/^[\s\-–:·]+/, "") || nom : nom;
+    if (out.nom){ const n2 = out.nom.replace(/\b(rhum|rum|ron|whisk(e)?y|calvados|gin)\b( (agricole|traditionnel|vieux|blanc|ambré|hors d'âge))*/gi, " ").replace(/\s{2,}/g, " ").replace(/^[\s\-–·,]+|[\s\-–·,]+$/g, ""); out.nom = n2 || out.nom; }
+    const al = p.nutriments && (p.nutriments.alcohol_100g || p.nutriments.alcohol_value || p.nutriments.alcohol); if (al && +al >= 15 && +al <= 80) out.degre = String(al).replace(".", ",");
+    const text = [p.product_name_fr, p.product_name, p.generic_name_fr, p.quantity, cats, p.origins, p.labels].filter(Boolean).join("\n");
+    return {out, text};
+  } catch { return null; } finally { clearTimeout(tm); }
+}
 async function ocrPhotos(){
   const f = cur; const imgs = pending.map(p => p.orig || p.blob);
   for (const p of (cur.photos || [])){ try { const r = await fetch(blobUrl(p.id)); if (r.ok) imgs.push(await r.blob()); } catch {} }
   if (!imgs.length){ toast("Ajoutez d'abord une photo de l'étiquette."); return; }
   ocrStop = false;
   $("reading").hidden = false; $("b-ocr").disabled = true;
-  $("reading-txt").textContent = "Préparation de la lecture (premier usage : 10 à 30 secondes)…";
+  let byCode = null, code = "", dCode = null;
   try {
+  try {
+    $("reading-txt").textContent = "Recherche du code-barres…";
+    for (const im of imgs.slice(0, 4)){ if (ocrStop || cur !== f) return; try { code = await readBarcode(im); } catch {} if (code) break; }
+    if (code){ $("reading-txt").textContent = "Code-barres " + code + " : recherche de la bouteille en ligne…"; byCode = await offLookup(code); }
+    if (cur !== f) return;
+    if (byCode){ dCode = Object.assign(SP.parse(byCode.text, {bigLines:[byCode.out.marque || "", byCode.out.nom || ""], known: knownBrands(), cat: cur.categorie}), byCode.out); delete dCode.texte; applyFields(Object.assign({texte:"Code-barres " + code}, dCode), "grâce au code-barres", "photo"); }
+  } catch (e) { console.error(e); }
+  if (ocrStop || cur !== f) return;
+  $("reading-txt").textContent = "Préparation de la lecture de l'étiquette (premier usage : 10 à 30 secondes)…";
     const w = await getOcr(() => {});
     let text = ""; const bigs = [], cands = {};
     const nb = Math.min(imgs.length, 4);
@@ -3689,7 +3769,10 @@ async function ocrPhotos(){
     const full = layoutText(lay) + "\n" + text;
     $("paste-txt").value = full.trim();
     const B = []; bigs.sort((a,b) => b[0]-a[0]).forEach(x => { const j = B.findIndex(y => lev(fold(y[1]), fold(x[1])) <= 2); if (j < 0) B.push(x); else if (x[2] > B[j][2]) B[j] = [B[j][0], x[1], x[2]]; });
-    applyFields(SP.parse(full, {bigLines: B.slice(0,4).map(x => x[1]), known: knownBrands(), cat: cur.categorie}), "par la lecture de l'étiquette", "photo");
+    const dOcr = SP.parse(full, {bigLines: B.slice(0,4).map(x => x[1]), known: knownBrands(), cat: cur.categorie});
+    if (code && !byCode) dOcr.texte = [dOcr.texte, "Code-barres " + code].filter(Boolean).join(" · ");
+    if (dCode) Object.keys(dCode).forEach(k => { const v = dCode[k]; if (v !== null && v !== undefined && String(v).trim()) dOcr[k] = v; }); // la base en ligne prime sur la lecture
+    applyFields(dOcr, byCode ? "par le code-barres et l'étiquette" : "par la lecture de l'étiquette", "photo");
   } catch (e) {
     console.error(e);
     $("paste-box").hidden = false;
@@ -3911,7 +3994,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("light"
 
 document.documentElement.lang = "fr";
 showView(location.hash.slice(1) || "cave");
-window.__delices = {parseNote, fmtNote, normalize, blankFiche, today, familiesOf, descriptors, ratingOf, SP, KNOW_SP, HOUSES, CATS, setEnv, logJournal, journalEntries, _set: a => { fiches = a.map(x => normalize(x)); renderList(); }, _ex: () => EXAMPLES, _lieux: a => { lieux = a.map(x => normalizeLieu(x)); renderLieux(); }, parseMapsLink};
+window.__delices = {readBarcode, offLookup, parseNote, fmtNote, normalize, blankFiche, today, familiesOf, descriptors, ratingOf, SP, KNOW_SP, HOUSES, CATS, setEnv, logJournal, journalEntries, _set: a => { fiches = a.map(x => normalize(x)); renderList(); }, _ex: () => EXAMPLES, _lieux: a => { lieux = a.map(x => normalizeLieu(x)); renderLieux(); }, parseMapsLink};
 boot();
 })();
 </script>
