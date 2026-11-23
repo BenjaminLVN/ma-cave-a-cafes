@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261123183236";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123183236"></script>
+<script>window.CAVE_BUILD="20261123225753";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123225753"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -484,6 +484,14 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 .env-b{container-type:inline-size;padding-left:0;padding-right:0}
 .envbar,.catseg{gap:6px}
 .env-b span:not(.cbadge){overflow:visible;text-overflow:clip;font-size:min(1em, 22.5cqi);letter-spacing:-.01em}
+/* Style « Trait fin » choisi : cartes blanches à bord fin, pictos au simple trait, le spiritueux choisi en encre pleine */
+.env-b{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:none;font-weight:500}
+.env-b .cbadge{background:none!important;box-shadow:none}
+.env-b .cbadge svg{stroke:var(--muted);stroke-width:1.4}
+.env-b[aria-pressed="true"]{background:var(--ink);border-color:var(--ink)}
+.env-b[aria-pressed="true"] span:not(.cbadge){color:var(--surface)}
+.env-b[aria-pressed="true"] .cbadge svg{stroke:var(--surface)}
+.env-b[aria-pressed="true"] small{color:var(--surface);opacity:.75}
 .top h1::after{background:var(--env-g)!important}
 #v-list .scan-hero .btn.primary,#v-form #b-save,#v-form #b-save-top{background:var(--grad)}
 /* Carte des fiches : vignette au dégradé du spiritueux */
