@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261123235454";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123235454"></script>
+<script>window.CAVE_BUILD="20261123235745";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123235745"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1438,7 +1438,7 @@ async function boot(){
   document.body.classList.toggle("ro", ro); $("ro-band").hidden = !ro;
   $("b-cancel").textContent = ro ? "Fermer" : "Annuler"; $("l-cancel").textContent = ro ? "Fermer" : "Annuler";
   if (sample) sampleCaps = await sample.limits().catch(() => null);
-  $("b-read").hidden = !(sampleCaps && sampleCaps.images);
+  $("b-read").hidden = !(sampleCaps && sampleCaps.images); if (sample && sample.cloud) $("b-read").textContent = "Relire les photos (lecture automatique)";
   $("b-ocr").hidden = !$("b-read").hidden;
   if (!db){ showStoreNote("<strong>Sauvegarde indisponible dans ce navigateur.</strong> Connectez-vous à claude.ai pour enregistrer vos fiches."); return; }
   if (!assets && !ro) showStoreNote("Les photos ne peuvent pas être enregistrées ici. Les fiches, elles, sont sauvegardées.");
@@ -4024,9 +4024,9 @@ async function readWebPage(url){
   const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Lecture de la page web de la bouteille…";
   try {
     if (sample && sample.cloud){
-      try { $("reading-txt").textContent = "Claude lit la page de la bouteille… (10 à 40 secondes)"; const data = await sample.json(webInstr(), {url});
+      try { $("reading-txt").textContent = "Lecture de la page de la bouteille… (10 à 40 secondes)"; const data = await sample.json(webInstr(), {url});
         if (cur !== f) return; const img = data._image; delete data._image;
-        applyFields(data, "par Claude depuis la page web", "web");
+        applyFields(data, "depuis la page web", "web");
         if (!cur.produit.texte) { cur.produit.texte = "Source : " + url; const ts = $("f_texte"); if (ts) ts.value = cur.produit.texte; }
         $("paste-box").hidden = true;
         if (img && !pending.length && !(cur.photos || []).length){ try { const b = await viaRelay(img, true); if (/^image\//.test(b.type) || b.size > 5000){ const sm = await downscale(new File([b], "page.jpg", {type:b.type || "image/jpeg"})); pending.push({key:uid(), blob:sm, url:URL.createObjectURL(sm), orig:sm}); renderPhotos(); } } catch {} }
@@ -4040,7 +4040,7 @@ async function readWebPage(url){
     const full = [parts.join("\n"), pg.brand ? "Marque : " + pg.brand : "", pg.text].filter(Boolean).join("\n\n");
     $("paste-txt").value = full.slice(0, 6000);
     let data = null;
-    if (sample){ try { $("reading-txt").textContent = "Claude range les informations…"; data = await sample.json(webPrompt(full)); } catch {} }
+    if (sample){ try { $("reading-txt").textContent = (sample.cloud ? "Rangement des informations…" : "Claude range les informations…"); data = await sample.json(webPrompt(full)); } catch {} }
     if (!data) data = SP.parse(full, {bigLines:parts.slice(0, 3), known:knownBrands(), cat: cur.categorie});
     if (pg.brand && !data.marque && !/^(shop|boutique|accueil|home|cave|caviste)$/i.test(pg.brand)) data.marque = pg.brand;
     if (!data.nom && parts[0] && parts[0].length < 50) data.nom = parts[0];
@@ -4066,8 +4066,8 @@ $("b-paste-go").onclick = async () => { const t = $("paste-txt").value; if (!t.t
   const um = t.trim().match(/^https?:\/\/\S+$/) || (t.trim().length < 400 && t.match(/https?:\/\/[^\s"'<>]+/));
   if (um){ await readWebPage(um[0]); return; }
   if (sample && t.trim().length > 15){
-    const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Claude range les informations…";
-    try { const data = await sample.json(webPrompt(t)); if (cur === f){ applyFields(data, "par Claude depuis le texte collé", "texte"); $("paste-box").hidden = true; } return; }
+    const f = cur; $("reading").hidden = false; $("reading-txt").textContent = (sample.cloud ? "Rangement des informations…" : "Claude range les informations…");
+    try { const data = await sample.json(webPrompt(t)); if (cur === f){ applyFields(data, "depuis le texte collé", "texte"); $("paste-box").hidden = true; } return; }
     catch (e) { /* lecture sur le téléphone ci-dessous */ } finally { $("reading").hidden = true; }
   } const firsts = t.split(/\n/).map(x => x.trim()).filter(x => x.length >= 3).slice(0, 3); applyFields(SP.parse(t, {bigLines: firsts, known: knownBrands(), cat: cur.categorie}), "depuis le texte collé", "texte"); $("paste-box").hidden = true; };
 async function readPhotos(){
@@ -4075,13 +4075,13 @@ async function readPhotos(){
   const f = cur; const imgs = await blobsForReading();
   if (!imgs.length){ toast("Ajoutez d'abord une photo de l'étiquette."); return; }
   readCtl = new AbortController();
-  $("reading").hidden = false; $("reading-txt").textContent = "Claude lit l'étiquette… (10 à 60 secondes)"; $("b-read").disabled = true;
+  $("reading").hidden = false; $("reading-txt").textContent = (sample.cloud ? "Lecture de l'étiquette" : "Claude lit l'étiquette") + "… (10 à 60 secondes)"; $("b-read").disabled = true;
   try {
     const data = await sample.json(readPrompt(imgs.length), {images: imgs, signal: readCtl.signal});
     if (cur !== f) return;
-    applyFields(data, "par Claude", "photo");
+    applyFields(data, sample.cloud ? "automatiquement" : "par Claude", "photo");
   } catch (e) {
-    const msg = {cancelled:"Lecture arrêtée.", not_granted:"Lecture refusée : autorisez l'application à utiliser Claude pour lire les étiquettes.", rate_limited:"Trop de lectures d'un coup. Réessayez dans une minute.", image_rejected:"Une photo a été refusée (format ou taille). Reprenez-la.", invalid_json:"La réponse de Claude était incomplète. Touchez « Lire les photos avec Claude » pour réessayer."}[e && e.code] || "La lecture a échoué. Vous pouvez remplir la fiche à la main ou réessayer.";
+    const msg = {cancelled:"Lecture arrêtée.", not_granted:"Lecture refusée : autorisez l'application à utiliser Claude pour lire les étiquettes.", rate_limited:"Quota gratuit de lecture atteint pour l'instant. Lecture sur le téléphone à la place ; réessayez plus tard.", image_rejected:"Une photo a été refusée (format ou taille). Reprenez-la.", invalid_json:"La réponse de Claude était incomplète. Touchez « Lire les photos avec Claude » pour réessayer."}[e && e.code] || "La lecture a échoué. Vous pouvez remplir la fiche à la main ou réessayer.";
     toast(msg);
     if (sample && sample.cloud && !(e && e.code === "cancelled") && cur === f) setTimeout(() => ocrPhotos(), 600);
   } finally {

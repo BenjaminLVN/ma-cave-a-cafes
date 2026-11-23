@@ -1,5 +1,7 @@
-// Ma cave à Délices : lecture par Claude des photos d'étiquette, des pages web et du texte collé.
-// La clé Anthropic reste ici, côté serveur (secret ANTHROPIC_API_KEY), jamais dans l'appli.
+// Ma cave à Délices : lecture des photos d'étiquette, des pages web et du texte collé.
+// Gratuit avec une clé Google Gemini (secret GEMINI_API_KEY, offre gratuite de Google AI Studio).
+// Optionnel et payant : Claude (secret ANTHROPIC_API_KEY), utilisé seulement si aucune clé Gemini n'est fournie.
+// Les clés restent ici, côté serveur, jamais dans l'appli.
 import Anthropic from "npm:@anthropic-ai/sdk";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -11,7 +13,36 @@ const CORS = {
 const out = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
-const anthropic = new Anthropic(); // lit ANTHROPIC_API_KEY
+const GEMINI_KEY = Deno.env.get("GEMINI_API_KEY") || "";
+const anthropic = Deno.env.get("ANTHROPIC_API_KEY") ? new Anthropic() : null; // lit ANTHROPIC_API_KEY
+// Modèles gratuits essayés dans l'ordre (quota du jour épuisé ou modèle retiré : on passe au suivant)
+const GEMINI_MODELS = (Deno.env.get("GEMINI_MODELS") || "gemini-flash-latest,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash").split(",").map((m) => m.trim()).filter(Boolean);
+
+async function viaGemini(images: { type: string; data: string }[], texte: string) {
+  const parts: unknown[] = images.map((im) => ({ inline_data: { mime_type: /^image\/(jpeg|png|webp)$/.test(im.type) ? im.type : "image/jpeg", data: im.data } }));
+  parts.push({ text: texte });
+  let last = "failed";
+  for (const model of GEMINI_MODELS) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY },
+      body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0 } }),
+      signal: AbortSignal.timeout(90000),
+    }).catch(() => null);
+    if (!r) { last = "failed"; continue; }
+    if (r.status === 429) { last = "rate_limited"; continue; }
+    if (r.status === 404 || r.status >= 500) { last = "failed"; continue; }
+    const j = await r.json().catch(() => null);
+    if (r.status === 400) { const msg = JSON.stringify(j || {}); if (/image|inline_data|mime/i.test(msg)) return { error: "image_rejected" }; last = /API key/i.test(msg) ? "no_key" : "failed"; continue; }
+    if (r.status === 401 || r.status === 403) return { error: "no_key" };
+    if (!r.ok) { last = "failed"; continue; }
+    const txt = (j?.candidates?.[0]?.content?.parts || []).map((p: { text?: string }) => p.text || "").join("");
+    const data = extraireJson(txt);
+    if (data) return { data };
+    last = "invalid_json";
+  }
+  return { error: last };
+}
 const supa = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
 // Seules les caves qui existent déjà peuvent utiliser la lecture (évite qu'un inconnu consomme le crédit)
@@ -55,7 +86,7 @@ function extraireJson(t: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method === "GET") return out({ ok: !!Deno.env.get("ANTHROPIC_API_KEY"), images: { maxCount: 4 } });
+  if (req.method === "GET") return out({ ok: !!(GEMINI_KEY || anthropic), moteur: GEMINI_KEY ? "gemini" : anthropic ? "claude" : "", images: { maxCount: 4 } });
   const cave = req.headers.get("x-cave") || "";
   if (!(await caveConnue(cave))) return out({ error: "not_granted" }, 403);
   let body: { prompt?: string; images?: { type: string; data: string }[]; url?: string };
@@ -63,16 +94,24 @@ Deno.serve(async (req) => {
   const prompt = String(body.prompt || "").slice(0, 30000);
   if (!prompt) return out({ error: "bad_request" }, 400);
 
-  const content: Anthropic.Beta.BetaContentBlockParam[] = [];
-  for (const im of (body.images || []).slice(0, 4)) {
-    const mt = /^image\/(jpeg|png|webp|gif)$/.test(im.type) ? im.type : "image/jpeg";
-    content.push({ type: "image", source: { type: "base64", media_type: mt as "image/jpeg", data: im.data } });
-  }
+  const imgs = (body.images || []).slice(0, 4);
   let image = "";
   let texte = prompt;
   if (body.url) {
     try { const p = await lirePage(body.url); image = p.image; texte += "\n\nTexte de la page :\n<<<\n" + p.texte + "\n>>>"; }
     catch { return out({ error: "page_unreadable" }, 422); }
+  }
+  if (GEMINI_KEY) {
+    const g = await viaGemini(imgs, texte);
+    if (g.error) return out({ error: g.error }, g.error === "rate_limited" ? 429 : 502);
+    if (image) g.data._image = image;
+    return out(g.data);
+  }
+  if (!anthropic) return out({ error: "no_key" }, 500);
+  const content: Anthropic.Beta.BetaContentBlockParam[] = [];
+  for (const im of imgs) {
+    const mt = /^image\/(jpeg|png|webp|gif)$/.test(im.type) ? im.type : "image/jpeg";
+    content.push({ type: "image", source: { type: "base64", media_type: mt as "image/jpeg", data: im.data } });
   }
   content.push({ type: "text", text: texte });
 
