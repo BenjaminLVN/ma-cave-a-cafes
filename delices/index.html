@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261121003437";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261121003437"></script>
+<script>window.CAVE_BUILD="20261123183236";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123183236"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -480,6 +480,10 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 .env-b[aria-pressed="true"]{border-color:var(--green);background:#fff}
 .catseg .env-b{min-height:72px;font-size:.8rem}
 @media (max-width:380px){.env-b{font-size:.76rem;padding:8px 2px}.envbar,.catseg{gap:6px}}
+/* Libellés toujours entiers : la taille suit la largeur de la carte (toutes identiques), « Calvados » compris */
+.env-b{container-type:inline-size;padding-left:0;padding-right:0}
+.envbar,.catseg{gap:6px}
+.env-b span:not(.cbadge){overflow:visible;text-overflow:clip;font-size:min(1em, 22.5cqi);letter-spacing:-.01em}
 .top h1::after{background:var(--env-g)!important}
 #v-list .scan-hero .btn.primary,#v-form #b-save,#v-form #b-save-top{background:var(--grad)}
 /* Carte des fiches : vignette au dégradé du spiritueux */
