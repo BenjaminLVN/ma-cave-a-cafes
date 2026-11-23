@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261123225753";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123225753"></script>
+<script>window.CAVE_BUILD="20261123235454";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123235454"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,6 +108,14 @@ button{cursor:pointer}
 .block-num{font-family:var(--f-display);font-weight:700;color:var(--accent);font-size:1.05rem}
 .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 @media (min-width:620px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid .full{grid-column:1/-1}}
+/* Fiche simplifiée : l'essentiel à l'écran, le reste replié */
+.more{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.more>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:0 14px;font-weight:600;font-size:.95rem}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after{content:"";width:8px;height:8px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(45deg);margin-top:-4px;flex:none}
+.more[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.more>summary .cnt{font-weight:500;color:var(--muted);font-size:.85rem;margin-left:auto}
+.more>.grid{padding:4px 14px 14px}
 .field{display:grid;gap:4px;min-width:0}
 .profil .plab{font-weight:600;font-size:.92rem}
 .crop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
@@ -890,7 +898,7 @@ const F_ACHAT = [
   {k:"texte", l:"Autres infos de l'étiquette", ta:true, full:true, ph:"n° de bouteille, n° de fût, date de mise en bouteille, mentions…"}
 ];
 const F_CAT = {
-  rhum: [fM("ex. Neisson, Hampden, Bielle"), fN("ex. XO, Cuvée Homère, 8 ans"), fD(), fP(PAYS_RHUM), fR(REG_RHUM),
+  rhum: [{k:"famille", l:"Type de rhum", seg:["Blanc","Vieux","Autre"]}, fM("ex. Neisson, Hampden, Bielle"), fN("ex. XO, Cuvée Homère, 8 ans"), fD(), fP(PAYS_RHUM), fR(REG_RHUM),
     {k:"matiere", l:"Matière première", list:MATIERE_RHUM}, {k:"appellation", l:"Appellation", list:APPEL_RHUM},
     {k:"distillation", l:"Distillation", list:DISTIL_RHUM}, fAge(AGE_RHUM), fMil, fDeg, fCl, fFut(), fEmb],
   whisky: [fM("ex. Lagavulin, Nikka, Armorik"), fN("ex. 16 ans, From the Barrel"), fD(), {k:"type", l:"Type", list:TYPE_WHISKY}, fP(PAYS_WHISKY), fR(REG_WHISKY),
@@ -914,6 +922,8 @@ function migrateProduit(cat, p, ai){
     else if (!(/overproof/i.test(s) && p.degre)) addMention(p, /épic|spiced/i.test(s) ? "Rhum épicé" : /arrang/i.test(s) ? "Rhum arrangé" : s);
     delete p.style; delete ai.style;
   }
+  // Rhum blanc / vieux / autre : déduit de l'âge quand il n'est pas choisi
+  if (cat === "rhum" && !p.famille && p.age){ p.famille = /^blanc/i.test(p.age) ? "Blanc" : /sous bois|paille/i.test(p.age) ? "Autre" : "Vieux"; if (ai.age) ai.famille = true; }
   // « Solera » et « Millésime » n'étaient pas des âges : ils rejoignent le fût ou les mentions
   if (p.age === "Solera"){ if (!p.fut) p.fut = "Solera"; else addMention(p, "Solera"); delete p.age; }
   if (p.age === "Millésime"){ if (!p.millesime) addMention(p, "Millésimé"); delete p.age; }
@@ -924,7 +934,7 @@ function migrateProduit(cat, p, ai){
 const fieldsFor = cat => (F_CAT[cat] || F_CAT.autres).concat(F_ACHAT);
 const FIELD_KEYS = [...new Set(Object.values(F_CAT).flat().concat(F_ACHAT).map(d => d.k))];
 /* Rubrique de classement propre à chaque spiritueux (filtres et tableau de bord) */
-const STYLE_KEY = {rhum:["matiere","Matière première"], whisky:["type","Type"], calvados:["appellation","Appellation"], gin:["style","Style"], autres:["type","Type"]};
+const STYLE_KEY = {rhum:["famille","Type"], whisky:["type","Type"], calvados:["appellation","Appellation"], gin:["style","Style"], autres:["type","Type"]};
 /* Profil en verre : 8 curseurs de 0 à 4, propres à chaque spiritueux */
 const PROFILS = {
   rhum: [["canne","Canne, végétal"],["fruite","Fruité"],["exotique","Exotique"],["epice","Épicé"],["vanille","Vanillé, sucré"],["boise","Boisé"],["fume","Fumé, grillé"],["longueur","Longueur"]],
@@ -1357,6 +1367,28 @@ async function checkUpdate(){
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkUpdate(); });
 setTimeout(checkUpdate, 2500);
+/* Lecture par Claude hors de claude.ai : passe par la fonction « lire-etiquette » de Supabase, qui garde la clé Anthropic côté serveur */
+function cloudSample(cfg){
+  const base = cfg.url.replace(/\/$/, "") + "/functions/v1/lire-etiquette";
+  const H = {apikey: cfg.key, Authorization: "Bearer " + cfg.key};
+  const b64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.onerror = rej; r.readAsDataURL(blob); });
+  const fail = code => { const e = new Error(code); e.code = code; return e; };
+  return {
+    cloud: true,
+    async limits(){ const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
+      try { const r = await fetch(base, {headers:H, signal:ctl.signal}); if (!r.ok) return null; return await r.json(); } finally { clearTimeout(tm); } },
+    async json(prompt, opt){ opt = opt || {};
+      const images = []; for (const b of (opt.images || [])){ const sm = b.size > 1500000 ? await downscale(new File([b], "e.jpg", {type:b.type || "image/jpeg"})) : b; images.push({type: sm.type || "image/jpeg", data: await b64(sm)}); }
+      const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 120000);
+      if (opt.signal) opt.signal.addEventListener("abort", () => ctl.abort());
+      let r; try { r = await fetch(base, {method:"POST", headers:Object.assign({"Content-Type":"application/json", "x-cave": caveKey()}, H), body: JSON.stringify({prompt, images, url: opt.url || ""}), signal: ctl.signal}); }
+      catch (e) { throw fail(opt.signal && opt.signal.aborted ? "cancelled" : "network"); } finally { clearTimeout(tm); }
+      const j = await r.json().catch(() => null);
+      if (!r.ok || !j || j.error) throw fail((j && j.error) || "http_" + r.status);
+      return j;
+    }
+  };
+}
 async function boot(){
   setEnv(env); renderList();
   const c = window.claude;
@@ -1390,6 +1422,7 @@ async function boot(){
     if (d) [a, s, u] = await Promise.all([c.use("assets"), c.use("sample"), c.use("user")].map(p => Promise.resolve(p).catch(() => null)));
   }
   sample = s;
+  if (remote && !sample){ const cs = cloudSample(window.CAVE_CFG); const caps = await cs.limits().catch(() => null); if (caps && caps.ok) sample = cs; }
   if (remote){}
   else if (d){
     db = d; assets = a;
@@ -1762,11 +1795,11 @@ const EXAMPLES = (() => {
     Object.assign(f.produit, {marque, nom, pays, notesAromatiques:notes, dateAchat:date}); f.produit[sk] = style; if (cat === "calvados") f.produit.region = pays;
     f.noteGlobale = note; f.degustation.date = date; f.updatedAt = date; if (ex) ex.forEach(([k,n]) => { f.extractions[k].active = true; f.extractions[k].note = n; }); return f; };
   return {
-    rhum: [mk("rhum","Exemple · Maison A","Hors d'âge","Martinique","Pur jus de canne (agricole)","vanille, cannelle, banane flambée, cuir",4.4,"2026-03-12",[["pur",4.5]]),
-      mk("rhum","Exemple · Maison B","Blanc 50","Guadeloupe","Pur jus de canne (agricole)","canne fraîche, citron vert, poivre, herbe coupée",3.9,"2026-04-02",[["tipunch",4.2]]),
-      mk("rhum","Exemple · Maison C","8 ans","Jamaïque","Mélasse (traditionnel)","ananas, banane, vernis, épices",4.6,"2026-05-15",[["pur",4.6],["cocktail",4.3]]),
-      mk("rhum","Exemple · Maison D","Solera 15","Guatemala","Sirop ou miel de canne","caramel, raisins secs, vanille, chocolat",3.4,"2026-06-03",[["glace",3.6]]),
-      mk("rhum","Exemple · Maison A","XO","Martinique","Pur jus de canne (agricole)","fruits secs, vanille, tabac, orange confite",4.7,"2026-09-08",[["pur",4.7]])],
+    rhum: [mk("rhum","Exemple · Maison A","Hors d'âge","Martinique","Vieux","vanille, cannelle, banane flambée, cuir",4.4,"2026-03-12",[["pur",4.5]]),
+      mk("rhum","Exemple · Maison B","Blanc 50","Guadeloupe","Blanc","canne fraîche, citron vert, poivre, herbe coupée",3.9,"2026-04-02",[["tipunch",4.2]]),
+      mk("rhum","Exemple · Maison C","8 ans","Jamaïque","Vieux","ananas, banane, vernis, épices",4.6,"2026-05-15",[["pur",4.6],["cocktail",4.3]]),
+      mk("rhum","Exemple · Maison D","Solera 15","Guatemala","Vieux","caramel, raisins secs, vanille, chocolat",3.4,"2026-06-03",[["glace",3.6]]),
+      mk("rhum","Exemple · Maison A","XO","Martinique","Vieux","fruits secs, vanille, tabac, orange confite",4.7,"2026-09-08",[["pur",4.7]])],
     whisky: [mk("whisky","Exemple · Distillerie A","16 ans","Écosse","Single Malt","tourbe, iode, fumée, vanille",4.5,"2026-03-10",[["pur",4.5],["eau",4.7]]),
       mk("whisky","Exemple · Distillerie B","12 ans","Écosse","Single Malt","miel, pomme, fleurs, malt",4.0,"2026-04-12",[["pur",4.0]]),
       mk("whisky","Exemple · Distillerie C","Small Batch","États-Unis","Bourbon","caramel, vanille, cerise, chêne",3.8,"2026-05-20",[["pur",3.7],["cocktail",4.1]]),
@@ -3229,8 +3262,15 @@ function renderProduit(){
   g.append(catSegEl()); $("f-cat-note").textContent = keepNote;
   const cat = catOf(cur);
   const brands = () => [...new Set(fiches.filter(f => catOf(f) === cat).map(f => f.produit.marque).concat(HOUSES.filter(h => h.cat === cat && !h.reco).map(h => h.nom)).filter(Boolean))].sort((a,b) => a.localeCompare(b, "fr"));
+  const ESS = ESSENTIELS[cat] || ESSENTIELS.autres;
+  const more = document.createElement("details"); more.className = "more"; more.open = moreOpen.produit;
+  more.addEventListener("toggle", () => { moreOpen.produit = more.open; });
+  const ms = document.createElement("summary"); ms.textContent = "Plus de détails (facultatif)"; const cnt = document.createElement("span"); cnt.className = "cnt"; ms.append(cnt);
+  const mg = document.createElement("div"); mg.className = "grid"; more.append(ms, mg); let nMore = 0;
   fieldsFor(cat).forEach(def => {
     if (def.legacy && !cur.produit[def.k]) return;
+    const g = ESS.includes(def.k) ? $("g-produit") : (cur.produit[def.k] && def.k !== "dateAchat" ? (nMore++, mg) : mg);
+    if (def.seg){ g.append(famSegEl(def)); return; }
     let d2 = def;
     if (def.k === "boutique" || def.k === "distillerie") d2 = Object.assign({}, def, {list: lieuNames()});
     if (def.k === "marque") d2 = Object.assign({}, def, {list: brands()});
@@ -3241,6 +3281,24 @@ function renderProduit(){
     if (def.k === "distillerie") el.append(placeBtn("production", el.querySelector("input"), v => { cur.produit.distillerie = v; }));
     if (def.k === "dateAchat") g.append(anteControl(cur.produit, "anterieur", "anneeAchat", "f_dateAchat", "dateAchat", "Déjà dans ma cave avant novembre 2026 (date d'achat inconnue)"));
   });
+  cnt.textContent = nMore ? nMore + " remplie" + (nMore > 1 ? "s" : "") : "";
+  $("g-produit").append(more);
+}
+/* Rubriques toujours visibles, par spiritueux ; tout le reste est dans « Plus de détails » */
+const ESSENTIELS = {
+  rhum:["famille","marque","nom","pays","degre","dateAchat"], whisky:["marque","nom","type","pays","degre","dateAchat"],
+  calvados:["marque","nom","appellation","degre","dateAchat"], gin:["marque","nom","style","pays","degre","dateAchat"],
+  autres:["type","marque","nom","pays","degre","dateAchat"]
+};
+const moreOpen = {produit:false, degust:false};
+function famSegEl(def){
+  const w = document.createElement("div"); w.className = "field full" + (cur.ai[def.k] ? " ai" : "");
+  const lab = document.createElement("label"); lab.id = "fam_l"; lab.textContent = def.l;
+  const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-labelledby", "fam_l");
+  def.seg.forEach(opt => { const b = document.createElement("button"); b.type = "button"; b.textContent = opt; b.disabled = ro; b.setAttribute("aria-pressed", cur.produit[def.k] === opt ? "true" : "false");
+    b.onclick = () => { cur.produit[def.k] = cur.produit[def.k] === opt ? "" : opt; delete cur.ai[def.k]; w.classList.remove("ai"); [...seg.children].forEach(x => x.setAttribute("aria-pressed", x.textContent === cur.produit[def.k] ? "true" : "false")); };
+    seg.append(b); });
+  w.append(lab, seg); return w;
 }
 
 function renderMethods(){
@@ -3271,7 +3329,13 @@ function renderMethods(){
 }
 
 function renderDegust(){
-  const g = $("g-degust"); g.textContent = ""; const d = cur.degustation;
+  const top = $("g-degust"); top.textContent = ""; const d = cur.degustation;
+  const more = document.createElement("details"); more.className = "more"; more.open = moreOpen.degust;
+  more.addEventListener("toggle", () => { moreOpen.degust = more.open; });
+  const ms = document.createElement("summary"); ms.textContent = "Dégustation détaillée (facultatif)"; const cnt = document.createElement("span"); cnt.className = "cnt"; ms.append(cnt);
+  const g = document.createElement("div"); g.className = "grid"; more.append(ms, g);
+  const nD = [d.date, d.lieu, cur.produit.nez, cur.produit.bouche, cur.produit.finale, cur.produit.notesAromatiques, cur.produit.attaque, (cur.produit.caractere || []).length, Object.keys(cur.produit.structure || {}).length, Object.keys(cur.produit.profil || {}).length].filter(Boolean).length;
+  cnt.textContent = nD ? nD + " remplie" + (nD > 1 ? "s" : "") : "";
   g.append(fieldEl({k:"date",l:"Date de dégustation",t:"date"}, d.date, v => d.date = v, {prefix:"dg_"}));
   g.append(anteControl(d, "anterieur", "annee", "f_dg_date", "date", "Dégustée avant novembre 2026 (date exacte inconnue)"));
   { const el = fieldEl({k:"lieu",l:"Lieu de dégustation",ph:"maison, bar, distillerie, ville…",list:lieuNames()}, d.lieu, v => d.lieu = v, {prefix:"dg_"}); el.append(placeBtn("degustation", el.querySelector("input"), v => { d.lieu = v; })); g.append(el); }
@@ -3280,14 +3344,15 @@ function renderDegust(){
   F_DEGUST_PROD.forEach(def => { const el = fieldEl(def, cur.produit[def.k], v => { cur.produit[def.k] = v; delete cur.ai[def.k]; }); if (cur.ai[def.k]) el.classList.add("ai"); g.append(el); });
   g.append(structEl(cur.produit));
   g.append(profilEl(cur.produit));
-  g.append(fieldEl({k:"avis",l:"Avis général",ta:true}, d.avis, v => d.avis = v, {prefix:"dg_"}));
+  top.append(ratingEl("Note globale", "n_globale", cur.noteGlobale, v => cur.noteGlobale = v));
+  top.append(fieldEl({k:"avis",l:"Avis général",ta:true,ph:"en quelques mots"}, d.avis, v => d.avis = v, {prefix:"dg_"}));
   const w = document.createElement("div"); w.className="field full";
   const lab = document.createElement("label"); lab.id="rach_l"; lab.textContent = "Envie de racheter";
   const seg = document.createElement("div"); seg.className="seg"; seg.setAttribute("role","group"); seg.setAttribute("aria-labelledby","rach_l");
   ["Oui","Peut-être","Non"].forEach(opt => { const b=document.createElement("button"); b.type="button"; b.textContent=opt; b.setAttribute("aria-pressed", d.racheter===opt?"true":"false");
     b.onclick = () => { d.racheter = d.racheter===opt ? "" : opt; [...seg.children].forEach(x => x.setAttribute("aria-pressed", x.textContent===d.racheter?"true":"false")); }; seg.append(b); });
-  w.append(lab, seg); g.append(w);
-  g.append(ratingEl("Note globale", "n_globale", cur.noteGlobale, v => cur.noteGlobale = v));
+  w.append(lab, seg); top.append(w);
+  top.append(more);
 }
 
 function structTxt(p){ const c = (Array.isArray(p.caractere) ? p.caractere : []).map(k => (CARACT.find(x => x[0] === k) || [k, k])[1].toLowerCase());
@@ -3425,7 +3490,7 @@ Règles :
 - La marque ou maison mise en avant va dans "marque" ; le nom de la cuvée (XO, 12 ans, Hors d'âge, nom de fantaisie…) dans "nom" ; la distillerie ou le producteur s'il est différent dans "distillerie".
 - "age" : mention d'âge telle qu'écrite (« 12 ans », « XO », « VSOP »…), en français ; "millesime" : année de distillation (4 chiffres) ; "degre" : nombre avec virgule (ex. « 43,5 ») ; "contenance" : en centilitres, chiffres seulement (70 cl = « 70 », 1 l = « 100 »).
 - "fut" : type de fût ou finition (ex-bourbon, sherry oloroso, porto…) ; "embouteillage" : officiel, embouteilleur indépendant, single cask, brut de fût, non filtré à froid, couleur naturelle, édition limitée.
-- Rhum : "matiere" (pur jus de canne ou mélasse), "style" (blanc, ambré, vieux, épicé, arrangé…), "appellation" (AOC Martinique, IG…), "distillation" (colonne créole, alambic…).
+- Rhum : "famille" = "Blanc", "Vieux" (ambré, vieux, hors d'âge, XO…) ou "Autre" (épicé, arrangé, paille…), "matiere" (pur jus de canne ou mélasse), "appellation" (AOC Martinique, IG…), "distillation" (colonne créole, alambic…).
 - Whisky : "type" (Single Malt, Blended, Bourbon, Rye…), "region" (Speyside, Islay, Kentucky…), "tourbe" (non tourbé, tourbé, très tourbé, avec ppm si indiqué).
 - Calvados : "appellation" (AOC Calvados, AOC Calvados Pays d'Auge, AOC Calvados Domfrontais), "fruits", "distillation".
 - Gin : "style" (London Dry Gin, Distilled Gin, Old Tom…), "botaniques" (liste en français), "base".
@@ -3433,7 +3498,7 @@ Règles :
 - Tout le reste d'utile (n° de bouteille, n° de fût, date de mise en bouteille, récompenses) va dans "texte", en phrases courtes séparées par « · ».
 - N'invente rien. Laisse "" si l'information n'est ni écrite ni déductible avec certitude.
 
-Réponds UNIQUEMENT par un objet JSON avec ces clés (chaînes) : categorie, type, marque, nom, distillerie, pays, region, matiere, style, appellation, distillation, tourbe, fruits, botaniques, base, age, millesime, degre, contenance, fut, embouteillage, nez, bouche, finale, notesAromatiques, texte.`;
+Réponds UNIQUEMENT par un objet JSON avec ces clés (chaînes) : categorie, famille, type, marque, nom, distillerie, pays, region, matiere, style, appellation, distillation, tourbe, fruits, botaniques, base, age, millesime, degre, contenance, fut, embouteillage, nez, bouche, finale, notesAromatiques, texte.`;
 }
 async function blobsForReading(){
   const out = pending.map(p => p.blob);
@@ -3619,6 +3684,8 @@ function applyFields(data, who, src){
     if (f.produit[k] && !f.ai[k]) continue; // ne jamais écraser une saisie manuelle
     f.produit[k] = v; f.ai[k] = true; filled++;
   }
+  if (f.produit.famille){ const m = {blanc:"Blanc", vieux:"Vieux", autre:"Autre"}[fold(f.produit.famille)]; f.produit.famille = m || "Autre"; }
+  if (catOf(f) === "rhum" && !f.produit.famille && f.produit.age){ f.produit.famille = /^blanc/i.test(f.produit.age) ? "Blanc" : /sous bois|paille|épic|arrang/i.test(f.produit.age) ? "Autre" : "Vieux"; f.ai.famille = true; filled++; }
   if (!Object.keys(f.produit.profil || {}).length){
     const ip = SP.inferProfil(catOf(f), AROMA_TXT(f));
     if (ip){ f.produit.profil = ip; f.ai.profil = true; filled++; }
@@ -3956,6 +4023,16 @@ function pageText(src, url){
 async function readWebPage(url){
   const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Lecture de la page web de la bouteille…";
   try {
+    if (sample && sample.cloud){
+      try { $("reading-txt").textContent = "Claude lit la page de la bouteille… (10 à 40 secondes)"; const data = await sample.json(webInstr(), {url});
+        if (cur !== f) return; const img = data._image; delete data._image;
+        applyFields(data, "par Claude depuis la page web", "web");
+        if (!cur.produit.texte) { cur.produit.texte = "Source : " + url; const ts = $("f_texte"); if (ts) ts.value = cur.produit.texte; }
+        $("paste-box").hidden = true;
+        if (img && !pending.length && !(cur.photos || []).length){ try { const b = await viaRelay(img, true); if (/^image\//.test(b.type) || b.size > 5000){ const sm = await downscale(new File([b], "page.jpg", {type:b.type || "image/jpeg"})); pending.push({key:uid(), blob:sm, url:URL.createObjectURL(sm), orig:sm}); renderPhotos(); } } catch {} }
+        return;
+      } catch (e) { if (cur !== f) return; /* le site bloque le serveur : on essaie les relais ci-dessous */ }
+    }
     const src = await viaRelay(url);
     if (cur !== f) return;
     const pg = pageText(src, url);
@@ -3979,16 +4056,16 @@ async function readWebPage(url){
     toast("La page n'a pas pu être lue (site protégé ou pas de réseau). Ouvrez-la, sélectionnez tout son texte, copiez-le et collez-le ici.");
   } finally { $("reading").hidden = true; }
 }
-function webPrompt(t){
-  return readPrompt(1).replace(/Tu lis 1 photo\(s\) d'une même bouteille[^.]*\. Déchiffre tout le texte visible[^.]*\./, "Tu lis le texte copié depuis la page web d'une bouteille (site d'une maison, d'une distillerie ou d'un caviste). Ignore menus, panier, livraison, avis clients et autres bouteilles proposées : garde uniquement ce qui décrit CETTE bouteille.")
-    + "\n\nTexte de la page :\n<<<\n" + t.slice(0, 20000) + "\n>>>";
+function webPrompt(t){ return webInstr() + "\n\nTexte de la page :\n<<<\n" + t.slice(0, 20000) + "\n>>>"; }
+function webInstr(){
+  return readPrompt(1).replace(/Tu lis 1 photo\(s\) d'une même bouteille[^.]*\. Déchiffre tout le texte visible[^.]*\./, "Tu lis le texte copié depuis la page web d'une bouteille (site d'une maison, d'une distillerie ou d'un caviste). Ignore menus, panier, livraison, avis clients et autres bouteilles proposées : garde uniquement ce qui décrit CETTE bouteille. Si c'est un texte collé (étiquette, fiche de caviste, notes), range de même chaque information dans la bonne case.");
 }
 $("b-paste").onclick = () => { $("paste-box").hidden = !$("paste-box").hidden; if (!$("paste-box").hidden) $("paste-txt").focus(); };
 $("b-paste-x").onclick = () => { $("paste-box").hidden = true; };
 $("b-paste-go").onclick = async () => { const t = $("paste-txt").value; if (!t.trim()){ toast("Collez d'abord le texte de l'étiquette ou le lien de la page."); return; }
   const um = t.trim().match(/^https?:\/\/\S+$/) || (t.trim().length < 400 && t.match(/https?:\/\/[^\s"'<>]+/));
   if (um){ await readWebPage(um[0]); return; }
-  if (sample && t.trim().length > 60){
+  if (sample && t.trim().length > 15){
     const f = cur; $("reading").hidden = false; $("reading-txt").textContent = "Claude range les informations…";
     try { const data = await sample.json(webPrompt(t)); if (cur === f){ applyFields(data, "par Claude depuis le texte collé", "texte"); $("paste-box").hidden = true; } return; }
     catch (e) { /* lecture sur le téléphone ci-dessous */ } finally { $("reading").hidden = true; }
@@ -4006,6 +4083,7 @@ async function readPhotos(){
   } catch (e) {
     const msg = {cancelled:"Lecture arrêtée.", not_granted:"Lecture refusée : autorisez l'application à utiliser Claude pour lire les étiquettes.", rate_limited:"Trop de lectures d'un coup. Réessayez dans une minute.", image_rejected:"Une photo a été refusée (format ou taille). Reprenez-la.", invalid_json:"La réponse de Claude était incomplète. Touchez « Lire les photos avec Claude » pour réessayer."}[e && e.code] || "La lecture a échoué. Vous pouvez remplir la fiche à la main ou réessayer.";
     toast(msg);
+    if (sample && sample.cloud && !(e && e.code === "cancelled") && cur === f) setTimeout(() => ocrPhotos(), 600);
   } finally {
     readCtl = null; $("reading").hidden = true; renderPhotos();
   }
