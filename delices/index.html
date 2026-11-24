@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124002819";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002819"></script>
+<script>window.CAVE_BUILD="20261124003747";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124003747"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -544,6 +544,87 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 .field .btn.small{min-height:32px;font-size:.82rem;padding:0 12px;margin-top:4px;justify-self:start}
 .field.ante{margin-top:-2px}
 .field.ante label.check{font-size:.82rem;font-weight:500}
+
+/* Finition visuelle des fiches : cases pleines sans contour, interrupteurs, liens discrets */
+#v-form{--fill:color-mix(in srgb,var(--ink) 5%,var(--surface));--fill-2:color-mix(in srgb,var(--ink) 8%,var(--surface))}
+#v-form .field input:not([type=checkbox]):not([type=range]):not([type=radio]),#v-form .field textarea,#v-form .field select{border:1px solid transparent!important;background:var(--fill)!important;box-shadow:none;border-radius:12px!important;transition:background .15s,border-color .15s,box-shadow .15s}
+#v-form .field input:not([type=checkbox]):not([type=range]):focus,#v-form .field textarea:focus,#v-form .field select:focus{outline:none;background:var(--surface)!important;border-color:color-mix(in srgb,var(--accent) 55%,transparent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)!important}
+#v-form .field.ai input:not([type=checkbox]):not([type=range]),#v-form .field.ai textarea,#v-form .field.ai select{background:var(--ai)!important;border-color:transparent!important;box-shadow:inset 3px 0 0 var(--ai-line)!important}
+#v-form .field textarea{resize:none}
+#v-form .field input::placeholder,#v-form .field textarea::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+#v-form label .rbadge{display:none!important}
+/* Interrupteur à la place des cases carrées */
+#v-form input[type=checkbox]{-webkit-appearance:none;appearance:none;position:relative;width:40px!important;min-width:40px;height:24px!important;border-radius:999px;background:var(--fill-2);border:none;margin:0;cursor:pointer;transition:background .2s;flex:none}
+#v-form input[type=checkbox]::before{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+#v-form input[type=checkbox]:checked{background:var(--accent)}
+#v-form input[type=checkbox]:checked::before{transform:translateX(16px)}
+#v-form .check{gap:10px;font-size:.84rem;font-weight:500;color:var(--muted);line-height:1.3}
+/* « Choisir sur la carte » : simple lien */
+#v-form .place-btn{margin-top:2px;gap:6px}
+#v-form .place-btn .btn.small{min-height:28px!important;padding:0!important;border:none!important;background:none!important;box-shadow:none!important;color:var(--accent);font-weight:600;font-size:.82rem;border-radius:6px!important;width:auto}
+#v-form .place-btn .btn.small::after{content:" ›";font-weight:700}
+#v-form .place-btn .hint{font-size:.8rem}
+/* Volets, boutons de choix, note */
+#v-form .more{border:none!important;background:color-mix(in srgb,var(--ink) 3%,var(--surface))!important;border-radius:14px!important}
+#v-form .more>summary{font-size:.9rem;min-height:46px}
+#v-form .seg button,#v-form .chip{border:1px solid transparent!important;background:var(--fill)!important;color:var(--ink);font-weight:500;box-shadow:none!important}
+#v-form .seg button[aria-pressed="true"],#v-form .chip[aria-pressed="true"]{background:var(--grad)!important;color:#fff!important}
+#v-form .seg button{min-height:40px!important}
+#v-form .chip{min-height:36px!important;font-size:.9rem}
+#v-form .rating{grid-template-columns:1fr 64px;gap:14px}
+#v-form .rating input[type=text]{min-height:40px!important;padding:6px!important}
+#v-form input[type=range]{accent-color:var(--accent)}
+#v-form .hint{font-size:.82rem}
+#v-form input[type=checkbox]{background:color-mix(in srgb,var(--ink) 22%,var(--surface))}
+#v-form .check input[type=checkbox]{margin-right:2px}
+#v-form .catseg .env-b{border:1px solid transparent!important;background:var(--fill)!important;box-shadow:none!important;min-height:64px;border-radius:14px!important}
+#v-form .catseg .env-b[aria-pressed="true"],#v-form .catseg .env-b.on{background:var(--ink)!important;color:var(--surface)!important}
+
+/* Fiche bouteille en lecture */
+#v-fiche{padding-bottom:40px}
+.fv-bar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;}
+.fv-bar .btn.primary{min-width:120px}
+.fv-hero{border-radius:24px;overflow:hidden;background:var(--surface);box-shadow:0 18px 40px -26px rgba(40,20,60,.45);margin-bottom:14px}
+.fv-photo{all:unset;display:block;width:100%;aspect-ratio:4/3;background:var(--g);cursor:zoom-in;position:relative;overflow:hidden}
+.fv-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.fv-nophoto{display:grid;place-items:center;cursor:default}
+.fv-id{padding:16px 18px 18px;display:grid;gap:6px}
+.fv-kind{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--c)}
+.fv-fav{margin-left:auto;color:var(--accent);font-size:1.1rem}
+.fv-id h1{margin:0;font-size:1.75rem;line-height:1.1;letter-spacing:-.01em}
+.fv-sub{font-size:1.05rem;color:var(--muted);font-weight:500}
+.fv-score{display:flex;align-items:baseline;gap:4px;margin-top:6px}
+.fv-num{font-size:2.1rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.fv-of{color:var(--muted);font-weight:600;margin-right:8px}
+.fv-stars{display:inline-flex;gap:2px;font-size:1.15rem;align-self:center}
+.fv-star{background:linear-gradient(90deg,var(--accent) var(--f),color-mix(in srgb,var(--ink) 14%,transparent) var(--f));-webkit-background-clip:text;background-clip:text;color:transparent}
+.fv-none{color:var(--muted);font-size:.9rem}
+.fv-pill{justify-self:start;margin-top:4px;padding:5px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.82rem;font-weight:600}
+.fv-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:8px;margin-bottom:14px}
+.fv-fact{background:var(--surface);border-radius:16px;padding:10px 14px;display:grid;gap:2px;min-width:0;align-content:start}
+.fv-fact span{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.fv-fact strong{font-size:.9rem;font-weight:650;line-height:1.25;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fv-avis{margin:0 0 14px;padding:18px 18px 16px 34px;border-radius:18px;background:var(--surface);font-size:1.05rem;line-height:1.45;font-style:italic;position:relative}
+.fv-avis::before{content:"“";position:absolute;top:2px;left:10px;font-size:2.6rem;color:var(--accent);opacity:.35;font-style:normal}
+.fv-sec{background:var(--surface);border-radius:20px;padding:16px 18px;margin-bottom:12px;display:grid;gap:12px}
+.fv-sec h2{margin:0;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.fv-meta{color:var(--muted);font-size:.9rem}.fv-meta.strong{color:var(--ink);font-weight:600;font-size:.95rem}
+.fv-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fv-chips span{padding:6px 12px;border-radius:999px;background:var(--grad);color:#fff;font-size:.85rem;font-weight:600}
+.fv-chips.soft span{background:color-mix(in srgb,var(--ink) 6%,var(--surface));color:var(--ink);font-weight:500}
+.fv-note h3{margin:0 0 2px;font-size:.85rem;color:var(--accent)}
+.fv-note p,.fv-txt{margin:0;line-height:1.45}
+.fv-bars{display:grid;gap:8px}
+.fv-bars div{display:grid;grid-template-columns:7em 1fr;align-items:center;gap:10px;font-size:.88rem}
+.fv-bars i{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--accent) var(--v),color-mix(in srgb,var(--ink) 8%,transparent) var(--v))}
+.fv-prof{display:grid;place-items:center}.fv-prof svg{max-width:280px;width:100%}
+.fv-gal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fv-gal button{all:unset;cursor:zoom-in;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--sunk)}
+.fv-gal img{width:100%;height:100%;object-fit:cover;display:block}
+
+#v-form input[type=checkbox]{min-height:0!important;padding:0!important;border:none!important}
+#v-form input[type=checkbox]:not(:checked){background:color-mix(in srgb,var(--ink) 22%,var(--surface))!important}
+#v-form input[type=checkbox]:checked{background:var(--accent)!important}
 </style>
 
 <div class="wrap">
@@ -631,6 +712,11 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
     <div class="section-label">Historique des fiches</div>
     <div class="list" id="g-list"></div>
     <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" class="ed"><button class="btn primary" id="b-gnew" type="button">J'ai racheté cette bouteille</button><button class="btn" id="b-gmerge" type="button" hidden>Réunir en une seule fiche</button></div>
+  </section>
+
+  <section id="v-fiche" hidden>
+    <div class="fv-bar"><button class="btn small ghost" id="fv-back" type="button">← Retour</button><button class="btn small primary ed" id="fv-edit" type="button">Modifier</button></div>
+    <div id="fv"></div>
   </section>
 
   <section id="v-dash" hidden>
@@ -1629,7 +1715,7 @@ function ficheCard(f, line3){
   l3.textContent = line3 !== undefined ? line3 : [((f.achats || []).length ? `${nbAchats(f)} achats` : ""), achatLabel(f), f.produit.degre ? String(f.produit.degre).replace(".", ",") + " %" : "" ].filter(Boolean).join(" · ");
   meta.append(n, l2, l3);
   b.append(thumbEl(f), meta, pillEl(ratingOf(f)));
-  b.onclick = () => openForm(f);
+  b.onclick = () => openFiche(f);
   return b;
 }
 function sparkSvg(values){
@@ -1932,7 +2018,7 @@ function renderJournal(){
     const p = document.createElement("span"); p.className = "jpill j-" + e.action; p.textContent = J_ACT[e.action] || e.action;
     const ic = document.createElement("span"); ic.innerHTML = catBadge(e.categorie, 40);
     b.append(ic, meta, p);
-    b.onclick = () => { if (f){ setEnv(catOf(f)); openForm(f); } else toast("Cette fiche a été supprimée."); };
+    b.onclick = () => { if (f){ setEnv(catOf(f)); openFiche(f); } else toast("Cette fiche a été supprimée."); };
     box.append(b);
   });
 }
@@ -3094,7 +3180,7 @@ function placeForm(p){
 
 const VIEWS = {cave:"v-list", tableau:"v-dash", lieux:"v-lieux", atelier:"v-learn", journal:"v-journal"};
 let curView = "cave";
-function hideAll(){ ["v-list","v-dash","v-group","v-form","v-learn","v-lieux","v-lieu","v-journal"].forEach(id => $(id).hidden = true); $("actionbar").hidden = true; }
+function hideAll(){ ["v-list","v-dash","v-group","v-fiche","v-form","v-learn","v-lieux","v-lieu","v-journal"].forEach(id => $(id).hidden = true); $("actionbar").hidden = true; }
 /* Harmonie : dans une même page, les bandeaux d'un même groupe ont tous la même hauteur */
 const BAND_SEL = [".guide > summary", "#list > .card", "#lieu-list > *", "#j-list > .jrow", ".house", ".envbar > .env-b", "#d-top > *"];
 
@@ -3124,6 +3210,55 @@ function showView(name){
 }
 window.addEventListener("hashchange", () => { closePick(); if (cur) closeForm(true); curLieu = null; showView(location.hash.slice(1)); });
 
+
+
+/* ---------- Fiche bouteille en lecture : présentation finale, « Modifier » pour revenir à la saisie ---------- */
+let fvId = null, fvReturn = null;
+const fvEsc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function fvStars(n){ if (n === null || n === undefined) return ""; let h = ""; for (let i = 1; i <= 5; i++){ const fill = Math.max(0, Math.min(1, n - i + 1)); h += `<span class="fv-star" style="--f:${Math.round(fill*100)}%">★</span>`; } return h; }
+function openFiche(f){
+  if (!f) return; fvId = f.id; fvReturn = openGroupKey;
+  const p = f.produit || {}, d = f.degustation || {}, cat = catOf(f), C = CAT[cat] || CAT.autres;
+  const note = ratingOf(f), ph = (f.photos || [])[0];
+  const famille = [p.famille ? (cat === "rhum" ? "Rhum " + p.famille.toLowerCase() : p.famille) : "", cat !== "rhum" ? (p.type || p.style || p.appellation || "") : ""].filter(Boolean).join(" · ") || catName(cat);
+  const title = p.marque || p.nom || "Bouteille sans nom", sub = p.marque ? p.nom : "";
+  const facts = [["Degré", p.degre ? String(p.degre).replace(".", ",") + " %" : ""], ["Âge", p.age], ["Millésime", p.millesime], [cat === "calvados" ? "Région" : "Origine", cat === "calvados" ? (p.region || p.pays) : p.pays], [cat === "calvados" ? "Producteur" : "Distillerie", p.distillerie], ["Appellation", cat !== "calvados" ? p.appellation : ""], ["Matière", p.matiere], ["Distillation", p.distillation], ["Fût", p.fut], ["Tourbe", p.tourbe], ["Botaniques", p.botaniques], ["Contenance", p.contenance ? p.contenance + " cl" : ""], ["Embouteillage", p.embouteillage]].filter(x => x[1]);
+  const achat = [achatLabel(f), p.boutique ? "chez " + p.boutique : "", p.prix ? String(p.prix).replace(".", ",") + " €" : ""].filter(Boolean);
+  const rach = d.racheter ? {oui:"Je la rachèterais", "peut-être":"Peut-être à racheter", "peut-etre":"Peut-être à racheter", non:"Pas à racheter"}[fold(d.racheter)] || "Racheter : " + d.racheter : "";
+  const prof = profOf(cat), pv = p.profil || {}, hasProf = prof.some(([k]) => pv[k]);
+  const car = (p.caractere || []).map(k => (CARACT.find(c => c[0] === k) || [k, k])[1]);
+  const aromes = String(p.notesAromatiques || "").split(/\s*[,;·]\s*/).filter(Boolean);
+  const notes = [["Nez", p.nez], ["Bouche", p.bouche], ["Finale", p.finale]].filter(x => x[1]);
+  const struct = STRUCT.filter(([k]) => p.structure && p.structure[k]);
+  const sec = (t, inner) => inner ? `<section class="fv-sec"><h2>${t}</h2>${inner}</section>` : "";
+  let h = `<div class="fv-hero" style="--g:${C.g};--c:${C.c}">` +
+    (ph ? `<button type="button" class="fv-photo" id="fv-photo" aria-label="Agrandir la photo"><img src="${fvEsc(blobUrl(ph.id))}" alt=""></button>` : `<div class="fv-photo fv-nophoto">${catIcon(cat, 88, "rgba(255,255,255,.95)")}</div>`) +
+    `<div class="fv-id"><div class="fv-kind">${catBadge(cat, 22)}<span>${fvEsc(famille)}</span>${f.favori ? '<span class="fv-fav" title="Bouteille préférée">♥</span>' : ""}</div>` +
+    `<h1>${fvEsc(title)}</h1>${sub ? `<div class="fv-sub">${fvEsc(sub)}</div>` : ""}` +
+    `<div class="fv-score">${note !== null ? `<span class="fv-num">${fmtNote(note)}</span><span class="fv-of">/5</span><span class="fv-stars">${fvStars(note)}</span>` : `<span class="fv-none">Pas encore notée</span>`}</div>` +
+    (rach ? `<span class="fv-pill">${fvEsc(rach)}</span>` : "") + `</div></div>`;
+  if (facts.length) h += `<div class="fv-facts">${facts.map(([l, v]) => `<div class="fv-fact"><span>${l}</span><strong>${fvEsc(v)}</strong></div>`).join("")}</div>`;
+  if (d.avis) h += `<blockquote class="fv-avis">${fvEsc(d.avis)}</blockquote>`;
+  h += sec("Dégustation", [degustLabel(f) || d.lieu ? `<div class="fv-meta">${fvEsc([degustLabel(f), d.lieu].filter(Boolean).join(" · "))}</div>` : "",
+    aromes.length ? `<div class="fv-chips">${aromes.map(a => `<span>${fvEsc(a)}</span>`).join("")}</div>` : "",
+    notes.map(([l, v]) => `<div class="fv-note"><h3>${l}</h3><p>${fvEsc(v)}</p></div>`).join(""),
+    car.length || p.attaque ? `<div class="fv-chips soft">${car.map(c => `<span>${fvEsc(c)}</span>`).join("")}${p.attaque ? `<span>Attaque ${fvEsc(String(p.attaque).toLowerCase())}</span>` : ""}</div>` : "",
+    struct.length ? `<div class="fv-bars">${struct.map(([k, l]) => `<div><span>${l}</span><i style="--v:${p.structure[k] * 25}%"></i></div>`).join("")}</div>` : "",
+    hasProf ? `<div class="fv-prof" id="fv-prof"></div>` : ""].join(""));
+  h += sec("Achat", achat.length ? `<div class="fv-meta strong">${fvEsc(achat.join(" · "))}</div>` + ((f.achats || []).length ? `<div class="fv-meta">${nbAchats(f)} achats de cette bouteille</div>` : "") : "");
+  if (p.texte) h += sec("Sur l'étiquette", `<p class="fv-txt">${fvEsc(p.texte)}</p>`);
+  if ((f.photos || []).length > 1) h += sec("Photos", `<div class="fv-gal">${f.photos.map((x, i) => `<button type="button" data-i="${i}"><img src="${fvEsc(blobUrl(x.id))}" alt="" loading="lazy"></button>`).join("")}</div>`);
+  const box = $("fv"); box.innerHTML = h;
+  if (hasProf) $("fv-prof").append(profilSvg(pv, 260, prof));
+  const zoom = src => { $("light-img").src = src; $("light").hidden = false; };
+  if ($("fv-photo") && ph) $("fv-photo").onclick = () => zoom(blobUrl(ph.id));
+  box.querySelectorAll(".fv-gal button").forEach(b => b.onclick = () => zoom(blobUrl(f.photos[+b.dataset.i].id)));
+  box.querySelectorAll(".fv-photo img, .fv-gal img").forEach(im => im.onerror = () => { const b = im.closest("button"); if (b && b.classList.contains("fv-photo")) b.outerHTML = `<div class="fv-photo fv-nophoto">${catIcon(cat, 88, "rgba(255,255,255,.95)")}</div>`; else if (b) b.remove(); });
+  hideAll(); $("tabs").hidden = true; $("v-fiche").hidden = false; window.scrollTo(0, 0);
+}
+$("fv-back").onclick = () => { const g = fvReturn; fvId = null; fvReturn = null; showView(curView); if (g && fiches.some(x => groupKey(x) === g)) openGroup(g); };
+let fvAfter = null;
+$("fv-edit").onclick = () => { const f = fiches.find(x => x.id === fvId); if (f){ const r = fvReturn; openForm(f); returnGroup = r; fvAfter = f.id; } };
 
 /* ---------- Formulaire ---------- */
 let cur = null;           // fiche en cours d'édition
@@ -3250,9 +3385,10 @@ function closeForm(silent){
   pending.forEach(p => URL.revokeObjectURL(p.url)); pending = []; cur = null;
   if (readCtl) readCtl.abort();
   if (silent) return;
-  const g = returnGroup; returnGroup = null;
+  const g = returnGroup; returnGroup = null; const back = fvAfter; fvAfter = null;
   showView(curView);
   if (g && fiches.some(f => groupKey(f) === g)) openGroup(g);
+  const fb = back && fiches.find(f => f.id === back); if (fb){ openFiche(fb); fvReturn = g; }
 }
 // Choisir le spiritueux de la fiche : les rubriques et les façons de le boire suivent
 function setFicheCat(k, why){
