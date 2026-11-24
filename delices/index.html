@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261123235745";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261123235745"></script>
+<script>window.CAVE_BUILD="20261124001836";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124001836"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -894,7 +894,6 @@ const F_ACHAT = [
   {k:"dateAchat", l:"Date d'achat", t:"date"},
   {k:"boutique", l:"Caviste / lieu d'achat"},
   {k:"prix", l:"Prix (€)", ph:"ex. 54,90", mode:"decimal"},
-  {k:"niveau", l:"Bouteille", list:NIVEAUX, ph:"pleine, entamée, vide…"},
   {k:"texte", l:"Autres infos de l'étiquette", ta:true, full:true, ph:"n° de bouteille, n° de fût, date de mise en bouteille, mentions…"}
 ];
 const F_CAT = {
@@ -1610,7 +1609,7 @@ function ficheCard(f, line3){
   if (fav) n.insertAdjacentHTML("afterbegin", roleBadge("coeur", 18));
   const l2 = document.createElement("div"); l2.className="line2"; l2.textContent = ficheSub(f) || "Cuvée, âge et origine à compléter";
   const l3 = document.createElement("div"); l3.className="line2";
-  l3.textContent = line3 !== undefined ? line3 : [((f.achats || []).length ? `${nbAchats(f)} achats` : ""), achatLabel(f), f.produit.degre ? String(f.produit.degre).replace(".", ",") + " %" : "", f.produit.niveau && f.produit.niveau !== "Pleine" ? f.produit.niveau : ""].filter(Boolean).join(" · ");
+  l3.textContent = line3 !== undefined ? line3 : [((f.achats || []).length ? `${nbAchats(f)} achats` : ""), achatLabel(f), f.produit.degre ? String(f.produit.degre).replace(".", ",") + " %" : "" ].filter(Boolean).join(" · ");
   meta.append(n, l2, l3);
   b.append(thumbEl(f), meta, pillEl(ratingOf(f)));
   b.onclick = () => openForm(f);
@@ -3389,7 +3388,7 @@ function renderHist(){
 function startRebuy(){
   if (!cur || ro) return;
   cur.achats.push(snapshotOf(cur)); cur.rebuy = true;
-  Object.assign(cur.produit, {dateAchat:today(), anterieur:false, anneeAchat:"", niveau:"Pleine"});
+  Object.assign(cur.produit, {dateAchat:today(), anterieur:false, anneeAchat:""});
   cur.degustation = {date:"", lieu:"", avis:"", racheter:"", note:null, anterieur:false, annee:""}; cur.noteGlobale = null;
   Object.values(cur.extractions).forEach(e => { if (e){ e.note = null; e.remarques = ""; } });
   renderProduit(); renderMethods(); renderDegust(); renderHist();
