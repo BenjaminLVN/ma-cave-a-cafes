@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#d9d4e3">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124002819";</script><script src="config.js?v=20261124002819"></script>
+<script>window.CAVE_BUILD="20261124003747";</script><script src="config.js?v=20261124003747"></script>
 </head><body><title>Ma cave à cafés</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -452,6 +452,55 @@ body::before{background:rgba(217,212,227,.9)!important}
 .schema-box{border:none!important;border-radius:16px!important}
 input.search,select{border-radius:14px!important}
 .link-row{border:none!important;background:var(--sunk)!important;border-radius:16px!important}
+
+/* Finition visuelle des fiches : cases pleines sans contour, interrupteurs, liens discrets */
+#v-form{--fill:color-mix(in srgb,var(--ink) 5%,var(--surface));--fill-2:color-mix(in srgb,var(--ink) 8%,var(--surface))}
+#v-form .field input:not([type=checkbox]):not([type=range]):not([type=radio]),#v-form .field textarea,#v-form .field select{border:1px solid transparent!important;background:var(--fill)!important;box-shadow:none;border-radius:12px!important;transition:background .15s,border-color .15s,box-shadow .15s}
+#v-form .field input:not([type=checkbox]):not([type=range]):focus,#v-form .field textarea:focus,#v-form .field select:focus{outline:none;background:var(--surface)!important;border-color:color-mix(in srgb,var(--accent) 55%,transparent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)!important}
+#v-form .field.ai input:not([type=checkbox]):not([type=range]),#v-form .field.ai textarea,#v-form .field.ai select{background:var(--ai)!important;border-color:transparent!important;box-shadow:inset 3px 0 0 var(--ai-line)!important}
+#v-form .field textarea{resize:none}
+#v-form .field input::placeholder,#v-form .field textarea::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+#v-form label .rbadge{display:none!important}
+/* Interrupteur à la place des cases carrées */
+#v-form input[type=checkbox]{-webkit-appearance:none;appearance:none;position:relative;width:40px!important;min-width:40px;height:24px!important;border-radius:999px;background:var(--fill-2);border:none;margin:0;cursor:pointer;transition:background .2s;flex:none}
+#v-form input[type=checkbox]::before{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+#v-form input[type=checkbox]:checked{background:var(--accent)}
+#v-form input[type=checkbox]:checked::before{transform:translateX(16px)}
+#v-form .check{gap:10px;font-size:.84rem;font-weight:500;color:var(--muted);line-height:1.3}
+/* « Choisir sur la carte » : simple lien */
+#v-form .place-btn{margin-top:2px;gap:6px}
+#v-form .place-btn .btn.small{min-height:28px!important;padding:0!important;border:none!important;background:none!important;box-shadow:none!important;color:var(--accent);font-weight:600;font-size:.82rem;border-radius:6px!important;width:auto}
+#v-form .place-btn .btn.small::after{content:" ›";font-weight:700}
+#v-form .place-btn .hint{font-size:.8rem}
+/* Volets, boutons de choix, note */
+#v-form .more{border:none!important;background:color-mix(in srgb,var(--ink) 3%,var(--surface))!important;border-radius:14px!important}
+#v-form .more>summary{font-size:.9rem;min-height:46px}
+#v-form .seg button,#v-form .chip{border:1px solid transparent!important;background:var(--fill)!important;color:var(--ink);font-weight:500;box-shadow:none!important}
+#v-form .seg button[aria-pressed="true"],#v-form .chip[aria-pressed="true"]{background:var(--grad)!important;color:#fff!important}
+#v-form .seg button{min-height:40px!important}
+#v-form .chip{min-height:36px!important;font-size:.9rem}
+#v-form .rating{grid-template-columns:1fr 64px;gap:14px}
+#v-form .rating input[type=text]{min-height:40px!important;padding:6px!important}
+#v-form input[type=range]{accent-color:var(--accent)}
+#v-form .hint{font-size:.82rem}
+
+/* Marquage discret des cases remplies automatiquement (harmonisé avec Délices) */
+:root,:root[data-theme]{--ai:#f4effc!important;--ai-line:#8a63d2!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ai:#2a2140!important;--ai-line:#a98bf0!important}}
+:root[data-theme="dark"]{--ai:#2a2140!important;--ai-line:#a98bf0!important}
+.field.ai label::after{content:" ✦"!important;font-weight:700;color:var(--ai-line)}
+.field label{font-size:.8rem}
+
+/* Harmonisation avec Délices : boutons photos en grille, fiche sur deux colonnes */
+.photo-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}.photo-actions .btn{width:100%;min-height:44px;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.photo-actions [hidden]{display:none!important}
+#g-produit{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important}
+#g-produit>*{grid-column:1/-1}
+#g-produit>.field:is(:has(#f_pays),:has(#f_region),:has(#f_variete),:has(#f_procede),:has(#f_altitude),:has(#f_producteur),:has(#f_dateTorrefaction),:has(#f_dateAchat),:has(#f_prix),:has(#f_poids)){grid-column:auto}
+.field input:not([type=checkbox]):not([type=range]),.field select{min-height:42px!important;padding:8px 12px!important}
+
+#v-form input[type=checkbox]{min-height:0!important;padding:0!important;border:none!important}
+#v-form input[type=checkbox]:not(:checked){background:color-mix(in srgb,var(--ink) 22%,var(--surface))!important}
+#v-form input[type=checkbox]:checked{background:var(--accent)!important}
 </style>
 
 <div class="wrap">
@@ -689,9 +738,9 @@ input.search,select{border-radius:14px!important}
         <button class="btn small" id="b-addcam" type="button">Prendre une photo</button>
         <button class="btn small" id="b-addgal" type="button">Galerie</button>
         <button class="btn small" id="b-read" type="button">Relire les photos</button>
-        <button class="btn small" id="b-ocr" type="button">Lire le sachet (sur le téléphone)</button>
-        <button class="btn small" id="b-crop" type="button">Relire une zone</button>
-        <button class="btn small ghost" id="b-paste" type="button">Lien de la page web ou texte du sachet</button>
+        <button class="btn small" id="b-ocr" type="button">Relire les photos</button>
+        <button class="btn small" id="b-crop" type="button" hidden style="display:none">Relire une zone</button>
+        <button class="btn small" id="b-paste" type="button">Lien ou texte</button>
       </div>
       <div class="paste-box" id="paste-box" hidden>
         <div class="hint">Astuce iPhone : ouvrez la photo du sachet dans Photos, touchez l'icône de texte en bas à droite, puis « Tout sélectionner » et « Copier ». Collez ici :</div>
@@ -3766,7 +3815,7 @@ function applyFields(data, who){
   }
   renderProduit(); renderDegust();
   if (f.produit.nom) $("f-title").textContent = f.produit.nom;
-  toast(filled ? `${filled} rubrique${filled>1?"s":""} pré-remplie${filled>1?"s":""} ${who}, surlignée${filled>1?"s":""} en jaune : vérifiez-les.` : "Aucune information reconnue. Essayez une photo plus nette, de près, ou collez le texte du sachet.");
+  toast(filled ? `${filled} rubrique${filled>1?"s":""} pré-remplie${filled>1?"s":""} ${who}, marquée${filled>1?"s":""} ✦ : vérifiez-les.` : "Aucune information reconnue. Essayez une photo plus nette, de près, ou collez le texte du sachet.");
   return filled;
 }
 const knownRoasters = () => [...new Set(fiches.map(x => x.produit && x.produit.torrefacteur).filter(Boolean))];
