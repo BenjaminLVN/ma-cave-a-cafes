@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124001946";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124001946"></script>
+<script>window.CAVE_BUILD="20261124002021";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002021"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -883,7 +883,7 @@ const fM = ph => ({k:"marque", l:"Marque / maison", ph});
 const fN = ph => ({k:"nom", l:"Nom / cuvée", ph});
 const fD = (l, ph) => ({k:"distillerie", l:l || "Distillerie (si autre que la marque)", ph:ph || "distillerie d'origine, embouteilleur indépendant…"});
 const fP = list => ({k:"pays", l:"Pays / île", list});
-const fR = list => ({k:"region", l:"Région", list});
+const fR = list => ({k:"region", l:"Région", list, off:true}); // retirée de la fiche, les valeurs restent enregistrées
 const fAge = list => ({k:"age", l:"Âge / compte d'âge", list});
 const fMil = {k:"millesime", l:"Millésime", ph:"année de distillation, ex. 2008", mode:"numeric"};
 const fDeg = {k:"degre", l:"Degré (% vol.)", ph:"ex. 43,5", mode:"decimal"};
@@ -3267,6 +3267,7 @@ function renderProduit(){
   const ms = document.createElement("summary"); ms.textContent = "Plus de détails (facultatif)"; const cnt = document.createElement("span"); cnt.className = "cnt"; ms.append(cnt);
   const mg = document.createElement("div"); mg.className = "grid"; more.append(ms, mg); let nMore = 0;
   fieldsFor(cat).forEach(def => {
+    if (def.off) return;
     if (def.legacy && !cur.produit[def.k]) return;
     const g = ESS.includes(def.k) ? $("g-produit") : (cur.produit[def.k] && def.k !== "dateAchat" ? (nMore++, mg) : mg);
     if (def.seg){ g.append(famSegEl(def)); return; }
