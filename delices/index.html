@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124004706";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124004706"></script>
+<script>window.CAVE_BUILD="20261124011658";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124011658"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2736,22 +2736,56 @@ function findTown(q){
 }
 const dirNear = () => [];
 // Les adresses viennent d'OpenStreetMap : distilleries, cavistes et bars dont le nom évoque les spiritueux
-const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
+const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
 const BAR_WORDS = "rhum|rum|whisk|gin|cocktail|spirit|spiritueux|malt|tiki|calvados|cognac|armagnac|mezcal|tequila|distill|speakeasy|cave a|caviste|single";
+const BAR_RE = new RegExp(BAR_WORDS, "i");
+const opCache = new Map();
+function opFetch(ep, q, ms, outer){
+  const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), ms);
+  if (outer) outer.signal.addEventListener("abort", () => ctl.abort());
+  return fetch(ep, {method:"POST", body:"data=" + encodeURIComponent(q), headers:{"Content-Type":"application/x-www-form-urlencoded"}, signal:ctl.signal})
+    .then(async r => { if (!r.ok) throw new Error("overpass " + r.status); const j = await r.json(); if (j.remark && /runtime error|timed out/i.test(j.remark) && !(j.elements || []).length) throw new Error(j.remark); return j.elements || []; })
+    .finally(() => clearTimeout(tm));
+}
 async function overpass(area){
-  const q = `[out:json][timeout:25];(nwr["craft"="distillery"](${area});nwr["industrial"="distillery"](${area});nwr["shop"~"^(alcohol|wine|beverages)$"](${area});nwr["amenity"~"^(bar|pub)$"]["name"~"${BAR_WORDS}",i](${area});nwr["tourism"~"^(attraction|museum)$"]["name"~"distill|rhumerie|habitation|destiler|calvados|cognac",i](${area}););out center tags 300;`;
+  // Requête légère : tous les bars et pubs (triés ensuite dans l'appli), distilleries, cavistes, visites de distilleries
+  const q = `[out:json][timeout:20];(nwr["craft"="distillery"](${area});nwr["industrial"="distillery"](${area});nwr["shop"~"^(alcohol|wine|beverages)$"](${area});nwr["tourism"~"^(attraction|museum)$"]["name"~"distill|rhumerie|habitation|destiler|calvados|cognac",i](${area}););out tags center 250;nwr["amenity"~"^(bar|pub)$"](${area});out tags center 250;`;
+  if (opCache.has(q)) return opCache.get(q);
   let last = null;
-  for (const ep of OVERPASS){
-    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 30000);
-    try { const r = await fetch(ep, {method:"POST", body:"data=" + encodeURIComponent(q), headers:{"Content-Type":"application/x-www-form-urlencoded"}, signal:ctl.signal}); if (r.ok) return (await r.json()).elements || []; last = new Error("overpass " + r.status); }
-    catch (e) { last = e; } finally { clearTimeout(tm); }
+  // Deux serveurs à la fois, le premier qui répond gagne ; puis les deux suivants ; puis un second essai
+  const pairs = [[0,1],[2,3],[1,0]];
+  for (let k = 0; k < pairs.length; k++){
+    if (k === 2) await new Promise(r => setTimeout(r, 1500));
+    const outer = new AbortController();
+    try { const els = await Promise.any(pairs[k].map(n => opFetch(OVERPASS[n], q, 22000, outer))); outer.abort(); opCache.set(q, els); return els; }
+    catch (e) { last = (e.errors && e.errors[0]) || e; outer.abort(); }
   }
+  // Dernier recours : le moteur de recherche de la carte (Photon), par type de lieu
+  const els = await photonAround(area); if (els.length) return els;
   throw last || new Error("overpass");
 }
+async function photonAround(area){
+  let lat, lon, bbox = "";
+  const m = area.match(/^around:(\d+),([-\d.]+),([-\d.]+)$/);
+  if (m){ lat = +m[2]; lon = +m[3]; const d = +m[1] / 111000; bbox = [lon - d*1.5, lat - d, lon + d*1.5, lat + d].map(x => x.toFixed(4)).join(","); }
+  else { const [s, w, n, e] = area.split(",").map(Number); lat = (s+n)/2; lon = (w+e)/2; bbox = [w, s, e, n].join(","); }
+  const kinds = [["bar","amenity:bar"],["pub","amenity:pub"],["caviste","shop:alcohol"],["cave","shop:wine"],["distillerie","craft:distillery"]];
+  const out = [];
+  await Promise.all(kinds.map(async ([term, tag]) => {
+    try { const u = new URL("https://photon.komoot.io/api/"); u.searchParams.set("q", term); u.searchParams.set("osm_tag", tag); u.searchParams.set("limit", "50"); u.searchParams.set("lat", lat.toFixed(4)); u.searchParams.set("lon", lon.toFixed(4)); u.searchParams.set("bbox", bbox);
+      const r = await fetch(u.toString()); if (!r.ok) return;
+      ((await r.json()).features || []).forEach(f => { const p = f.properties || {}, c = (f.geometry || {}).coordinates || []; const [k, v] = tag.split(":");
+        out.push({type:(p.osm_type || "N").toLowerCase().replace(/^n$/,"node").replace(/^w$/,"way").replace(/^r$/,"relation"), id:p.osm_id, lat:c[1], lon:c[0], tags:{name:p.name, [k]:v, "addr:street":p.street, "addr:housenumber":p.housenumber, "addr:postcode":p.postcode, "addr:city":p.city || p.town || p.village}}); });
+    } catch {}
+  }));
+  return out;
+}
+const SPIRIT_DRINKS = ["rum","whisky","whiskey","gin","cocktail","calvados","cognac","armagnac","tequila","mezcal","spirits"];
+const spiritBar = t => BAR_RE.test(t.name || "") || t.bar === "cocktail" || t.cocktails === "yes" || SPIRIT_DRINKS.some(d => /^(yes|served|only)$/.test(t["drink:" + d] || ""));
 function osmGenre(t){
   if (t.craft === "distillery" || t.industrial === "distillery" || /distill|rhumerie|habitation|destiler/i.test(t.name || "")) return "distillerie";
   if (t.shop === "alcohol") return "caviste (spiritueux)"; if (t.shop === "wine") return "caviste (vins et spiritueux)"; if (t.shop === "beverages") return "boissons";
-  if (t.amenity === "pub") return "pub"; if (t.amenity === "bar") return /cocktail|tiki|speakeasy/i.test(t.name || "") ? "bar à cocktails" : "bar à spiritueux";
+  if (t.amenity === "bar" || t.amenity === "pub"){ if (spiritBar(t)) return /cocktail|tiki|speakeasy/i.test(t.name || "") || t.bar === "cocktail" || t.cocktails === "yes" ? "bar à cocktails" : "bar à spiritueux"; return t.amenity === "pub" ? "pub" : "bar"; }
   if (t.tourism === "museum") return "musée"; return "visite";
 }
 function osmItems(els, ref){
@@ -2764,7 +2798,7 @@ function osmItems(els, ref){
     if (ref) it.dist = haversine(ref, it); return it; }).filter(Boolean);
 }
 const osmAround = (home, m) => overpass(`around:${m},${(+home.lat).toFixed(5)},${(+home.lon).toFixed(5)}`).then(els => osmItems(els, home));
-const KIND_RANK = g => /distillerie/.test(g) ? 0 : /caviste/.test(g) ? 1 : /bar|pub/.test(g) ? 2 : 3;
+const KIND_RANK = g => /distillerie/.test(g) ? 0 : /caviste/.test(g) ? 1 : /bar à/.test(g) ? 2 : /^(bar|pub)$/.test(g) ? 3 : 4;
 async function nearSearch(q){
   const note = $("near-note");
   if (!q){ note.hidden = false; note.textContent = "Indiquez une ville ou une adresse."; return; }
