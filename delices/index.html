@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124002227";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002227"></script>
+<script>window.CAVE_BUILD="20261124002521";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002521"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -167,7 +167,7 @@ img,svg,video,canvas{max-width:100%}
 .ph{position:relative;width:84px;height:84px;border-radius:10px;overflow:hidden;background:var(--sunk);border:1px solid var(--line);padding:0}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .ph .x{position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:15px;line-height:26px;padding:0}
-.photo-actions{display:flex;gap:8px;flex-wrap:wrap}
+.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.photo-actions .btn{width:100%;min-height:44px;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.photo-actions [hidden]{display:none}
 .reading{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--sunk);margin-top:10px;font-size:.92rem}
 .spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 0.9s linear infinite;flex:none}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -748,10 +748,10 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
       <div class="photo-actions ed">
         <button class="btn small" id="b-addcam" type="button">Prendre une photo</button>
         <button class="btn small" id="b-addgal" type="button">Galerie</button>
-        <button class="btn small" id="b-read" type="button">Lire les photos avec Claude</button>
-        <button class="btn small" id="b-ocr" type="button">Lire l'étiquette (sur le téléphone)</button>
-        <button class="btn small" id="b-crop" type="button">Relire une zone</button>
-        <button class="btn small ghost" id="b-paste" type="button">Lien de la page web ou texte de l'étiquette</button>
+        <button class="btn small" id="b-read" type="button">Relire les photos</button>
+        <button class="btn small" id="b-ocr" type="button">Relire les photos</button>
+        <button class="btn small" id="b-crop" type="button" hidden style="display:none">Relire une zone</button>
+        <button class="btn small" id="b-paste" type="button">Lien ou texte</button>
       </div>
       <div class="paste-box" id="paste-box" hidden>
         <div class="hint">Astuce iPhone : ouvrez la photo de l'étiquette dans Photos, touchez l'icône de texte en bas à droite, puis « Tout sélectionner » et « Copier ». Collez ici :</div>
@@ -1437,7 +1437,7 @@ async function boot(){
   document.body.classList.toggle("ro", ro); $("ro-band").hidden = !ro;
   $("b-cancel").textContent = ro ? "Fermer" : "Annuler"; $("l-cancel").textContent = ro ? "Fermer" : "Annuler";
   if (sample) sampleCaps = await sample.limits().catch(() => null);
-  $("b-read").hidden = !(sampleCaps && sampleCaps.images); if (sample && sample.cloud) $("b-read").textContent = "Relire les photos (lecture automatique)";
+  $("b-read").hidden = !(sampleCaps && sampleCaps.images);
   $("b-ocr").hidden = !$("b-read").hidden;
   if (!db){ showStoreNote("<strong>Sauvegarde indisponible dans ce navigateur.</strong> Connectez-vous à claude.ai pour enregistrer vos fiches."); return; }
   if (!assets && !ro) showStoreNote("Les photos ne peuvent pas être enregistrées ici. Les fiches, elles, sont sauvegardées.");
@@ -4081,7 +4081,7 @@ async function readPhotos(){
     if (cur !== f) return;
     applyFields(data, sample.cloud ? "automatiquement" : "par Claude", "photo");
   } catch (e) {
-    const msg = {cancelled:"Lecture arrêtée.", not_granted:"Lecture refusée : autorisez l'application à utiliser Claude pour lire les étiquettes.", rate_limited:"Quota gratuit de lecture atteint pour l'instant. Lecture sur le téléphone à la place ; réessayez plus tard.", image_rejected:"Une photo a été refusée (format ou taille). Reprenez-la.", invalid_json:"La réponse de Claude était incomplète. Touchez « Lire les photos avec Claude » pour réessayer."}[e && e.code] || "La lecture a échoué. Vous pouvez remplir la fiche à la main ou réessayer.";
+    const msg = {cancelled:"Lecture arrêtée.", not_granted:"Lecture refusée : autorisez l'application à utiliser Claude pour lire les étiquettes.", rate_limited:"Quota gratuit de lecture atteint pour l'instant. Lecture sur le téléphone à la place ; réessayez plus tard.", image_rejected:"Une photo a été refusée (format ou taille). Reprenez-la.", invalid_json:"La réponse de Claude était incomplète. Touchez « Relire les photos » pour réessayer."}[e && e.code] || "La lecture a échoué. Vous pouvez remplir la fiche à la main ou réessayer.";
     toast(msg);
     if (sample && sample.cloud && !(e && e.code === "cancelled") && cur === f) setTimeout(() => ocrPhotos(), 600);
   } finally {
