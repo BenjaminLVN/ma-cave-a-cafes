@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124002521";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002521"></script>
+<script>window.CAVE_BUILD="20261124002819";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002819"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -527,6 +527,23 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 .house .hint{font-size:.86rem}
 .know table{border-collapse:collapse;width:100%;font-size:.9rem}.know td,.know th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
 @media (max-width:440px){.tabs a{padding:0 9px!important;font-size:.84rem}}
+
+/* Fiche compacte (2 colonnes) et marquage discret des cases remplies automatiquement */
+:root,:root[data-theme]{--ai:#f4effc!important;--ai-line:#8a63d2!important}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ai:#2a2140!important;--ai-line:#a98bf0!important}}
+:root[data-theme="dark"]{--ai:#2a2140!important;--ai-line:#a98bf0!important}
+#g-produit,#g-degust,.more>.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px 10px!important}
+#g-produit>*,#g-degust>*,.more>.grid>*{grid-column:1/-1}
+#g-produit>.half,.more>.grid>.half{grid-column:auto}
+.field{gap:3px}
+.field label{font-size:.78rem;letter-spacing:.01em}
+.field input,.field select{min-height:42px!important;padding:8px 12px!important;border-radius:12px!important;background:var(--surface)!important}
+.field textarea{border-radius:12px!important;background:var(--surface)!important}
+.field.ai input,.field.ai textarea,.field.ai select{background:var(--ai)!important;border-color:color-mix(in srgb,var(--ai-line) 45%,var(--line))!important;box-shadow:inset 3px 0 0 var(--ai-line)}
+.field.ai label::after{content:" ✦";font-weight:700;color:var(--ai-line)}
+.field .btn.small{min-height:32px;font-size:.82rem;padding:0 12px;margin-top:4px;justify-self:start}
+.field.ante{margin-top:-2px}
+.field.ante label.check{font-size:.82rem;font-weight:500}
 </style>
 
 <div class="wrap">
@@ -884,8 +901,8 @@ const fN = ph => ({k:"nom", l:"Nom / cuvée", ph});
 const fD = (l, ph) => ({k:"distillerie", l:l || "Distillerie (si autre que la marque)", ph:ph || "distillerie d'origine, embouteilleur indépendant…"});
 const fP = list => ({k:"pays", l:"Pays / île", list});
 const fR = list => ({k:"region", l:"Région", list, off:true}); // retirée de la fiche, les valeurs restent enregistrées
-const fAge = list => ({k:"age", l:"Âge / compte d'âge", list});
-const fMil = {k:"millesime", l:"Millésime", ph:"année de distillation, ex. 2008", mode:"numeric"};
+const fAge = list => ({k:"age", l:"Âge", list, ph:"ex. 12 ans, XO"});
+const fMil = {k:"millesime", l:"Millésime", ph:"ex. 2008", mode:"numeric"};
 const fDeg = {k:"degre", l:"Degré (% vol.)", ph:"ex. 43,5", mode:"decimal"};
 const fCl = {k:"contenance", l:"Contenance (cl)", ph:"ex. 70", mode:"numeric"};
 const fFut = ph => ({k:"fut", l:"Fût / élevage", list:FUTS, ph:ph || "type de fût, finition"});
@@ -3115,7 +3132,7 @@ let removed = [];         // ids d'assets retirés
 let readCtl = null;
 
 function fieldEl(def, value, onInput, opts={}){
-  const w = document.createElement("div"); w.className = "field" + (def.full || def.ta ? " full" : "");
+  const w = document.createElement("div"); w.className = "field" + (def.full || def.ta ? " full" : ""); w.dataset.k = def.k;
   const id = "f_" + (opts.prefix||"") + def.k;
   const lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = def.l;
   let inp;
@@ -3246,7 +3263,7 @@ function setFicheCat(k, why){
   $("f-cat-note").textContent = why || "";
 }
 function catSegEl(){
-  const w = document.createElement("div"); w.className = "field full" + (cur.ai.categorie ? " ai" : "");
+  const w = document.createElement("div"); w.className = "field full" + (cur.ai.categorie ? " ai" : ""); w.dataset.k = "categorie";
   const lab = document.createElement("label"); lab.id = "cat_l"; lab.textContent = "Spiritueux";
   const seg = document.createElement("div"); seg.className = "catseg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-labelledby", "cat_l");
   CATS.forEach(c => { const b = document.createElement("button"); b.type = "button"; b.className = "env-b"; b.style.setProperty("--eg", c.g);
@@ -3273,6 +3290,7 @@ function renderProduit(){
     if (def.seg){ g.append(famSegEl(def)); return; }
     let d2 = def;
     if (def.k === "boutique" || def.k === "distillerie") d2 = Object.assign({}, def, {list: lieuNames()});
+    if (def.k === "distillerie") d2 = Object.assign({}, d2, {l: cat === "calvados" ? "Producteur" : "Distillerie"});
     if (def.k === "marque") d2 = Object.assign({}, def, {list: brands()});
     const el = fieldEl(d2, cur.produit[def.k], v => { cur.produit[def.k] = v; delete cur.ai[def.k]; if (def.k === "marque" || def.k === "nom") $("f-title").textContent = ficheTitle(cur) === "Bouteille sans nom" ? "Nouvelle bouteille" : ficheTitle(cur); });
     if (cur.ai[def.k]) el.classList.add("ai");
@@ -3282,6 +3300,7 @@ function renderProduit(){
     if (def.k === "dateAchat") g.append(anteControl(cur.produit, "anterieur", "anneeAchat", "f_dateAchat", "dateAchat", "Déjà dans ma cave avant novembre 2026 (date d'achat inconnue)"));
   });
   cnt.textContent = nMore ? nMore + " remplie" + (nMore > 1 ? "s" : "") : "";
+  layoutGrid($("g-produit")); layoutGrid(mg);
   $("g-produit").append(more);
 }
 /* Rubriques toujours visibles, par spiritueux ; tout le reste est dans « Plus de détails » */
@@ -3291,8 +3310,18 @@ const ESSENTIELS = {
   autres:["type","marque","nom","pays","degre","distillerie","age","millesime","dateAchat","boutique","prix"]
 };
 const moreOpen = {produit:false, degust:false};
+/* Mise en page compacte : les rubriques courtes vont par deux, dans un ordre logique */
+const G_ORD = ["categorie","famille","type","style","appellation","marque","nom","distillerie","pays","degre","age","millesime","prix","dateAchat","ante","boutique"];
+const G_SHORT = new Set(["pays","degre","age","millesime","prix","dateAchat","contenance","matiere","distillation","tourbe","fruits","base"]);
+function layoutGrid(g){
+  const kids = [...g.children]; const pos = el => { const i = G_ORD.indexOf(el.dataset.k || ""); return i < 0 ? (el.classList.contains("ante") ? G_ORD.indexOf("ante") : 50) : i; };
+  kids.map((el, i) => [el, pos(el), i]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).forEach(([el]) => { el.classList.remove("half"); g.append(el); });
+  let run = []; const flush = () => { if (run.length % 2) run.pop(); run.forEach(el => el.classList.add("half")); run = []; };
+  [...g.children].forEach(el => { if (G_SHORT.has(el.dataset.k) && !el.classList.contains("ta")) run.push(el); else if (!el.classList.contains("ante")) flush(); });
+  flush();
+}
 function famSegEl(def){
-  const w = document.createElement("div"); w.className = "field full" + (cur.ai[def.k] ? " ai" : "");
+  const w = document.createElement("div"); w.className = "field full" + (cur.ai[def.k] ? " ai" : ""); w.dataset.k = def.k;
   const lab = document.createElement("label"); lab.id = "fam_l"; lab.textContent = def.l;
   const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-labelledby", "fam_l");
   def.seg.forEach(opt => { const b = document.createElement("button"); b.type = "button"; b.textContent = opt; b.disabled = ro; b.setAttribute("aria-pressed", cur.produit[def.k] === opt ? "true" : "false");
@@ -3692,8 +3721,8 @@ function applyFields(data, who, src){
   }
   renderProduit(); renderMethods(); renderDegust();
   if (ficheTitle(f) !== "Bouteille sans nom") $("f-title").textContent = ficheTitle(f);
-  if (f.ai.categorie) $("f-cat-note").textContent = `Reconnu : ${catName(f.categorie)}${f.produit.type && f.categorie === "autres" ? " (" + f.produit.type + ")" : ""}. La fiche sera rangée dans cet environnement ; touchez un autre spiritueux pour corriger.`;
-  toast(filled ? `${filled} rubrique${filled>1?"s":""} pré-remplie${filled>1?"s":""} ${who}, surlignée${filled>1?"s":""} en jaune : vérifiez-les.` : "Aucune information reconnue. Essayez une photo plus nette, de près, ou collez le texte de l'étiquette.");
+  if (f.ai.categorie) $("f-cat-note").textContent = `Reconnu : ${catName(f.categorie)}${f.produit.type && f.categorie === "autres" ? " (" + f.produit.type + ")" : ""} (touchez un autre spiritueux pour corriger).`;
+  toast(filled ? `${filled} rubrique${filled>1?"s":""} pré-remplie${filled>1?"s":""} ${who}, marquée${filled>1?"s":""} ✦ : vérifiez-les.` : "Aucune information reconnue. Essayez une photo plus nette, de près, ou collez le texte de l'étiquette.");
   return filled;
 }
 const knownBrands = () => [...new Map(fiches.filter(x => x.produit && x.produit.marque).map(x => [fold(x.produit.marque), [x.produit.marque, catOf(x)]])).values()];
