@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124002021";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002021"></script>
+<script>window.CAVE_BUILD="20261124002227";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124002227"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3286,9 +3286,9 @@ function renderProduit(){
 }
 /* Rubriques toujours visibles, par spiritueux ; tout le reste est dans « Plus de détails » */
 const ESSENTIELS = {
-  rhum:["famille","marque","nom","pays","degre","dateAchat"], whisky:["marque","nom","type","pays","degre","dateAchat"],
-  calvados:["marque","nom","appellation","degre","dateAchat"], gin:["marque","nom","style","pays","degre","dateAchat"],
-  autres:["type","marque","nom","pays","degre","dateAchat"]
+  rhum:["famille","marque","nom","pays","degre","distillerie","age","millesime","dateAchat","boutique","prix"], whisky:["marque","nom","type","pays","degre","distillerie","age","millesime","dateAchat","boutique","prix"],
+  calvados:["marque","nom","appellation","degre","distillerie","age","millesime","dateAchat","boutique","prix"], gin:["marque","nom","style","pays","degre","distillerie","age","millesime","dateAchat","boutique","prix"],
+  autres:["type","marque","nom","pays","degre","distillerie","age","millesime","dateAchat","boutique","prix"]
 };
 const moreOpen = {produit:false, degust:false};
 function famSegEl(def){
