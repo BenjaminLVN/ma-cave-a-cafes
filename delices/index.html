@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#fde6ee">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="favicon.png">
 <style>[hidden]{display:none!important}html{-webkit-tap-highlight-color:transparent}</style>
-<script>window.CAVE_BUILD="20261124003747";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124003747"></script>
+<script>window.CAVE_BUILD="20261124004706";window.DELICES_TESS="../tess/";</script><script src="config.js?v=20261124004706"></script>
 </head><body><title>Ma cave à Délices</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -530,8 +530,6 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 
 /* Fiche compacte (2 colonnes) et marquage discret des cases remplies automatiquement */
 :root,:root[data-theme]{--ai:#f4effc!important;--ai-line:#8a63d2!important}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ai:#2a2140!important;--ai-line:#a98bf0!important}}
-:root[data-theme="dark"]{--ai:#2a2140!important;--ai-line:#a98bf0!important}
 #g-produit,#g-degust,.more>.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px 10px!important}
 #g-produit>*,#g-degust>*,.more>.grid>*{grid-column:1/-1}
 #g-produit>.half,.more>.grid>.half{grid-column:auto}
@@ -625,6 +623,9 @@ button,.btn,.tabs a,.seg button{background-origin:border-box!important}
 #v-form input[type=checkbox]{min-height:0!important;padding:0!important;border:none!important}
 #v-form input[type=checkbox]:not(:checked){background:color-mix(in srgb,var(--ink) 22%,var(--surface))!important}
 #v-form input[type=checkbox]:checked{background:var(--accent)!important}
+
+#v-form .field input,#v-form .field textarea,#v-form .field select{color:var(--ink)!important;-webkit-text-fill-color:var(--ink)}
+#v-form .field input::placeholder,#v-form .field textarea::placeholder{-webkit-text-fill-color:color-mix(in srgb,var(--muted) 70%,transparent)}
 </style>
 
 <div class="wrap">
